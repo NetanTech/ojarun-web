@@ -7,7 +7,7 @@ export default function SubFooter({ className = "" }: { className?: string }) {
       <div className="mx-auto w-full max-w-330">
         {/* Card — Figma: 1320×529, padding 60/90, rounded-3xl, bg yellow-100 */}
         <div className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-3xl bg-[#FFF2B8] px-8 py-15 sm:flex-row sm:px-22.5">
-          {/* Decorative bg — sits only behind/around the groceries on the right side */}
+          {/* Decorative bgd — sits only behind/around the groceries on the right side */}
           <Image
             src="/assets/subfooterbg.png"
             alt=""
