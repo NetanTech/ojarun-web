@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Phone, Basket, Car } from "../../../../public/svg/svg";
 
 
@@ -36,11 +37,22 @@ const steps: Step[] = [
 
 export default function HowItWorks() {
   return (
-    <section className="w-full px-4 sm:px-8 py-16">
-      <div className="mx-auto max-w-[1100px] rounded-3xl bg-primary p-8 sm:p-12 border-2 border-dashed border-white/20">
+    <section className="relative w-full px-6 py-12 sm:px-15">
+      {/* Groceries bag — sits at the bottom-right, overflowing the card. Drop image at /assets/groceries-bag.png */}
+      <Image
+        src="/assets/groceries-bag.png"
+        alt=""
+        aria-hidden
+        width={280}
+        height={320}
+        className="pointer-events-none absolute -right-2 -bottom-32 z-10 hidden h-auto w-40 sm:-right-4 sm:-bottom-40 sm:block sm:w-52 lg:w-64"
+      />
+
+      {/* Card — Figma: 1320×509, padding 60/40, rounded-3xl, bg primary, gap 10 between children */}
+      <div className="relative mx-auto flex w-full max-w-330 flex-col gap-2.5 rounded-3xl bg-primary px-6 py-15 sm:px-10">
 
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="mb-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
             How It Works
           </h2>
@@ -50,12 +62,9 @@ export default function HowItWorks() {
         </div>
 
         {/* Steps */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:divide-x sm:divide-white/15">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {steps.map((step, i) => (
-            <div
-              key={i}
-              className="flex flex-col gap-4 sm:px-8 first:pl-0 last:pr-0"
-            >
+            <div key={i} className="flex flex-col gap-4">
               {/* Icon */}
               <div>{step.icon}</div>
 
@@ -67,7 +76,10 @@ export default function HowItWorks() {
               {/* Description paragraphs */}
               <div className="flex flex-col gap-2">
                 {step.description.map((para, j) => (
-                  <p key={j} className="text-sm sm:text-base leading-relaxed text-white/60">
+                  <p
+                    key={j}
+                    className="text-sm leading-relaxed tracking-[-0.02em] text-white/60 sm:text-base"
+                  >
                     {para}
                   </p>
                 ))}
@@ -75,7 +87,6 @@ export default function HowItWorks() {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

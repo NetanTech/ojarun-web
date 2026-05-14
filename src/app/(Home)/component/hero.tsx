@@ -3,80 +3,74 @@ import { WhatsAppIcon } from "../../../../public/svg/svg";
 
 export default function Hero() {
   return (
-    <section className="relative w-full pb-0 h-[110vh]  flex flex-col items-center justify-top pt-[12rem] overflow-hidden">
+    <section className="relative w-full overflow-hidden pt-32 pb-44 sm:pt-48 sm:pb-52">
 
       {/* Text block */}
-      <div className="relative z-10 mx-auto flex max-w-[500px] flex-col items-center px-6 text-center ">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight text-white">
+      <div className="relative z-10 mx-auto flex max-w-[550px] flex-col items-center px-6 text-center ">
+        {/* H1 — Figma: 550×128, DM Sans 600, 56/64, center */}
+        <h1 className="font-semibold text-white text-[32px] leading-10 sm:text-[56px] sm:leading-16 sm:whitespace-nowrap">
           Bringing the Market to
           <br />
           Your Doorstep
         </h1>
-        <p className="mt-4 max-w-[400px] text-sm sm:text-base leading-relaxed text-white/60">
+        {/* Subtitle — Figma: 506×48, DM Sans 400, 16/24, -2%, center */}
+        <p className="mt-4 max-w-126.5 text-base leading-6 tracking-[-0.02em] text-white/60">
           Fresh food from local markets, sourced by trained agents and delivered
           to you without the stress, time, or guesswork.
         </p>
-          
-          <a
-            href="https://wa.me/YOURNUMBER"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 mt-4 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"
-          >
-            <WhatsAppIcon className="h-5 w-5 shrink-0" />
-            Get started
-          </a>
-        
+
+        <a
+          href="https://wa.me/YOURNUMBER"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 mt-4 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"
+        >
+          <WhatsAppIcon className="h-5 w-5 shrink-0" />
+          Get started
+        </a>
       </div>
 
-      {/* Image strip */}
-      <div className="relative z-10 mx-auto mt-8 flex w-full max-w-5xl items-end justify-end gap-2 px-6">
-        
-        <div className="relative h-full w-full overflow-hidden rounded-2xl min-h-64 sm:h-96 ">
-          <Image
-            src="/assets/hero1.png"
-            alt="Agent handing over a grocery box"
-            fill
-            priority
-            className="object-cover object-center bg-primary p-2 rounded-2xl"
-          />
+      {/* Image strip — two side-by-side images with badge centered.
+          Figma — combined: 895.69×334 | each image: 442.06×334 | badge: 157.9×154.78 */}
+      <div className="relative z-10 mx-auto mt-10 sm:mt-12 flex w-full max-w-4xl items-stretch justify-center gap-3 px-6">
+        <div className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2">
+          <div className="relative h-full w-full overflow-hidden rounded-xl sm:rounded-2xl">
+            <Image
+              src="/assets/hero1.png"
+              alt="Agent handing over a grocery box"
+              fill
+              priority
+              sizes="(max-width: 640px) 50vw, 442px"
+              className="object-cover object-center"
+            />
+          </div>
         </div>
 
-        {/* Trust badge */}
-        <div className="absolute bottom-25 left-1/2 z-20 -translate-x-1/2">
+        {/* Trust badge — centered between the two images. Figma: 157.9×154.78 */}
+        <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
           <Image
             src="/assets/hero3.png"
-            alt="Agent handing over a grocery box"
-            width={80}
-            height={80}
-            className="w-auto h-auto object-contain "
+            alt="Safe and secure badge"
+            width={158}
+            height={155}
+            className="h-20 w-20 object-contain sm:h-38.75 sm:w-39.5"
           />
         </div>
 
-        <div className="relative h-full w-full overflow-hidden rounded-2xl min-h-64 sm:h-96">
-          <Image
-            src="/assets/hero2.png"
-            alt="Delivery rider with fresh produce"
-            fill
-            priority
-            className="object-cover object-top bg-primary p-2 rounded-2xl"
-          />
+        <div className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2">
+          <div className="relative h-full w-full overflow-hidden rounded-xl sm:rounded-2xl">
+            <Image
+              src="/assets/hero2.png"
+              alt="Delivery rider with fresh produce"
+              fill
+              priority
+              sizes="(max-width: 640px) 50vw, 442px"
+              className="object-cover object-top"
+            />
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function TrustBadge() {
-  return (
-    <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full border-[3px] border-white/80 bg-[#1a5c30] text-center shadow-xl">
-      <svg xmlns="http://www.w3.org/2000/svg" className="mb-0.5 h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M2 20h2a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1H2v9zm19.83-7.12A2 2 0 0 0 20 10h-5l.95-4.57.03-.32a1.5 1.5 0 0 0-.44-1.06L14 3l-6.59 6.59A2 2 0 0 0 7 11v7a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3-7.28c.09-.23.16-.47.16-.72v-1.78l-.01-.01A2 2 0 0 0 21.83 12.88z" />
-      </svg>
-      <span className="text-[7.5px] font-bold uppercase leading-tight tracking-wide text-white">
-        Trusted<br />Service<br />Always
-      </span>
-    </div>
   );
 }
 

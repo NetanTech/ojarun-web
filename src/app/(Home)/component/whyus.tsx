@@ -28,9 +28,9 @@ const reasons = [
 
 export default function WhyUs() {
   return (
-    <section className="w-[90%] m-auto max-w-[1200px] rounded-4xl bg-accent py-14 px-4 sm:px-16 mt-[-120px] relative z-20">
-      
-
+    <section className="relative z-20 -mt-28 w-full px-6 sm:-mt-36 sm:px-15">
+      {/* Card — Figma: 1320×646, padding 60/40, rounded-3xl, bg yellow-100, gap 10 between children */}
+      <div className="mx-auto flex w-full max-w-330 flex-col gap-2.5 rounded-3xl bg-accent px-6 py-15 sm:px-10">
         {/* Heading */}
         <div className="mb-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
@@ -42,7 +42,7 @@ export default function WhyUs() {
         </div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 ">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {reasons.map((reason) => (
             <div
               key={reason.title}
@@ -71,7 +71,7 @@ export default function WhyUs() {
             </div>
           ))}
         </div>
-
+      </div>
     </section>
   );
 }

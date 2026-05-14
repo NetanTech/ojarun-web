@@ -45,25 +45,14 @@ export default function FAQ() {
   return (
     <section className="relative w-full overflow-hidden bg-white py-20 px-4">
 
-      {/* Decorative grocery bag — top right */}
-      <div className="pointer-events-none absolute -top-4 right-0 w-40 sm:w-52 opacity-90 rotate-6">
+      {/* Decorative grocery bag — Figma: 193×249, angle 23.81°. Sits beside FAQ accordion on the left, lower portion */}
+      <div className="pointer-events-none absolute bottom-0 left-4 hidden sm:left-8 lg:left-18 lg:block">
         <Image
-          src="/assets/grocery-bag.png"
+          src="/assets/groceries-bag-left.png"
           alt=""
-          width={210}
-          height={210}
-          className="object-contain"
-        />
-      </div>
-
-      {/* Decorative grocery bag — bottom left */}
-      <div className="pointer-events-none absolute bottom-16 -left-6 w-36 sm:w-44 opacity-90 -rotate-6">
-        <Image
-          src="/assets/grocery-bag.png"
-          alt=""
-          width={180}
-          height={180}
-          className="object-contain"
+          width={280}
+          height={361}
+          className="h-auto w-72 object-contain"
         />
       </div>
 
@@ -89,7 +78,7 @@ export default function FAQ() {
                   {faq.question}
                 </span>
                 <span
-                  className={`ml-4 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 text-gray-500 transition-transform duration-300 ${
+                  className={`ml-4 shrink-0 flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 text-gray-500 transition-transform duration-300 ${
                     isOpen ? "rotate-180" : ""
                   }`}
                 >
@@ -103,7 +92,8 @@ export default function FAQ() {
                   isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                 }`}
               >
-                <p className="px-6 pb-5 text-sm sm:text-base leading-relaxed text-gray-400">
+                {/* Answer — Figma: 751×24, DM Sans 400, 16/24, -2%, #242424 */}
+                <p className="px-6 pb-5 text-base leading-6 tracking-[-0.02em] text-[#242424]">
                   {faq.answer}
                 </p>
               </div>
