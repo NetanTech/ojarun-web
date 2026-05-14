@@ -1,50 +1,52 @@
-"use client";
-
+import Link from "next/link";
 import Image from "next/image";
-import { WhatsAppIcon } from "../../public/svg/svg";
 
-type SubFooterProps = {
-  className?: string;
-};
-
-export default function SubFooter({ className = "" }: SubFooterProps) {
+export default function SubFooter({ className = "" }: { className?: string }) {
   return (
-    <section
-      className={`w-full px-4 sm:px-8 py-10 pb-0 mb-[-50px] relative z-10 ${className}`}
-    >
-      <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-3xl bg-accent">
+    <section className={`w-full px-6 py-15 ${className}`}>
+      <div className="mx-auto w-full max-w-330">
+        {/* Card — Figma: 1320×529, padding 60/90, rounded-3xl, bg yellow-100 */}
+        <div className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-3xl bg-[#FFF2B8] px-8 py-15 sm:flex-row sm:px-22.5">
+          {/* Decorative bg — sits only behind/around the groceries on the right side */}
+          <Image
+            src="/assets/subfooterbg.png"
+            alt=""
+            aria-hidden
+            width={700}
+            height={500}
+            className="pointer-events-none absolute bottom-0 right-0 z-0 h-full w-[80%] object-contain object-bottom-right"
+          />
 
-        <div className="relative flex flex-col items-center gap-8 px-10 py-14 md:grid md:grid-cols-[55fr_45fr] md:items-center md:gap-8">
-          {/* ── Left: Text ── */}
-          <div className="w-full">
-            <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-gray-900 max-w-[500px]">
-              Skip the Market And Get the{" "}
-              <span className="text-gray-900">Fresh Items With Ease</span>
-            </h1>
-            <p className="mt-4 text-sm sm:text-base leading-relaxed text-gray-500">
+          {/* Text + CTA — Figma: 506×232, gap 24 */}
+          <div className="relative z-10 flex w-full max-w-126.5 shrink-0 flex-col gap-5 text-center sm:gap-6 sm:text-left">
+            {/* Heading — Figma: 506×88, DM Sans 600, 36/44, -2% */}
+            <h2 className="text-2xl font-semibold leading-8 tracking-[-0.02em] text-black sm:text-[36px] sm:leading-11">
+              Skip the Market And Get the Fresh Items With Ease
+            </h2>
+
+            {/* Subtitle — DM Sans 400, 16/24, -2% */}
+            <p className="text-sm leading-5 tracking-[-0.02em] text-black/70 sm:text-base sm:leading-6">
               Let us handle the sourcing for your kitchen, home or business,
               while you focus on your day.
             </p>
-            <a
-              href="https://wa.me/YOURNUMBER"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2.5 rounded-xl bg-[#1a3c2e] px-5 py-3.5 text-sm font-medium text-white transition hover:opacity-90"
+
+            {/* Get started button — Figma: 132×48, padding 12/24, radius 8 */}
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center self-center rounded-lg bg-primary px-6 py-3 text-base font-medium leading-6 tracking-[-0.02em] text-white sm:self-start"
             >
-              <WhatsAppIcon className="h-4 w-4" />
-              Get started on whatsApp
-            </a>
+              Get started
+            </Link>
           </div>
 
-          {/* ── Right: Illustration ── */}
-          <div className="flex w-full justify-center items-end relative min-h-[260px] bg-[url('/assets/subfooterbg.png')] bg-cover bg-no-repeat bg-bottom">
+          {/* Groceries illustration — /assets/Groceries.png */}
+          <div className="relative z-10 h-60 w-full max-w-100 sm:h-85">
             <Image
               src="/assets/Groceries.png"
-              alt="Grocery bag with fresh market items"
-              width={280}
-              height={200}
-              className="max-w-full h-auto object-contain drop-shadow-xl"
-              priority
+              alt="Bag of fresh groceries"
+              fill
+              sizes="(max-width: 640px) 90vw, 400px"
+              className="object-contain object-center"
             />
           </div>
         </div>

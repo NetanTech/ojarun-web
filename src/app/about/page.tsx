@@ -1,8 +1,8 @@
 import Header from "@/components/Header";
+import SubFooter from "@/components/SubFooter";
 import AboutHero from "./component/hero";
 import MissionVision from "./component/missionVision";
 import Team from "./component/team";
-import CtaBanner from "./component/ctaBanner";
 
 export default function AboutPage() {
   return (
@@ -11,7 +11,7 @@ export default function AboutPage() {
       <AboutHero />
       <MissionVision />
       <Team />
-      <CtaBanner />
+      <SubFooter />
     </main>
   );
 }
