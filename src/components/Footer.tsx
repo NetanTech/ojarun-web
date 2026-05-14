@@ -71,7 +71,7 @@ const socials = [
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#0d4a2a] px-6 pb-24 sm:px-10 pt-30 ">
+    <footer className="w-full bg-primary px-6 pb-24 sm:px-10 pt-30 ">
       <div className="mx-auto max-w-[1100px]">
         <div className="flex flex-col gap-12 md:flex-row md:gap-8">
           {/* ── Left: Logo + Socials + Copyright ── */}
