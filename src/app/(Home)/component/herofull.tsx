@@ -1,9 +1,14 @@
 import Hero from "./hero";
-import { HeroTop, HeroBottom, HeroLeft, HeroRight } from "../../../../public/svg/svg";
+import { HeroBackdrop, HeroTop, HeroBottom, HeroLeft, HeroRight } from "../../../../public/svg/svg";
 
 export default function HeroFull() {
   return (
-  <div className="relative overflow-hidden bg-[url('/assets/herobg.png')] bg-cover bg-bottom">
+  <div className="relative overflow-hidden">
+      {/* Solid green background with a single smooth bottom curve */}
+      <HeroBackdrop
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+      />
       {/* Decorative arc SVGs — non-interactive, z-0 (behind the z-10 content) */}
       <HeroTop
         aria-hidden

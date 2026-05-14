@@ -1,17 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { WhatsAppIcon } from "../../../../public/svg/svg";
+import { WhatsAppIcon } from "../../public/svg/svg";
 
-export default function SubFooter() {
+type SubFooterProps = {
+  className?: string;
+};
+
+export default function SubFooter({ className = "" }: SubFooterProps) {
   return (
-    <section className="w-full px-4 sm:px-8 py-10 pb-0 mb-[-50px] relative z-10 ">
+    <section
+      className={`w-full px-4 sm:px-8 py-10 pb-0 mb-[-50px] relative z-10 ${className}`}
+    >
       <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-3xl bg-accent">
 
         <div className="relative flex flex-col items-center gap-8 px-10 py-14 md:grid md:grid-cols-[55fr_45fr] md:items-center md:gap-8">
           {/* ── Left: Text ── */}
           <div className="w-full">
-            <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-gray-900">
+            <h1 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-gray-900 max-w-[500px]">
               Skip the Market And Get the{" "}
               <span className="text-gray-900">Fresh Items With Ease</span>
             </h1>
