@@ -2,7 +2,7 @@ export default function MissionVision() {
   return (
     <section className="w-full">
       {/* Figma: 1240×272, top 1007, left 100 (so 100px gutter each side), pt 60, pb 40, gap 24 between cards */}
-      <div className="mx-auto flex w-full max-w-310 flex-col gap-6 px-6 pt-25 pb-10 sm:flex-row sm:px-0">
+      <div className="mx-auto flex w-full max-w-310 flex-col gap-6 px-6 pt-15 pb-10 sm:flex-row sm:px-0 sm:pt-25">
         {/* Our Mission — dark green card */}
         <div className="flex flex-1 flex-col gap-2.5 rounded-3xl bg-primary p-6">
           <h2 className="text-xl font-semibold text-white">Our Mission</h2>

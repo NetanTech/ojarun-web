@@ -42,19 +42,25 @@ function TeamCard({
   image: string;
 }) {
   return (
-    // Card — Figma: 397×422 (with green tab extending below)
-    <div className="relative h-[422px] w-[397px] max-w-full">
+    // Card — Figma: 397×422 (with green tab extending below). max-w-full so it shrinks below 397
+    <div className="relative h-[422px] w-full max-w-[397px]">
       {/* Green back layer — Figma: 397×336, top 98, radius 24. Only the bottom tab shows */}
       <div className="absolute inset-x-0 top-[98px] h-[336px] rounded-3xl bg-primary" />
 
       {/* Yellow card body — Figma: 397×402, top 12. Sits on top of green, hiding everything except the bottom tab */}
       <div className="absolute inset-x-0 top-3 h-[402px] rounded-2xl bg-[#FFF2B8]" />
 
-      {/* Photo + text frame — Figma: 377×380, top 23, left 10, radius 8, 3px green border */}
-      <div className="absolute left-2.5 top-[23px] flex h-[380px] w-[377px] flex-col overflow-hidden rounded-lg border-[3px] border-primary bg-white">
+      {/* Photo + text frame — Figma: 377×380, top 23, 10px gutter each side, radius 8, 3px green border */}
+      <div className="absolute left-2.5 right-2.5 top-[23px] flex h-[380px] flex-col overflow-hidden rounded-lg border-[3px] border-primary bg-white">
         {/* Photo */}
         <div className="relative flex-1">
-          <Image src={image} alt={name} fill className="object-cover" />
+          <Image
+            src={image}
+            alt={name}
+            fill
+            sizes="(max-width: 640px) 90vw, 377px"
+            className="object-cover"
+          />
         </div>
 
         {/* Divider + Name + title */}
