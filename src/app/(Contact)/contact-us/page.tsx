@@ -7,7 +7,7 @@ export default function ContactPage() {
     <main>
       <Header />
       <ContactForm />
-      <SubFooter className="mt-[-110px]" />
+      <SubFooter className="-mt-42.5" />
     </main>
   );
 }

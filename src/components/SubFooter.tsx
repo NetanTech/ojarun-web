@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import { WhatsAppIcon } from "../../public/svg/svg";
 
 export default function SubFooter({ className = "" }: { className?: string }) {
   return (
-    <section className={`w-full px-6 py-15 ${className}`}>
+    <section className={`relative z-20 -mb-27.5 w-full px-6 py-15 ${className}`}>
       <div className="mx-auto w-full max-w-330">
         {/* Card — Figma: 1320×529, padding 60/90, rounded-3xl, bg yellow-100 */}
         <div className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-3xl bg-[#FFF2B8] px-8 py-15 sm:flex-row sm:px-22.5">
@@ -30,12 +31,15 @@ export default function SubFooter({ className = "" }: { className?: string }) {
               while you focus on your day.
             </p>
 
-            {/* Get started button — Figma: 132×48, padding 12/24, radius 8 */}
+            {/* Get started button — Figma: padding 12/24, radius 8 */}
             <Link
-              href="/"
-              className="inline-flex items-center justify-center self-center rounded-lg bg-primary px-6 py-3 text-base font-medium leading-6 tracking-[-0.02em] text-white sm:self-start"
+              href="https://wa.me/YOURNUMBER"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 self-center rounded-lg bg-primary px-6 py-3 text-base font-medium leading-6 tracking-[-0.02em] text-white sm:self-start"
             >
-              Get started
+              <WhatsAppIcon className="h-5 w-5 shrink-0" />
+              Get started on WhatsApp
             </Link>
           </div>
 

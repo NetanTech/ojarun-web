@@ -20,11 +20,11 @@ export default function HeroFull() {
       />
       <HeroLeft
         aria-hidden
-        className="pointer-events-none absolute left-[7%] top-[25%] z-0 -translate-y-1/2"
+        className="pointer-events-none hidden sm:block absolute -left-2 -top-42 z-0 w-145 h-140 rotate-180"
       />
       <HeroRight
         aria-hidden
-        className="pointer-events-none absolute right-[7%] top-[25%] z-0 -translate-y-1/2"
+        className="pointer-events-none hidden sm:block absolute -right-6 -top-20 z-0 w-145 h-140"
       />
 
       <div className="relative z-10">
