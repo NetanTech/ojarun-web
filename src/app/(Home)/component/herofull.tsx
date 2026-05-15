@@ -16,7 +16,7 @@ export default function HeroFull() {
       />
       <HeroBottom
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-40 z-0 h-auto w-full"
+        className="pointer-events-none absolute inset-x-0 bottom-35 z-0 h-auto w-full"
       />
       <HeroLeft
         aria-hidden

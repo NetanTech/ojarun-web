@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Logo } from "../../public/svg/svg";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 const footerLinks = {
   Company: [
@@ -73,9 +77,15 @@ export default function Footer() {
   return (
     <footer className="w-full bg-primary px-6 pb-24 sm:px-10 pt-30 ">
       <div className="mx-auto max-w-[1100px]">
-        <div className="flex flex-col gap-12 md:flex-row md:gap-8">
+        <motion.div
+          variants={stagger(0.1, 0.05)}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="flex flex-col gap-12 md:flex-row md:gap-8"
+        >
           {/* ── Left: Logo + Socials + Copyright ── */}
-          <div className="flex flex-col gap-6 md:w-64">
+          <motion.div variants={fadeUp} className="flex flex-col gap-6 md:w-64">
             <Link href="/" aria-label="Ojarun home" className="inline-block transition-opacity hover:opacity-80">
               <Logo className="h-12 w-auto sm:h-16" />
             </Link>
@@ -94,12 +104,15 @@ export default function Footer() {
             <p className="text-sm sm:text-base text-white/50">
               ©2026 Ojarun. All Rights Reserved
             </p>
-          </div>
+          </motion.div>
 
           {/* ── Right: Link Columns ── */}
-          <div className="flex flex-1 flex-wrap gap-10 md:justify-end">
+          <motion.div
+            variants={stagger(0.08, 0)}
+            className="flex flex-1 flex-wrap gap-10 md:justify-end"
+          >
             {Object.entries(footerLinks).map(([group, links]) => (
-              <div key={group} className="min-w-[120px]">
+              <motion.div key={group} variants={fadeUp} className="min-w-[120px]">
                 <h3 className="mb-4 text-sm font-semibold text-white">
                   {group}
                 </h3>
@@ -115,10 +128,10 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </footer>
   );

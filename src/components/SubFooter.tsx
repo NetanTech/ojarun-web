@@ -1,13 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { WhatsAppIcon } from "../../public/svg/svg";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 export default function SubFooter({ className = "" }: { className?: string }) {
   return (
     <section className={`relative z-20 -mb-27.5 w-full px-6 py-15 ${className}`}>
       <div className="mx-auto w-full max-w-330">
         {/* Card — Figma: 1320×529, padding 60/90, rounded-3xl, bg yellow-100 */}
-        <div className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-3xl bg-[#FFF2B8] px-8 py-15 sm:flex-row sm:px-22.5">
+        <motion.div
+          variants={stagger(0.12, 0.05)}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="relative flex flex-col items-center justify-between gap-10 overflow-hidden rounded-3xl bg-[#FFF2B8] px-8 py-15 sm:flex-row sm:px-22.5"
+        >
           {/* Decorative bgd — sits only behind/around the groceries on the right side */}
           <Image
             src="/assets/subfooterbg.png"
@@ -19,7 +29,7 @@ export default function SubFooter({ className = "" }: { className?: string }) {
           />
 
           {/* Text + CTA — Figma: 506×232, gap 24 */}
-          <div className="relative z-10 flex w-full max-w-126.5 shrink-0 flex-col gap-5 text-center sm:gap-6 sm:text-left">
+          <motion.div variants={fadeUp} className="relative z-10 flex w-full max-w-126.5 shrink-0 flex-col gap-5 text-center sm:gap-6 sm:text-left">
             {/* Heading — Figma: 506×88, DM Sans 600, 36/44, -2% */}
             <h2 className="text-2xl font-semibold leading-8 tracking-[-0.02em] text-black sm:text-[36px] sm:leading-11">
               Skip the Market And Get the Fresh Items With Ease
@@ -41,10 +51,10 @@ export default function SubFooter({ className = "" }: { className?: string }) {
               <WhatsAppIcon className="h-5 w-5 shrink-0" />
               Get started on WhatsApp
             </Link>
-          </div>
+          </motion.div>
 
           {/* Groceries illustration — /assets/Groceries.png */}
-          <div className="relative z-10 h-60 w-full max-w-100 sm:h-85">
+          <motion.div variants={fadeUp} className="relative z-10 h-60 w-full max-w-100 sm:h-85">
             <Image
               src="/assets/Groceries.png"
               alt="Bag of fresh groceries"
@@ -52,8 +62,8 @@ export default function SubFooter({ className = "" }: { className?: string }) {
               sizes="(max-width: 640px) 90vw, 400px"
               className="object-contain object-center"
             />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

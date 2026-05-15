@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 const team = [
   { name: "John Doe", title: "Chief Executive Officer", image: "/assets/team-1.png" },
@@ -9,9 +13,15 @@ const team = [
 export default function Team() {
   return (
     <section className="w-full">
-      <div className="mx-auto w-full max-w-310 px-6 py-15 sm:px-0">
+      <motion.div
+        variants={stagger(0.12, 0.05)}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="mx-auto w-full max-w-310 px-6 py-15 sm:px-0"
+      >
         {/* Heading */}
-        <div className="flex flex-col items-center gap-2 text-center">
+        <motion.div variants={fadeUp} className="flex flex-col items-center gap-2 text-center">
           <h2 className="text-3xl font-semibold text-black sm:text-4xl">
             Our Team
           </h2>
@@ -19,15 +29,20 @@ export default function Team() {
             We&apos;re a team of builders and problem solvers focused on
             improving real world experiences
           </p>
-        </div>
+        </motion.div>
 
         {/* Cards row — Figma: 1240×446, py 12, justify-between */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-6 py-3 sm:flex-row sm:gap-0">
+        <motion.div
+          variants={stagger(0.12, 0)}
+          className="mt-12 flex flex-col items-center justify-between gap-6 py-3 sm:flex-row sm:gap-0"
+        >
           {team.map((member, i) => (
-            <TeamCard key={i} {...member} />
+            <motion.div key={i} variants={fadeUp} className="w-full max-w-[397px]">
+              <TeamCard {...member} />
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

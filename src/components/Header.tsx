@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { Logo, WhatsAppIcon } from "../../public/svg/svg";
+import { EASE } from "@/lib/motion";
 
 const navLinks = ["Agents", "Riders", "FAQs", "About", "Contact us"];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -16,6 +19,18 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Entrance animation helpers
+  const fadeFromTop = (delay: number) => ({
+    initial: reduced ? false : { opacity: 0, y: -12 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.45, delay, ease: EASE },
+  });
+  const fade = (delay: number) => ({
+    initial: reduced ? false : { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: 0.5, delay, ease: EASE },
+  });
 
   return (
     <header
@@ -26,7 +41,10 @@ export default function Header() {
       <div className="mx-auto flex py-4 w-full max-w-[1200px] items-center px-6">
 
         {/* Left — Logo */}
-        <div className="flex flex-1 items-center">
+        <motion.div
+          {...fade(0.1)}
+          className="flex flex-1 items-center"
+        >
           <Link
             href="/"
             aria-label="Ojarun home"
@@ -34,20 +52,20 @@ export default function Header() {
           >
             <Logo className="h-12 w-auto sm:h-16" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* Center — Nav links (desktop only) */}
         <nav aria-label="Main navigation" className="hidden md:block">
           <ul className="flex items-center gap-7 text-sm font-medium text-white/80">
-            {navLinks.map((link) => (
-              <li key={link}>
+            {navLinks.map((link, i) => (
+              <motion.li key={link} {...fadeFromTop(0.2 + i * 0.08)}>
                 <Link
                   href={`/${link.toLowerCase().replace(/\s+/g, "-")}`}
                   className="relative inline-block py-1 transition-colors duration-200 hover:text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full"
                 >
                   {link}
                 </Link>
-              </li>
+              </motion.li>
             ))}
           </ul>
         </nav>
@@ -55,7 +73,8 @@ export default function Header() {
         {/* Right — CTA (desktop) + Hamburger (mobile) */}
         <div className="flex flex-1 justify-end items-center gap-3">
           {/* CTA — hidden on mobile */}
-          <a
+          <motion.a
+            {...fade(0.2 + navLinks.length * 0.08)}
             href="https://wa.me/YOURNUMBER"
             target="_blank"
             rel="noopener noreferrer"
@@ -63,10 +82,11 @@ export default function Header() {
           >
             <WhatsAppIcon className="h-5 w-5 shrink-0" />
             Get started
-          </a>
+          </motion.a>
 
           {/* Hamburger — visible on mobile only */}
-          <button
+          <motion.button
+            {...fade(0.3)}
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
@@ -87,7 +107,7 @@ export default function Header() {
                 menuOpen ? "-rotate-45 -translate-y-2" : ""
               }`}
             />
-          </button>
+          </motion.button>
         </div>
       </div>
 
