@@ -8,7 +8,7 @@ import Faq from "./component/faq";
 
 export default function Home() {
   return (
-    <main>
+    <main className=" ">
       <Header />
       <HeroFull />
       <WhyUs />

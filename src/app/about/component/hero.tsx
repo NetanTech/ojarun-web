@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { HeroLeft, HeroRight } from "../../../../public/svg/svg";
+import { fadeUp, stagger } from "@/lib/motion";
 
 export default function AboutHero() {
   return (
@@ -24,24 +28,35 @@ export default function AboutHero() {
       </div>
 
       {/* Hero text — Figma: width 704, top 148, gap 16 between children */}
-      <div className="relative z-10 mx-auto flex w-full max-w-176 flex-col items-center gap-4 px-6 sm:px-0 pt-32 sm:pt-37 text-center">
-        <span className="inline-flex items-center rounded-full border border-[#E6EDE8] px-3 py-1.5 text-sm leading-5 tracking-[-0.02em] text-[#E9E9E9] sm:text-base sm:leading-6">
+      <motion.div
+        variants={stagger(0.1, 0.15)}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 mx-auto flex w-full max-w-176 flex-col items-center gap-4 px-6 sm:px-0 pt-32 sm:pt-37 text-center"
+      >
+        <motion.span variants={fadeUp} className="inline-flex items-center rounded-full border border-[#E6EDE8] px-3 py-1.5 text-sm leading-5 tracking-[-0.02em] text-[#E9E9E9] sm:text-base sm:leading-6">
           About us
-        </span>
+        </motion.span>
 
-        <h1 className="font-semibold text-white text-[32px] leading-10 sm:text-[46px] sm:leading-16 sm:whitespace-nowrap">
+        <motion.h1 variants={fadeUp} className="font-semibold text-white text-[32px] leading-10 sm:text-[46px] sm:leading-16 sm:whitespace-nowrap">
           Reimagining How Nigeria Shops <br /> for Fresh Food
-        </h1>
+        </motion.h1>
 
-        <p className="text-sm leading-5 tracking-[-0.02em] text-[#E9E9E9] sm:text-base sm:leading-6">
+        <motion.p variants={fadeUp} className="text-sm leading-5 tracking-[-0.02em] text-[#E9E9E9] sm:text-base sm:leading-6">
           Ojarun exists to make market shopping easier, more reliable, and more
           accessible by connecting people to fresh food sourced directly from
           trusted local markets and delivered to their doorstep.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* Hero image — responsive height. Desktop: 535px per Figma */}
-      <div className="relative z-10 mx-auto mt-8 sm:mt-10 w-full max-w-310 px-6">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        animate="show"
+        transition={{ delay: 0.5 }}
+        className="relative z-10 mx-auto mt-8 sm:mt-10 w-full max-w-310 px-6"
+      >
         <div className="relative h-60 sm:h-100 lg:h-133.75 w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-primary/10">
           <Image
             src="/assets/about-hero.png"
@@ -52,7 +67,7 @@ export default function AboutHero() {
             className="object-cover object-center"
           />
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

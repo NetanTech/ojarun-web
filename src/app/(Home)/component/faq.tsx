@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 type FAQItem = {
   question: string;
@@ -43,7 +45,7 @@ export default function FAQ() {
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <section className="relative w-full overflow-hidden bg-white py-20 px-4">
+    <section className="relative w-full bg-white py-20 px-4">
 
       {/* Decorative grocery bag — Figma: 193×249, angle 23.81°. Sits beside FAQ accordion on the left, lower portion */}
       <div className="pointer-events-none absolute bottom-0 left-4 hidden sm:left-8 lg:left-18 lg:block">
@@ -56,19 +58,41 @@ export default function FAQ() {
         />
       </div>
 
+        {/* Groceries bag — sits at the bottom-right, overflowing the card. Drop image at /assets/groceries-bag.png */}
+      <Image
+        src="/assets/groceries-bag.png"
+        alt=""
+        aria-hidden
+        width={280}
+        height={320}
+        className="pointer-events-none absolute -right-[0px] -top-32 z-10 hidden h-auto w-40 sm:-bottom-40 sm:block sm:w-52 lg:w-64"
+      />
+
       {/* Heading */}
-      <div className="relative z-10 text-center mb-10">
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="relative z-10 text-center mb-10"
+      >
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
           Frequently Asked Questions
         </h2>
-      </div>
+      </motion.div>
 
       {/* Accordion container */}
-      <div className="relative z-10 mx-auto max-w-3xl rounded-2xl bg-primary overflow-hidden divide-y divide-gray-100 p-2 pb-0">
+      <motion.div
+        variants={stagger(0.08, 0.05)}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="relative z-10 mx-auto max-w-3xl rounded-2xl bg-primary overflow-hidden divide-y divide-gray-100 p-2 pb-0"
+      >
         {faqs.map((faq, i) => {
           const isOpen = openIndex === i;
           return (
-            <div key={i} className="bg-white mb-2 rounded-lg ">
+            <motion.div key={i} variants={fadeUp} className="bg-white mb-2 rounded-lg ">
               <button
                 onClick={() => toggle(i)}
                 className="flex w-full items-center justify-between px-6 py-5 text-left cursor-pointer mb-2"
@@ -97,10 +121,10 @@ export default function FAQ() {
                   {faq.answer}
                 </p>
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
     </section>
   );

@@ -1,5 +1,8 @@
-import Image from "next/image";
+"use client";
 
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 
 const reasons = [
@@ -30,22 +33,32 @@ export default function WhyUs() {
   return (
     <section className="relative z-20 -mt-28 w-full px-6 sm:-mt-36 sm:px-15">
       {/* Card — Figma: 1320×646, padding 60/40, rounded-3xl, bg yellow-100, gap 10 between children */}
-      <div className="mx-auto flex w-full max-w-330 flex-col gap-2.5 rounded-3xl bg-accent px-6 py-15 sm:px-10">
+      <motion.div
+        variants={stagger(0.12, 0.05)}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="mx-auto flex w-full max-w-330 flex-col gap-2.5 rounded-3xl bg-accent px-6 py-15 sm:px-10"
+      >
         {/* Heading */}
-        <div className="mb-8 text-center">
+        <motion.div variants={fadeUp} className="mb-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
             Why choose us
           </h2>
           <p className="mt-2 text-sm sm:text-base text-gray-500">
             Ojarun makes your shopping life hassle free
           </p>
-        </div>
+        </motion.div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          variants={stagger(0.12, 0)}
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {reasons.map((reason) => (
-            <div
+            <motion.div
               key={reason.title}
+              variants={fadeUp}
               className="flex flex-col overflow-hidden rounded-2xl bg-primary pb-5"
             >
               {/* Text block */}
@@ -68,10 +81,10 @@ export default function WhyUs() {
                   className="object-contain object-center"
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

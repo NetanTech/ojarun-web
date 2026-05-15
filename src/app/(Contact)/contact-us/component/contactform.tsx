@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { HeroBackdrop, HeroTop, HeroBottom, HeroLeft, HeroRight } from "../../../../../public/svg/svg";
+import { fadeUp, stagger } from "@/lib/motion";
 
 export default function ContactForm() {
   const [form, setForm] = useState({
@@ -36,9 +38,14 @@ export default function ContactForm() {
       />
 
 
-      <div className="relative z-10 mx-auto max-w-[1100px] grid grid-cols-1 gap-12 md:grid-cols-[40fr_60fr] md:gap-16">
+      <motion.div
+        variants={stagger(0.1, 0.15)}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 mx-auto max-w-[1100px] grid grid-cols-1 gap-12 md:grid-cols-[40fr_60fr] md:gap-16"
+      >
         {/* ── Left: Heading + description ── */}
-        <div className="flex flex-col">
+        <motion.div variants={fadeUp} className="flex flex-col">
           <span className="inline-flex w-fit items-center rounded-full border border-white/20 px-4 py-1.5 text-xs font-medium text-white/80">
             Contact us
           </span>
@@ -50,11 +57,16 @@ export default function ContactForm() {
             don&apos;t hesitate to reach out or fill out the form and
             we&apos;ll respond as soon as possible.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── Right: Form ── */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
+        <motion.form
+          variants={stagger(0.08, 0)}
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4"
+        >
+          <motion.input
+            variants={fadeUp}
             type="text"
             required
             placeholder="Your name"
@@ -63,7 +75,7 @@ export default function ContactForm() {
             className="rounded-xl border border-white/20 bg-white px-4 py-3.5 text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 transition"
           />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <motion.div variants={fadeUp} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <input
               type="email"
               required
@@ -79,9 +91,10 @@ export default function ContactForm() {
               onChange={update("phone")}
               className="rounded-xl border border-white/20 bg-white px-4 py-3.5 text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 transition"
             />
-          </div>
+          </motion.div>
 
-          <textarea
+          <motion.textarea
+            variants={fadeUp}
             required
             placeholder="Message"
             rows={6}
@@ -90,14 +103,15 @@ export default function ContactForm() {
             className="resize-none rounded-xl border border-white/20 bg-white px-4 py-3.5 text-sm sm:text-base text-gray-900 placeholder-gray-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 transition"
           />
 
-          <button
+          <motion.button
+            variants={fadeUp}
             type="submit"
             className="mt-2 inline-flex w-fit items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-medium text-primary transition hover:bg-accent cursor-pointer"
           >
             Leave us a message
-          </button>
-        </form>
-      </div>
+          </motion.button>
+        </motion.form>
+      </motion.div>
     </section>
   );
 }

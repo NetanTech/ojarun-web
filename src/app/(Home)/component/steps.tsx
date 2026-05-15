@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { LeftImgBg, RightImgBg } from "../../../../public/svg/svg";
+import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 type Section = {
   id: string;
@@ -109,16 +111,20 @@ export default function Steps() {
       {/* ── Sections ── */}
       <div className="mx-auto max-w-[1100px] px-6 sm:px-10 flex flex-col gap-24 py-20">
         {sections.map((s, i) => (
-          <div
+          <motion.div
             key={s.id}
             id={s.id}
             ref={(el) => { sectionRefs.current[i] = el; }}
+            variants={stagger(0.15, 0.05)}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
             className={`flex flex-col items-center gap-10 md:flex-row md:gap-16 ${
               s.reverse ? "md:flex-row-reverse" : ""
             }`}
           >
             {/* Text */}
-            <div className="flex-1">
+            <motion.div variants={fadeUp} className="flex-1">
               <h2 className="font-sans text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-gray-900">
                 {s.heading}
               </h2>
@@ -140,10 +146,10 @@ export default function Steps() {
                   <polyline points="12 5 19 12 12 19" />
                 </svg>
               </button>
-            </div>
+            </motion.div>
 
             {/* Image Card */}
-            <div className="flex-1 w-full relative">
+            <motion.div variants={fadeUp} className="flex-1 w-full relative">
               {/* Decorative cream + green backing sheet — shorter than the photo,
                   anchored low so it peeks out below it */}
               {s.reverse ? (
@@ -169,8 +175,8 @@ export default function Steps() {
                   className="object-cover object-top"
                 />
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         ))}
       </div>
     </div>
