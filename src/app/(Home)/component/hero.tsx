@@ -54,13 +54,13 @@ export default function Hero() {
 
       {/* Image strip — two side-by-side images with badge centered.
           Figma — combined: 895.69×334 | each image: 442.06×334 | badge: 157.9×154.78 */}
-      <motion.div
-        initial={reduced ? false : { opacity: 0, y: 32 }}
-        animate={shown}
-        transition={{ duration: 0.7, delay: 0.55, ease: EASE }}
-        className="relative z-10 mx-auto mt-10 sm:mt-12 flex w-full max-w-4xl items-stretch justify-center gap-3 px-6"
-      >
-        <div className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2">
+      <div className="relative z-10 mx-auto mt-10 sm:mt-12 flex w-full max-w-4xl items-stretch justify-center gap-3 px-6">
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 32 }}
+          animate={shown}
+          transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
+          className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2"
+        >
           <div className="relative h-full w-full overflow-hidden rounded-xl sm:rounded-2xl">
             <Image
               src="/assets/hero1.png"
@@ -71,20 +71,14 @@ export default function Hero() {
               className="object-cover object-center"
             />
           </div>
-        </div>
+        </motion.div>
 
-        {/* Trust badge — centered between the two images. Figma: 157.9×154.78 */}
-        <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
-          <Image
-            src="/assets/hero3.png"
-            alt="Safe and secure badge"
-            width={158}
-            height={155}
-            className="h-20 w-20 object-contain sm:h-38.75 sm:w-39.5"
-          />
-        </div>
-
-        <div className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2">
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 32 }}
+          animate={shown}
+          transition={{ duration: 0.8, delay: 0.8, ease: EASE }}
+          className="relative h-60 w-full overflow-hidden rounded-2xl bg-primary p-1.5 sm:h-83.5 sm:p-2"
+        >
           <div className="relative h-full w-full overflow-hidden rounded-xl sm:rounded-2xl">
             <Image
               src="/assets/hero2.png"
@@ -95,8 +89,24 @@ export default function Hero() {
               className="object-cover object-top"
             />
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Trust badge — centered between the two images. Figma: 157.9×154.78 */}
+        <motion.div
+          initial={reduced ? false : { opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 1.15, ease: EASE }}
+          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
+        >
+          <Image
+            src="/assets/hero3.png"
+            alt="Safe and secure badge"
+            width={158}
+            height={155}
+            className="h-20 w-20 object-contain sm:h-38.75 sm:w-39.5"
+          />
+        </motion.div>
+      </div>
     </section>
   );
 }
