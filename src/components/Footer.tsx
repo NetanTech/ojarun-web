@@ -17,8 +17,8 @@ const footerLinks = {
     { label: "Rider", href: "/rider" },
   ],
   Terms: [
-    { label: "Privacy policy", href: "/privacy" },
-    { label: "Terms & condition", href: "/terms" },
+    { label: "Privacy policy", href: "/privacy-policy" },
+    { label: "Terms & condition", href: "/terms-and-conditions" },
   ],
 };
 

@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import SubFooter from "@/components/SubFooter";
-import ContactForm from "./component/contactform";
+import ContactForm from "./components/contactform";
 
 export default function ContactPage() {
   return (
