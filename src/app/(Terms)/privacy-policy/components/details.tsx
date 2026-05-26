@@ -498,11 +498,8 @@ const sections: Section[] = [
 export default function Detail() {
   return (
     <section className="relative w-full bg-white px-4 sm:px-8 py-20">
-      <motion.div
-        variants={stagger(0.08, 0.1)}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.1 }}
+      <div
+        
         className="mx-auto max-w-[900px]"
       >
         {sections.map((section) => (
@@ -567,7 +564,7 @@ export default function Detail() {
             })}
           </motion.article>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
