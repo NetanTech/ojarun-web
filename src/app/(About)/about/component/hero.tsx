@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { HeroLeft, HeroRight } from "../../../../public/svg/svg";
+import { HeroLeft, HeroRight } from "../../../../../public/svg/svg";
 import { fadeUp, stagger } from "@/lib/motion";
 
 export default function AboutHero() {
