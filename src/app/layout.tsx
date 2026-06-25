@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   },
   description:
     "Fresh food from local markets, sourced by trained agents and delivered to your doorstep without the stress, time, or guesswork.",
+  icons: {
+    icon: "assets/favicon.png",
+  },
   keywords: [
     "Ojarun",
     "market delivery",
