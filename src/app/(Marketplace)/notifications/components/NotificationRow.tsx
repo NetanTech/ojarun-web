@@ -1,0 +1,25 @@
+"use client";
+
+import React from "react";
+import { getNotificationIcon } from "../../../../../lib/utils";
+
+const NotificationRow = ({ ...props }: NotificationProps) => {
+  return (
+    <div className="flex items-center gap-3 md:gap-5 w-full border border-[#E7E7E7] py-3 md:py-4 rounded-xl px-3 md:px-5 hover:bg-green-50/40 cursor-default">
+      <div className="relative">
+        {getNotificationIcon(props.type)}
+
+        {props.isRead && (
+          <div className="absolute bg-red-500 p-2 rounded-full -top-3 -right-2" />
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="body-medium font-medium text-black">{props.title}</p>
+        <p className="body-small text-grey-300">{props.message}</p>
+      </div>
+    </div>
+  );
+};
+
+export default NotificationRow;
