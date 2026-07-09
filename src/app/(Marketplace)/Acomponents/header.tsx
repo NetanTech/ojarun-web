@@ -4,16 +4,20 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   AllBookmark,
   BagCheck,
+  ChevronDown,
   GiftCard,
   Heart,
   HelpCircle,
   HeroTop,
   Logo,
   LogOut,
+  MapPin,
   NotificationBell,
+  Search2,
+  ShoppingCart,
   User,
 } from "../../../../public/svg/svg";
-import { MapPin, Menu, Search, ShoppingCart } from "lucide-react";
+import { Menu } from "lucide-react";
 import CartDrawer from "./CartDialog";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -89,7 +93,7 @@ const Header = () => {
       <div className="lg:max-w-300 relative w-full py-4 px-6  lg:mx-auto flex items-center justify-between">
         <HeroTop
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-2 z-0  w-full"
+          className="pointer-events-none absolute inset-x-0 -top-10 md:-top-2 z-0  w-full"
         />
         <div className="flex items-center gap-10 z-20 bg-transparent">
           <Link href={"/"}>
@@ -101,17 +105,22 @@ const Header = () => {
             onClick={() => setShowLocModal(true)}
           >
             <MapPin />
-            <p className="hidden sm:inline">Secteriat-UI-Road</p>
+            <p className="hidden sm:inline">Secretariat-UI Road</p>
+            <ChevronDown />
           </button>
 
           <Modal
             isOpen={showLocModal}
             onClose={() => setShowLocModal(false)}
             title="Location"
-            className="w-[35%]"
+            className="w-[35%] text-black"
           >
             <div className="flex flex-col gap-2 w-full items-start">
-              <Button as="button" size="lg" variant="primary">
+              <div className=" w-full border rounded-lg flex items-center gap-2 px-3 py-4 border-[#e7e7e7] ">
+                <MapPin  className="text-grey-300"/> 
+                <input type="text" placeholder="Enter a delivery address" className="focus-within:outline-0 flex-1" />
+              </div>
+              <Button as="button" className="w-full" size="lg" variant="primary">
                 Use precise location
               </Button>
             </div>
@@ -119,7 +128,7 @@ const Header = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-1 p-2 bg-white w-[40%] rounded-lg z-20">
-          <Search className="text-primary" />
+          <Search2 className="text-primary" />
           <input
             className="focus-within:outline-0 flex-1 text-black"
             placeholder="Search items, meals, market"
@@ -131,7 +140,7 @@ const Header = () => {
             className="bg-white px-3 py-2 flex rounded-lg items-center justify-center"
             onClick={() => setShowCart(true)}
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart />
           </button>
 
           {!user ? (
@@ -147,7 +156,7 @@ const Header = () => {
                 <User /> Dare Issac
               </button>
 
-              {/* Make this height expandable later on */}
+              {/* Make this height expanding later on */}
 
               {showMenu && (
                 <nav
@@ -169,7 +178,7 @@ const Header = () => {
                         onClick={() => setShowMenu(false)}
                       >
                         <Icon
-                          className={`${pathName === route.href ? "text-white" : "#004A19"}`}
+                          className={`${pathName === route.href ? "text-white" : "text-[#004A19]"}`}
                         />
                         <p className="">{route.name}</p>
                       </Link>
@@ -188,13 +197,13 @@ const Header = () => {
 
         <div className="lg:hidden z-20 text-black flex items-center gap-3">
           <button className="bg-white px-3 py-2 flex rounded-lg items-center justify-center">
-            <Search size={20} />
+            <Search2 size={20} />
           </button>
           <button
             className="bg-white px-3 py-2 flex rounded-lg items-center justify-center"
             onClick={() => setShowCart(true)}
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart />
           </button>
 
           <button

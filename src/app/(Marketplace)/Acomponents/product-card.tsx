@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Minus, Plus } from "lucide-react";
+import { Heart, Minus, Plus } from "../../../../public/svg/svg";
 import Image from "next/image";
 import React, { useState } from "react";
 import { formatCurrency } from "../../../../lib/utils";

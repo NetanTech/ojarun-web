@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { Calendar, ChevronRight } from "lucide-react";
+import { ChevronRight, DeliveryBox } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 
 const DeliveryNote = () => {
@@ -12,7 +12,7 @@ const DeliveryNote = () => {
       <p className="font-medium">Delivery note</p>
       <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3">
         <div className="flex items-center gap-5">
-          <Calendar />
+          <DeliveryBox />
           <div className="flex flex-col gap-2">
             <p className="body-medium font-medium">
               Leave a note for the agent

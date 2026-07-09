@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { MapPin } from "lucide-react";
+import { MapPin } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 
 const DeliveryAddress = () => {

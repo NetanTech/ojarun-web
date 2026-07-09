@@ -3,11 +3,7 @@
 import React from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
 import { usePathname } from "next/navigation";
-import {
-  ChevronRight,
-  Home,
-} from "lucide-react";
-import { SafeDelivery } from "../../../../public/svg/svg";
+import { ChevronRight, Home, SafeDelivery } from "../../../../public/svg/svg";
 import DeliveryAddress from "./components/DeliveryAddress";
 import DeliveryNote from "./components/DeliveryNote";
 import PromoCode from "./components/PromoCode";

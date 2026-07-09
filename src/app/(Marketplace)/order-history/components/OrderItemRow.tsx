@@ -13,8 +13,10 @@ import {
   CancelCircle,
   TickCircle,
 } from "../../../../../public/svg/svg";
-import { Check, Repeat2 } from "lucide-react";
+import { Repeat } from "../../../../../public/svg/svg";
+import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
 
 const statusVariants = {
   "in progress": "bg-warning-50 text-warning-500",
@@ -56,6 +58,7 @@ const orderTimelines = [
 ];
 
 const OrderItemRow = ({ ...props }: OrderProperties) => {
+  const router = useRouter();
   const cancelReasons = [
     "I added the wrong items",
     "I no longer need th color",
@@ -122,9 +125,9 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             size="sm"
             variant="secondary"
             className="flex-1"
-            onClick={() => {
-              setShowOrderDetails(true);
-              setOrder(props.orderId);
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/order-history/${ props.orderId }`);
             }}
           >
             Track Order
@@ -133,7 +136,7 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             as="button"
             size="sm"
             variant="primary"
-            leftIcon={<Repeat2 />}
+            leftIcon={<Repeat />}
             className="flex-1"
           >
             Reorder
@@ -141,10 +144,13 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
         </div>
       </div>
 
-      <div className="hidden md:grid grid-cols-8 items-center justify-between w-full border border-[#E7E7E7] py-6 rounded-xl px-5 hover:bg-green-50/40 cursor-default" onClick={() => {
-            setShowOrderDetails(true);
-            setOrder(props.orderId);
-          }}>
+      <div
+        className="hidden md:grid grid-cols-8 items-center justify-between w-full border border-[#E7E7E7] py-6 rounded-xl px-5 hover:bg-green-50/40 cursor-default"
+        onClick={() => {
+          setShowOrderDetails(true);
+          setOrder(props.orderId);
+        }}
+      >
         <div className="flex items-start gap-2">
           <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
             <ShoppingBag />
@@ -184,7 +190,15 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
           </p>
         </div>
         <div className=" flex items-center justify-end gap-4 col-span-2">
-          <Button className="" as="button" size="sm" variant="secondary">
+          <Button
+            as="button"
+            size="sm"
+            variant="secondary"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/order-history/${ props.orderId }`);
+            }}
+          >
             Track Order
           </Button>
           <Button
@@ -192,7 +206,7 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             as="button"
             size="sm"
             variant="primary"
-            leftIcon={<Repeat2 />}
+            leftIcon={<Repeat />}
           >
             Reorder
           </Button>

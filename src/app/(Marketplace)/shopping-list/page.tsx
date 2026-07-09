@@ -1,11 +1,15 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
-import { Dot, EllipsisVertical, Home, Minus, Plus } from "lucide-react";
+import { Dot } from "lucide-react";
 import Button from "@/components/ui/Button";
 import {
   AllBookmark,
   Edit,
+  EllipsisVertical,
+  Home,
+  Minus,
+  Plus,
   ProfileNotIcon,
   Search,
   ShoppingBags,
@@ -90,14 +94,14 @@ const ShoppingListCard = ({
   };
 
   return (
-    <div className="px-5 py-4 border border-[#E8E8E8] shadow-[0_2px_6px_rgba(0,0,0,0.04)] rounded-2xl w-full">
+    <div className="px-3 py-3 border border-[#E8E8E8] shadow-[0_2px_6px_rgba(0,0,0,0.04)] rounded-2xl w-full">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
             <AllBookmark className="w-6 h-6 text-green-500" />
           </div>
 
-          <p className="truncate flex-1 text-lg font-semibold">
+          <p className="truncate flex-1 text-md font-semibold">
             {list.name}
           </p>
         </div>
@@ -109,9 +113,9 @@ const ShoppingListCard = ({
           <EllipsisVertical />
         </button>
       </div>
-      <div className="mt-5 flex items-center gap-2 text-sm text-grey-300 whitespace-nowrap">
+      <div className="mt-5 flex items-center gap-1 text-sm text-grey-300 whitespace-nowrap">
         <span>{list.items.length} ingredients</span>
-        <Dot size={16} />
+        •
         <span>updated {list.updatedAt}</span>
       </div>
       <div className="mt-5 flex gap-4">
@@ -381,7 +385,7 @@ const Page = () => {
       {shoppingLists.length === 0 ? (
         <Empty onCreate={openCreateModal} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full gap-3">
           {shoppingLists.map((list) => (
             <ShoppingListCard
               key={list.id}
@@ -556,7 +560,7 @@ const Page = () => {
         )}
 
         {/* Fixed Bottom */}
-        <div className="pt-4">
+        <div className="py-4">
           <Button
             as="button"
             size="sm"

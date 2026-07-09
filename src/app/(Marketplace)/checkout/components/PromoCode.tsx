@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { ChevronRight, Tag } from "lucide-react";
+import { ChevronRight, Tag } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 
 const PromoCode = () => {

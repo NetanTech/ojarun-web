@@ -2,9 +2,10 @@ import React from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
 import Filters from "../Acomponents/filters";
 import AllProducts from "./components/all-products";
-import { Home } from "lucide-react";
+import { Home } from "../../../../public/svg/svg";
 import FreshToday from "./components/fresh-today";
 import CookingRecommendations from "./components/cooking-recommendations";
+import AIAgent from "@/components/ui/AIAgent";
 
 const Page = () => {
   return (
@@ -25,6 +26,7 @@ const Page = () => {
       <FreshToday />
       <CookingRecommendations />
       <AllProducts />
+      <AIAgent />
     </>
   );
 };

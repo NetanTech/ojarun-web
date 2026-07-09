@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from 'react'
-import { ChevronDown, Tag } from 'lucide-react';
-import { BottleItem, Market } from '../../../../public/svg/svg';
+import { BottleItem, ChevronDown, Market, Tag } from '../../../../public/svg/svg';
 import Categories from '../marketplace/components/categories';
 
 const Filters = () => {
@@ -12,7 +11,7 @@ const Filters = () => {
         <Categories selectedCat={ selectedCat } setSelectedCat={setSelectedCat}/>
         <div className='flex items-center gap-3 w-full md:gap-5 overflow-y-auto'>
             <button className='flex items-center gap-2 bg-grayScale-50 font-medium px-2 py-1 rounded-2xl text-black'>
-                <Tag size={15}/>
+                <Tag />
                 Offers
             </button>
             <button className='flex items-center gap-2 bg-grayScale-50 font-medium px-2 py-1 rounded-2xl text-black'>
@@ -31,3 +30,4 @@ const Filters = () => {
 }
 
 export default Filters
+

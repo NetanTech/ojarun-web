@@ -1,7 +1,7 @@
 "use client";
 
 import Modal from "@/components/ui/Modal";
-import { ChevronRight, Copy, Landmark } from "lucide-react";
+import { Bank, ChevronRight, Copy } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 import { formatCurrency } from "../../../../../lib/utils";
 import Button from "@/components/ui/Button";
@@ -11,7 +11,7 @@ const BankTransfer = () => {
   return (
     <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4">
       <div className="flex items-center gap-5 ">
-        <Landmark />
+        <Bank />
         <p className="body-medium">Bank Transfer</p>
       </div>
 

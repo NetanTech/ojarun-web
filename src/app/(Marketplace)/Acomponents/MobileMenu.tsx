@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, LogOut, User } from "lucide-react";
+import { LogOut, User } from "../../../../public/svg/svg";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,7 +21,7 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
   const pathName = usePathname();
-
+  
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -30,28 +30,31 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            key="mobile-menu-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/60"
-            onClick={onClose}
-          />
+  useEffect(() => {
+    if (!isOpen) return;
+    history.pushState({ menuOpen: true }, "");
+    const onPopState = () => onClose();
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      if (window.history.state?.menuOpen) history.replaceState(null, "");
+    };
+  }, [isOpen, onClose]);
 
-          <motion.div
-            key="mobile-menu-panel"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-full z-50 bg-white flex flex-col"
-          >
+  return (
+    <>
+      <div
+        className={`fixed inset-0 z-50 bg-black/60 transition-opacity duration-300 ${
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={onClose}
+      />
+
+      <div
+        className={`fixed top-0 right-0 bottom-0 w-full z-50 bg-white flex flex-col transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#E7E7E7]">
               <div className="flex items-center gap-3">
                 <div className="bg-green-500 p-2 rounded-full text-white">
@@ -94,10 +97,8 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
                 <p className="body-medium">Log out</p>
               </button>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      </div>
+    </>
   );
 };
 
