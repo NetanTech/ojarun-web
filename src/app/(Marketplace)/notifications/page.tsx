@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
-import { CheckCheck, Home } from "lucide-react";
+import { CheckCheck, Home } from "../../../../public/svg/svg";
 import { usePathname } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { MOCK_NOTIFICATIONS } from "../../../../constants/data";

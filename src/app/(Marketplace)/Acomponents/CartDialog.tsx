@@ -1,11 +1,13 @@
 "use client";
 
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus } from "../../../../public/svg/svg";
+import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { BasketEmpty, TrashCan } from "../../../../public/svg/svg";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import { formatCurrency } from "../../../../lib/utils";
+import { useRouter } from "next/navigation";
 
 interface CartDrawerProps {
   onClose: () => void;
@@ -79,6 +81,7 @@ const ItemRow = ({ img, productName, meta, price }: CartItem) => {
 };
 
 const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
+  const route = useRouter();
   useEffect(() => {
     const handleEscClick = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -87,6 +90,17 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
     document.addEventListener("keydown", handleEscClick);
 
     return () => document.removeEventListener("keydown", handleEscClick);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    history.pushState({ cartOpen: true }, "");
+    const onPopState = () => onClose();
+    window.addEventListener("popstate", onPopState);
+    return () => {
+      window.removeEventListener("popstate", onPopState);
+      if (window.history.state?.cartOpen) history.replaceState(null, "");
+    };
   }, [isOpen, onClose]);
 
   const cartContent = (
@@ -120,12 +134,14 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
           </div>
 
           <Button
-            as="link"
-            to="/checkout"
+            as="button"
             className="mb-5"
             variant="primary"
             size="sm"
-            onClick={() => onClose()}
+            onClick={() => {
+              onClose()
+              route.push("/checkout");
+            }}
           >
             Go to checkout
           </Button>

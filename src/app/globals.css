@@ -92,6 +92,13 @@
   --color-success-700: #0b6b2b;
   --color-success-800: #085322;
   --color-success-900: #063f1a;
+
+  --animate-slide-up: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
 @layer base {

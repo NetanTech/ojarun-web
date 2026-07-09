@@ -5,7 +5,7 @@ import BreadCrumb from "../Acomponents/bread-crumb";
 import {
   Search,
 } from "../../../../public/svg/svg";
-import { Funnel, Home, ListFilter } from "lucide-react";
+import { Funnel, Home, Sort } from "../../../../public/svg/svg";
 import { usePathname } from "next/navigation";
 import { MOCK_ORDERS } from "../../../../constants/data";
 import OrderItemRow from "./components/OrderItemRow";
@@ -118,7 +118,7 @@ const Page = () => {
         </div>
 
         <button className="border-[#E7E7E7] border p-2 rounded-xl flex items-center gap-2 text-black hover:bg-grey-50/50 self-end sm:self-auto">
-          <ListFilter size={20} />
+          <Sort size={20} />
           <span className="hidden sm:inline">Sort</span>
         </button>
       </div>

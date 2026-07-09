@@ -5,7 +5,7 @@ import BreadCrumb from "../Acomponents/bread-crumb";
 import ProductGrid from "../Acomponents/products-grid";
 import { DEMO_PRODUCTS } from "../../../../constants/data";
 import { usePathname } from "next/navigation";
-import { Home } from "lucide-react";
+import { Home } from "../../../../public/svg/svg";
 import Empty from "./components/Empty";
 
 
