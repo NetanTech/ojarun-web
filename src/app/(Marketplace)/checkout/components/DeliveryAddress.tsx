@@ -10,7 +10,7 @@ const DeliveryAddress = () => {
   return (
     <div className="flex flex-col gap-2 items-start w-full">
       <p className="font-medium">Delivery address</p>
-      <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3">
+      <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3" onClick={() => setOpenDAModal(true)}>
         <div className="flex items-center gap-5">
           <MapPin />
           <p>John doe street, john doe</p>

@@ -9,9 +9,9 @@ import Button from "@/components/ui/Button";
 const BankTransfer = () => {
   const [showBankTrabsfer, setShowBankTransfer] = useState(false); // show Bank transfer modal
   return (
-    <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4">
+    <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4" onClick={() => setShowBankTransfer(true)}>
       <div className="flex items-center gap-5 ">
-        <Bank />
+        <Bank/>
         <p className="body-medium">Bank Transfer</p>
       </div>
 
