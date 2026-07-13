@@ -2,17 +2,18 @@
 
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
-import { MapPin } from "../../../../../public/svg/svg";
+import { MapPin, MapPin2, MapPin3 } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 
 const DeliveryAddress = () => {
   const [openDAModal, setOpenDAModal] = useState(false); // delivery address
   return (
+   <>
     <div className="flex flex-col gap-2 items-start w-full">
       <p className="font-medium">Delivery address</p>
       <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3" onClick={() => setOpenDAModal(true)}>
-        <div className="flex items-center gap-5">
-          <MapPin />
+        <div className="flex items-center gap-2 md:gap-5">
+          <MapPin2 />
           <p>John doe street, john doe</p>
         </div>
 
@@ -23,6 +24,7 @@ const DeliveryAddress = () => {
           change
         </button>
 
+      </div>
         <Modal
             isOpen={openDAModal}
             onClose={() => setOpenDAModal(false)}
@@ -31,7 +33,7 @@ const DeliveryAddress = () => {
           >
             <div className="flex flex-col gap-4 w-full">
               <div className="flex items-center gap-2 w-full border border-[#E7E7E7] rounded-xl p-3">
-                <MapPin />
+                <MapPin3 />
                 <input
                   type="text"
                   className="focus-within:outline-0 flex-1"
@@ -49,8 +51,8 @@ const DeliveryAddress = () => {
               </Button>
             </div>
           </Modal>
-      </div>
     </div>
+   </>
   );
 };
 

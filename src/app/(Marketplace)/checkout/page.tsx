@@ -14,7 +14,7 @@ const Page = () => {
   const pathName = usePathname();
   return (
     <div className="bg-[#F9F9F9] min-h-screen">
-      <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full flex flex-col items-start gap-2 py-5">
+      <div className="lg:max-w-300 lg:w-full mx-3 lg:mx-auto flex flex-col items-start gap-2 py-5">
         <BreadCrumb
           item={[
             {
@@ -33,7 +33,7 @@ const Page = () => {
           ]}
         />
         <h6 className="font-medium">Checkout</h6>
-        <div className="flex flex-wrap items-start gap-2 w-full">
+        <div className="flex flex-col lg:flex-row items-start gap-2 w-full">
           <div className="flex-1 w-full bg-white rounded-xl p-5 flex flex-col gap-5">
             {/* Delivery address */}
             <DeliveryAddress />
@@ -47,7 +47,7 @@ const Page = () => {
               <div className="flex flex-col gap-2 w-full">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-2">
                   <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4">
-                    <div className="flex items-center gap-5 ">
+                    <div className="flex items-center gap-2 md:gap-5">
                       <SafeDelivery />
                       <p className="body-medium">Pay on Delivery</p>
                     </div>

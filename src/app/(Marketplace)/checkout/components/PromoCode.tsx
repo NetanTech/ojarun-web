@@ -8,9 +8,10 @@ import React, { useState } from "react";
 const PromoCode = () => {
   const [openPCModal, setOpenPCModal] = useState(false); // promo code
   return (
+    <>
     <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4" onClick={() => setOpenPCModal(true)}>
-      <div className="flex items-center gap-5 ">
-        <Tag className="-rotate-90" />
+      <div className="flex items-center gap-2 md:gap-5">
+        <Tag />
         <p className="body-medium">Use promo code</p>
       </div>
 
@@ -18,6 +19,7 @@ const PromoCode = () => {
         <ChevronRight />
       </button>
 
+    </div>
       <Modal
           isOpen={openPCModal}
           onClose={() => setOpenPCModal(false)}
@@ -39,7 +41,7 @@ const PromoCode = () => {
             </Button>
           </div>
         </Modal>
-    </div>
+    </>
   );
 };
 
