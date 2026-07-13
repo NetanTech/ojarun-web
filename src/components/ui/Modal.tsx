@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, children, title, className }: ModalProps) => {
   }, [isOpen, onClose]);
 
   const headerContent = (
-    <div className="flex items-center justify-between shrink-0">
+    <div className="flex items-center justify-between shrink-0 mb-3">
       {title && <h6 className="font-medium">{title}</h6>}
       <button onClick={onClose}>
         <X />
