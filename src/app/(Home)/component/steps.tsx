@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { LeftImgBg, RightImgBg } from "../../../../public/svg/svg";
@@ -15,6 +16,7 @@ type Section = {
   image: string;
   alt: string;
   reverse?: boolean;
+  ctaHref: string; // new field for the link
 };
 
 const sections: Section[] = [
@@ -26,6 +28,7 @@ const sections: Section[] = [
     cta: "Get started",
     image: "/assets/StepImg1.png",
     alt: "Woman shopping with a cart at the market",
+    ctaHref: "https://wa.me/2348025957234",
   },
   {
     id: "agent",
@@ -36,6 +39,7 @@ const sections: Section[] = [
     image: "/assets/StepImg2.png",
     alt: "Agent holding grocery bag",
     reverse: true,
+    ctaHref: "#",
   },
   {
     id: "rider",
@@ -45,6 +49,7 @@ const sections: Section[] = [
     cta: "Become a rider",
     image: "/assets/StepImg3.png",
     alt: "Rider delivering groceries",
+    ctaHref: "#",
   },
 ];
 
@@ -86,7 +91,7 @@ export default function Steps() {
 
   return (
     <div className="w-full pt-16">
-      {/* ── Sticky Tab Bar (sits under the fixed main header) ── */}
+      {/* ── Sticky Tab Bar ── */}
       <div
         ref={tabsRef}
         className="sticky top-20 sm:top-24 z-40 flex justify-center py-4 bg-white/80 backdrop-blur-md"
@@ -131,7 +136,14 @@ export default function Steps() {
               <p className="mt-5 text-sm sm:text-base leading-relaxed text-gray-500 max-w-md">
                 {s.body}
               </p>
-              <button className="mt-8 inline-flex items-center gap-2.5 rounded-xl bg-primary px-5 py-3.5 text-sm font-medium text-white transition hover:opacity-90 cursor-pointer">
+
+              {/* CTA as Link */}
+              <Link
+                href={s.ctaHref}
+                target={s.ctaHref.startsWith("http") ? "_blank" : undefined}
+                rel={s.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="mt-8 inline-flex items-center gap-2.5 rounded-xl bg-primary px-5 py-3.5 text-sm font-medium text-white transition hover:opacity-90 cursor-pointer"
+              >
                 {s.cta}
                 <svg
                   className="h-4 w-4"
@@ -145,13 +157,12 @@ export default function Steps() {
                   <line x1="5" y1="12" x2="19" y2="12" />
                   <polyline points="12 5 19 12 12 19" />
                 </svg>
-              </button>
+              </Link>
             </motion.div>
 
             {/* Image Card */}
             <motion.div variants={fadeUp} className="flex-1 w-full relative">
-              {/* Decorative cream + green backing sheet — shorter than the photo,
-                  anchored low so it peeks out below it */}
+              {/* Decorative backing */}
               {s.reverse ? (
                 <RightImgBg
                   aria-hidden
@@ -165,7 +176,7 @@ export default function Steps() {
                   className="pointer-events-none absolute inset-x-0 -bottom-[8%] h-[95%] w-full"
                 />
               )}
-              {/* Photo — sits on the flat top of the sheet, narrower than it */}
+              {/* Photo */}
               <div className="relative z-10 mx-auto aspect-[4/3] w-[88%] overflow-hidden rounded-2xl bg-gray-100">
                 <Image
                   src={s.image}
