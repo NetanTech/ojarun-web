@@ -75,7 +75,7 @@ export default function Header() {
           {/* CTA — hidden on mobile */}
           <motion.a
             {...fade(0.2 + navLinks.length * 0.08)}
-            href="https://wa.me/YOURNUMBER"
+            href="https://wa.me/2348025957234"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:shadow-md active:translate-y-0"
@@ -134,7 +134,7 @@ export default function Header() {
 
           {/* CTA inside mobile menu */}
           <a
-            href="https://wa.me/YOURNUMBER"
+            href="https://wa.me/2348025957234"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent"
