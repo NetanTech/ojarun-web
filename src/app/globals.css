@@ -5,15 +5,277 @@
   --foreground: #171717;
   --primary: #004a19;
   --accent: #fff2b8;
+  --grey-300: #6C6C6C;
+  --grayScale-50: #F4F4F4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-grey-300: var(--grey-300 );
   --color-primary: var(--primary);
+  --color-grayScale-50: var(--grayScale-50);
   --color-accent: var(--accent);
   --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  /* Green */
+  --color-green-50: #e6ede8;
+  --color-green-100: #b0c7b8;
+  --color-green-200: #8aac95;
+  --color-green-300 : #548665;
+  --color-green-400: #336e47;
+  --color-green-500: #004a19;
+  --color-green-600: #004317;
+  --color-green-700: #003512;
+  --color-green-800: #00290e;
+  --color-green-900: #001f0b;
+
+  /* Yellow */
+  --color-yellow-50: #fffbe8;
+  --color-yellow-100: #fff2b8;
+  --color-yellow-200: #ffeb95;
+  --color-yellow-300: #ffe265;
+  --color-yellow-400: #ffdd47;
+  --color-yellow-500: #ffd419;
+  --color-yellow-600: #e8c117;
+  --color-yellow-700: #b59712;
+  --color-yellow-800: #8c750e;
+  --color-yellow-900: #6b590b;
+
+  /* Grey */
+  --color-grey-50: #e9e9e9;
+  --color-grey-100: #bbbbbb;
+  --color-grey-200: #9a9a9a;
+  --color-grey-300: #6c6c6c;
+  --color-grey-400: #505050;
+  --color-grey-500: #242424;
+  --color-grey-600: #212121;
+  --color-grey-700: #1a1a1a;
+  --color-grey-800: #141414;
+  --color-grey-900: #0f0f0f;
+
+  /* Error / Red */
+  --color-red-50: #fbe9e9;
+  --color-red-100: #f2bcba;
+  --color-red-200: #eb9b98;
+  --color-red-300: #e26e6a;
+  --color-red-400: #dd514d;
+  --color-red-500: #d42620;
+  --color-red-600: #c1231d;
+  --color-red-700: #971b17;
+  --color-red-800: #751512;
+  --color-red-900: #59100d;
+
+  /* Warning */
+  --color-warning-50: #fef6e8;
+  --color-warning-100: #fbe2b7;
+  --color-warning-200: #f9d495;
+  --color-warning-300: #f7c164;
+  --color-warning-400: #f5b546;
+  --color-warning-500: #f3a218;
+  --color-warning-600: #dd9316;
+  --color-warning-700: #ad7311;
+  --color-warning-800: #86590d;
+  --color-warning-900: #66440a;
+
+  /* Success */
+  --color-success-50: #e7f5ec;
+  --color-success-100: #b5dfc3;
+  --color-success-200: #91cfa6;
+  --color-success-300: #5eb97d;
+  --color-success-400: #3fac64;
+  --color-success-500: #0f973d;
+  --color-success-600: #0e8938;
+  --color-success-700: #0b6b2b;
+  --color-success-800: #085322;
+  --color-success-900: #063f1a;
+
+  --animate-slide-up: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@layer base {
+  /* Semantic HTML tags with responsive sizing */
+  h1 {
+    @apply text-[32px] leading-[40px] tracking-[-2%] font-bold;
+  }
+  @media (min-width: 768px) {
+    h1 {
+      @apply text-[36px] leading-[44px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h1 {
+      @apply text-[40px] leading-[48px];
+    }
+  }
+
+  h2 {
+    @apply text-[28px] leading-[36px] tracking-[-2%] font-semibold;
+  }
+  @media (min-width: 768px) {
+    h2 {
+      @apply text-[32px] leading-[40px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h2 {
+      @apply text-[36px] leading-[44px];
+    }
+  }
+
+  h3 {
+    @apply text-[24px] leading-[32px] tracking-[-2%] font-semibold;
+  }
+  @media (min-width: 768px) {
+    h3 {
+      @apply text-[28px] leading-[36px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h3 {
+      @apply text-[32px] leading-[40px];
+    }
+  }
+
+  h4 {
+    @apply text-[20px] leading-[28px] tracking-[-2%] font-medium;
+  }
+  @media (min-width: 768px) {
+    h4 {
+      @apply text-[24px] leading-[32px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h4 {
+      @apply text-[28px] leading-[36px];
+    }
+  }
+
+  h5 {
+    @apply text-[18px] leading-[26px] tracking-[-2%] font-medium;
+  }
+  @media (min-width: 768px) {
+    h5 {
+      @apply text-[20px] leading-[28px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h5 {
+      @apply text-[24px] leading-[32px];
+    }
+  }
+
+  h6 {
+    @apply text-[16px] leading-[24px] tracking-[-2%] font-medium;
+  }
+  @media (min-width: 768px) {
+    h6 {
+      @apply text-[18px] leading-[26px];
+    }
+  }
+  @media (min-width: 1024px) {
+    h6 {
+      @apply text-[20px] leading-[28px];
+    }
+  }
+}
+
+@layer components {
+  /* Responsive Headings - Display sizes */
+  .heading-1 {
+    @apply text-[40px] leading-[48px] tracking-[-2%] font-bold;
+  }
+  @media (min-width: 768px) {
+    .heading-1 {
+      @apply text-[48px] leading-[56px];
+    }
+  }
+  @media (min-width: 1024px) {
+    .heading-1 {
+      @apply text-[56px] leading-[64px];
+    }
+  }
+
+  .heading-2 {
+    @apply text-[36px] leading-[44px] tracking-[-2%] font-bold;
+  }
+  @media (min-width: 768px) {
+    .heading-2 {
+      @apply text-[42px] leading-[50px];
+    }
+  }
+  @media (min-width: 1024px) {
+    .heading-2 {
+      @apply text-[48px] leading-[54px];
+    }
+  }
+
+  .heading-3 {
+    @apply text-[28px] leading-[36px] tracking-[-2%] font-semibold;
+  }
+  @media (min-width: 768px) {
+    .heading-3 {
+      @apply text-[32px] leading-[40px];
+    }
+  }
+  @media (min-width: 1024px) {
+    .heading-3 {
+      @apply text-[36px] leading-[44px];
+    }
+  }
+
+  .heading-4 {
+    @apply text-[24px] leading-[32px] tracking-[-2%] font-semibold;
+  }
+  @media (min-width: 768px) {
+    .heading-4 {
+      @apply text-[28px] leading-[36px];
+    }
+  }
+  @media (min-width: 1024px) {
+    .heading-4 {
+      @apply text-[32px] leading-[40px];
+    }
+  }
+
+  .heading-5 {
+    @apply text-[20px] leading-[28px] tracking-[-2%] font-medium;
+  }
+  @media (min-width: 768px) {
+    .heading-5 {
+      @apply text-[24px] leading-[32px];
+    }
+  }
+
+  .heading-6 {
+    @apply text-[18px] leading-[26px] tracking-[-2%] font-medium;
+  }
+  @media (min-width: 768px) {
+    .heading-6 {
+      @apply text-[20px] leading-[28px];
+    }
+  }
+  
+  /* Sizes */
+  .body-large   { @apply text-[18px] leading-[28px] tracking-[-0.01em]; }
+  .body-medium  { @apply text-[16px] leading-[24px] tracking-[-0.01em]; }
+  .body-small   { @apply text-[14px] leading-[20px] tracking-normal; }
+  .body-xsmall  { @apply text-[12px] leading-[20px] tracking-normal; }
+  .body-xxsmall { @apply text-[10px] leading-[18px] tracking-normal; }
+
+  /* Weights */
+  .text-regular  { @apply font-normal; }
+  .text-medium   { @apply font-medium; }
+  .text-semibold { @apply font-semibold; }
+  .text-bold     { @apply font-bold; }
 }
 
 
