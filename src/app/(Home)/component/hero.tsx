@@ -42,7 +42,7 @@ export default function Hero() {
           initial={hidden}
           animate={shown}
           transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
-          href="https://wa.me/YOURNUMBER"
+          href="https://wa.me/2348025957234"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 mt-4 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"

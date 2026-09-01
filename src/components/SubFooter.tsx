@@ -43,7 +43,7 @@ export default function SubFooter({ className = "" }: { className?: string }) {
 
             {/* Get started button — Figma: padding 12/24, radius 8 */}
             <Link
-              href="https://wa.me/YOURNUMBER"
+              href="https://wa.me/2348025957234"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 self-center rounded-lg bg-primary px-6 py-3 text-base font-medium leading-6 tracking-[-0.02em] text-white sm:self-start"
