@@ -135,6 +135,7 @@ interface OrderProperties {
   subtotal: number;
   agentFee: number;
   deliveryFee: number;
+  discount?: number;
   total: number;
 
   payment: PaymentDetails;
