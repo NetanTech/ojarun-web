@@ -4,7 +4,8 @@ import React, { useEffect } from "react";
 import { LogOut, User } from "../../../../public/svg/svg";
 import { X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCustomerSession } from "@/lib/customerAuth";
 
 
 interface Route {
@@ -21,7 +22,9 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
   const pathName = usePathname();
-  
+  const router = useRouter();
+  const { customer, logout } = useCustomerSession();
+
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -60,7 +63,9 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
                 <div className="bg-green-500 p-2 rounded-full text-white">
                   <User className="text-white"/>
                 </div>
-                <p className="font-medium text-black">Dare Issac</p>
+                <p className="font-medium text-black">
+                  {customer ? customer.name || customer.phone : "Guest"}
+                </p>
               </div>
               <button
                 onClick={onClose}
@@ -92,7 +97,14 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
             </nav>
 
             <div className="border-t border-[#E7E7E7] px-5 py-4">
-              <button className="flex items-center gap-4 text-red-500 w-full py-2">
+              <button
+                className="flex items-center gap-4 text-red-500 w-full py-2"
+                onClick={() => {
+                  onClose();
+                  logout();
+                  router.push("/login");
+                }}
+              >
                 <LogOut />
                 <p className="body-medium">Log out</p>
               </button>

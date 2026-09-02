@@ -1,13 +1,14 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "../../../../../public/svg/svg";
 import { ChevronDown } from "../../../../../public/svg/svg";
 import { Check, ChevronUp } from "lucide-react";
 import TrackingMap from "./components/TrackingMap";
-import { MOCK_ORDERS } from "../../../../../constants/data";
+import { useCustomerSession } from "@/lib/customerAuth";
+import { fetchMyOrder } from "@/lib/orders";
 
 const container = {
   open: {
@@ -39,13 +40,6 @@ const route: [number, number][] = [
   [-97.724, 30.281],
 ];
 
-const timelineStatus: OrderTimeline = {
-  orderReceived: true,
-  shoppingInProgress: false,
-  readyForPickup: false,
-  delivered: false,
-};
-
 const orderTimelines = [
   {
     title: "Order received",
@@ -68,14 +62,42 @@ const orderTimelines = [
 
 const Page = () => {
   const { orderID } = useParams();
-  const order = MOCK_ORDERS.find((o) => o.orderId === orderID);
+  const router = useRouter();
+  const { customer, ready } = useCustomerSession();
+  const [order, setOrder] = useState<OrderProperties | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showSub, setShowSub] = useState(false);
-  const isMobile = window.innerWidth <= 764;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 764);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!customer) {
+      router.replace("/login");
+      return;
+    }
+    if (typeof orderID !== "string") return;
+    fetchMyOrder(orderID)
+      .then(setOrder)
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load this order."))
+      .finally(() => setLoading(false));
+  }, [ready, customer, orderID, router]);
+
+  const timeline: OrderTimeline = order?.timeline ?? {
+    orderReceived: false,
+    shoppingInProgress: false,
+    readyForPickup: false,
+    delivered: false,
+  };
 
   const timelineContent = (
     <div className="flex flex-col items-start w-full">
       {orderTimelines.map((item, index) => {
-        const completed = timelineStatus[item.key as keyof OrderTimeline];
+        const completed = timeline[item.key as keyof OrderTimeline];
         const isLast = index === orderTimelines.length - 1;
 
         return (
@@ -116,6 +138,22 @@ const Page = () => {
       })}
     </div>
   );
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <p className="text-grey-300 body-medium">Loading order...</p>
+      </div>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <p className="text-red-600 body-medium">{error || "Order not found."}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-screen">

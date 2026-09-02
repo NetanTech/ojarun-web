@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useState } from 'react'
+import React from 'react'
 import { BottleItem, ChevronDown, Market, Tag } from '../../../../public/svg/svg';
 import Categories from '../marketplace/components/categories';
 
-const Filters = () => {
-    const [ selectedCat, setSelectedCat ] = useState< CategoriesType['name'] >( 'all' )
+interface FiltersProps {
+  selectedCat: string;
+  setSelectedCat: (b: string) => void;
+}
+
+const Filters = ({ selectedCat, setSelectedCat }: FiltersProps) => {
   return (
     <div className='flex flex-col gap-2 lg:mx-auto md:max-w-300 w-full px-4 py-3'>
         <Categories selectedCat={ selectedCat } setSelectedCat={setSelectedCat}/>
@@ -30,4 +34,3 @@ const Filters = () => {
 }
 
 export default Filters
-
