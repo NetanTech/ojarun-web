@@ -9,11 +9,13 @@ import DeliveryNote from "./components/DeliveryNote";
 import PromoCode from "./components/PromoCode";
 import BankTransfer from "./components/BankTransfer";
 import OrderSummary from "./components/OrderSummary";
+import { PromoValidation } from "@/lib/orders";
 
 const Page = () => {
   const pathName = usePathname();
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoValidation | null>(null);
 
   return (
     <div className="bg-[#F9F9F9] min-h-screen">
@@ -67,12 +69,12 @@ const Page = () => {
                     onSelect={() => setPaymentMethod("card")}
                   />
                 </div>
-                <PromoCode />
+                <PromoCode applied={appliedPromo} onApply={setAppliedPromo} />
               </div>
             </div>
           </div>
 
-          <OrderSummary paymentMethod={paymentMethod} note={note} />
+          <OrderSummary paymentMethod={paymentMethod} note={note} promo={appliedPromo} />
         </div>
       </div>
     </div>

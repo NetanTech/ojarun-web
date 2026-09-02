@@ -8,7 +8,7 @@ import { SuccessIcon } from "../../../../../public/svg/AnimatedSvgs/fun-svg";
 import Modal from "@/components/ui/Modal";
 import { useCart } from "@/lib/cart";
 import { useCustomerSession } from "@/lib/customerAuth";
-import { createOrder } from "@/lib/orders";
+import { createOrder, PromoValidation } from "@/lib/orders";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -18,9 +18,10 @@ const DELIVERY_FEE = 700;
 interface OrderSummaryProps {
   paymentMethod: "cash" | "card";
   note?: string;
+  promo?: PromoValidation | null;
 }
 
-const OrderSummary = ({ paymentMethod, note }: OrderSummaryProps) => {
+const OrderSummary = ({ paymentMethod, note, promo }: OrderSummaryProps) => {
   const cart = useCart();
   const router = useRouter();
   const { customer, ready } = useCustomerSession();
@@ -29,7 +30,11 @@ const OrderSummary = ({ paymentMethod, note }: OrderSummaryProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const hasItems = cart.lines.length > 0;
-  const total = cart.subtotal + (hasItems ? AGENT_FEE + DELIVERY_FEE : 0);
+  const discount = hasItems ? promo?.discountAmount || 0 : 0;
+  const total = Math.max(
+    cart.subtotal + (hasItems ? AGENT_FEE + DELIVERY_FEE : 0) - discount,
+    0,
+  );
   const loggedOut = ready && !customer;
 
   const handlePlaceOrder = async () => {
@@ -47,6 +52,7 @@ const OrderSummary = ({ paymentMethod, note }: OrderSummaryProps) => {
         deliveryAddress: customer.deliveryArea || "Not provided",
         paymentMethod,
         note: note?.trim() || undefined,
+        promoCode: promo?.code,
       });
 
       if (result.paymentError) {
@@ -120,6 +126,12 @@ const OrderSummary = ({ paymentMethod, note }: OrderSummaryProps) => {
           <p>Delivery fee</p>
           <p> {formatCurrency(hasItems ? DELIVERY_FEE : 0)} </p>
         </div>
+        {discount > 0 && (
+          <div className="flex items-center justify-between text-green-600">
+            <p>Discount ({promo?.code})</p>
+            <p>-{formatCurrency(discount)}</p>
+          </div>
+        )}
         <div className="flex items-center justify-between font-medium">
           <p>Total</p>
           <p> {formatCurrency(total)} </p>
