@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
-import { Dot } from "lucide-react";
 import Button from "@/components/ui/Button";
 import {
   AllBookmark,
@@ -10,14 +9,20 @@ import {
   Home,
   Minus,
   Plus,
-  ProfileNotIcon,
   Search,
   ShoppingBags,
 } from "../../../../public/svg/svg";
 import Modal from "@/components/ui/Modal";
 import Image from "next/image";
 import { formatCurrency } from "../../../../lib/utils";
-import { DEMO_PRODUCTS, DEMO_SHOPPING_LISTS } from "../../../../constants/data";
+import { fetchProducts } from "@/lib/products";
+import { useCart } from "@/lib/cart";
+import {
+  fetchShoppingLists,
+  createShoppingList,
+  updateShoppingList,
+  deleteShoppingList,
+} from "@/lib/shoppingLists";
 import { SuccessIcon } from "../../../../public/svg/AnimatedSvgs/fun-svg";
 
 const Empty = ({ onCreate }: { onCreate: () => void }) => {
@@ -55,7 +60,13 @@ const ShoppingListCard = ({
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [items, setItems] = useState(list.items);
+  const [justAdded, setJustAdded] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const cart = useCart();
+
+  useEffect(() => {
+    setItems(list.items);
+  }, [list.items]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -69,29 +80,49 @@ const ShoppingListCard = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   });
 
-  const handleIncrement = (productName: string) => {
+  const handleIncrement = (productId: string) => {
     setItems((prev) =>
       prev.map((item) =>
-        item.name === productName
+        item.productId === productId
           ? { ...item, quantity: item.quantity + 1 }
           : item,
       ),
     );
   };
 
-  const handleDecrement = (productName: string) => {
+  const handleDecrement = (productId: string) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.name === productName);
+      const existing = prev.find((item) => item.productId === productId);
       if (existing && existing.quantity <= 1) {
-        return prev.filter((item) => item.name !== productName);
+        return prev.filter((item) => item.productId !== productId);
       }
       return prev.map((item) =>
-        item.name === productName
+        item.productId === productId
           ? { ...item, quantity: item.quantity - 1 }
           : item,
       );
     });
   };
+
+  const handleAddAllToCart = () => {
+    items.forEach((item) => {
+      if (!item.productId) return;
+      cart.addItem(
+        {
+          id: item.productId,
+          name: item.name,
+          price: item.price,
+          image: item.imageURL,
+          unit: item.more,
+        },
+        item.quantity,
+      );
+    });
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 2000);
+  };
+
+  const listTotal = items.reduce((a, b) => a + b.price * b.quantity, 0);
 
   return (
     <div className="px-3 py-3 border border-[#E8E8E8] shadow-[0_2px_6px_rgba(0,0,0,0.04)] rounded-2xl w-full">
@@ -169,7 +200,7 @@ const ShoppingListCard = ({
             >
               {items.map((item) => (
                 <div
-                  key={item.name}
+                  key={item.productId || item.name}
                   className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-2 h-[70px]">
@@ -197,13 +228,21 @@ const ShoppingListCard = ({
                   </div>
 
                   <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3">
-                    <button onClick={() => handleDecrement(item.name)}>
+                    <button
+                      onClick={() =>
+                        item.productId && handleDecrement(item.productId)
+                      }
+                    >
                       <Minus size={18} />
                     </button>
 
                     <span>{item.quantity}</span>
 
-                    <button onClick={() => handleIncrement(item.name)}>
+                    <button
+                      onClick={() =>
+                        item.productId && handleIncrement(item.productId)
+                      }
+                    >
                       <Plus size={18} />
                     </button>
                   </div>
@@ -217,9 +256,9 @@ const ShoppingListCard = ({
                 size="sm"
                 variant="primary"
                 className="w-full"
+                onClick={handleAddAllToCart}
               >
-                Add to cart{" "}
-                {formatCurrency(list.items.reduce((a, b) => a + b.price, 0))}
+                {justAdded ? "Added to cart" : `Add to cart ${formatCurrency(listTotal)}`}
               </Button>
             </div>
           </Modal>
@@ -237,49 +276,85 @@ const Page = () => {
   const [listName, setListName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [addedItems, setAddedItems] = useState<ShoppingListItem[]>([]);
-  const [shoppingLists, setShoppingLists] = useState(DEMO_SHOPPING_LISTS);
+  const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
+  const [listsLoading, setListsLoading] = useState(true);
+  const [listsError, setListsError] = useState<string | null>(null);
 
-  const filteredProducts = searchQuery.trim()
-    ? DEMO_PRODUCTS.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          !addedItems.some((item) => item.name === p.name),
+  const [searchResults, setSearchResults] = useState<ProductCardProps[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const loadLists = () => {
+    setListsLoading(true);
+    setListsError(null);
+    fetchShoppingLists()
+      .then(setShoppingLists)
+      .catch((err) =>
+        setListsError(
+          err instanceof Error ? err.message : "Could not load your shopping lists.",
+        ),
       )
-    : [];
+      .finally(() => setListsLoading(false));
+  };
+
+  useEffect(() => {
+    loadLists();
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setSearchLoading(true);
+    fetchProducts({ search: searchQuery })
+      .then(setSearchResults)
+      .catch(() => setSearchResults([]))
+      .finally(() => setSearchLoading(false));
+  }, [searchQuery]);
+
+  const filteredProducts = searchResults.filter(
+    (p) => !addedItems.some((item) => item.productId === p.id),
+  );
 
   const handleAddItem = (product: ProductCardProps) => {
     setAddedItems((prev) => {
-      const existing = prev.find((item) => item.name === product.name);
+      const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
         return prev.map((item) =>
-          item.name === product.name
+          item.productId === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item,
         );
       }
-      const { name, price, imageURL, more } = product;
-      return [...prev, { name, price, imageURL, more, quantity: 1 }];
+      const { id, name, price, imageURL, more } = product;
+      return [...prev, { productId: id, name, price, imageURL, more, quantity: 1 }];
     });
   };
 
-  const handleIncrement = (productName: string) => {
+  const handleIncrement = (productId: string) => {
     setAddedItems((prev) =>
       prev.map((item) =>
-        item.name === productName
+        item.productId === productId
           ? { ...item, quantity: item.quantity + 1 }
           : item,
       ),
     );
   };
 
-  const handleDecrement = (productName: string) => {
+  const handleDecrement = (productId: string) => {
     setAddedItems((prev) => {
-      const existing = prev.find((item) => item.name === productName);
+      const existing = prev.find((item) => item.productId === productId);
       if (existing && existing.quantity <= 1) {
-        return prev.filter((item) => item.name !== productName);
+        return prev.filter((item) => item.productId !== productId);
       }
       return prev.map((item) =>
-        item.name === productName
+        item.productId === productId
           ? { ...item, quantity: item.quantity - 1 }
           : item,
       );
@@ -290,6 +365,7 @@ const Page = () => {
     setListName("");
     setAddedItems([]);
     setSearchQuery("");
+    setSaveError(null);
     setModalMode("create");
     setEditingList(null);
   };
@@ -298,6 +374,7 @@ const Page = () => {
     setListName(list.name);
     setAddedItems(list.items);
     setSearchQuery("");
+    setSaveError(null);
     setModalMode("edit");
     setEditingList(list);
   };
@@ -307,15 +384,26 @@ const Page = () => {
 
   const openDeleteModal = (list: ShoppingList) => {
     setListToDelete(list);
+    setDeleteError(null);
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    if (listToDelete) {
+  const confirmDelete = async () => {
+    if (!listToDelete) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteShoppingList(listToDelete.id);
       setShoppingLists((prev) => prev.filter((l) => l.id !== listToDelete.id));
+      setShowDeleteModal(false);
+      setListToDelete(null);
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : "Could not delete this list. Please try again.",
+      );
+    } finally {
+      setDeleting(false);
     }
-    setShowDeleteModal(false);
-    setListToDelete(null);
   };
 
   const closeModal = () => {
@@ -324,30 +412,41 @@ const Page = () => {
     setListName("");
     setAddedItems([]);
     setSearchQuery("");
+    setSaveError(null);
   };
 
-  const handleSave = () => {
-    if (modalMode === "edit" && editingList) {
-      setShoppingLists((prev) =>
-        prev.map((l) =>
-          l.id === editingList.id
-            ? { ...l, name: listName.trim(), items: addedItems }
-            : l,
-        ),
+  const handleSave = async () => {
+    const items = addedItems.map((item) => ({
+      productId: item.productId!,
+      quantity: item.quantity,
+    }));
+
+    setSaving(true);
+    setSaveError(null);
+    try {
+      if (modalMode === "edit" && editingList) {
+        const updated = await updateShoppingList(editingList.id, {
+          name: listName.trim(),
+          items,
+        });
+        setShoppingLists((prev) =>
+          prev.map((l) => (l.id === updated.id ? updated : l)),
+        );
+        closeModal();
+      } else {
+        const name = listName.trim();
+        const created = await createShoppingList(name, items);
+        setCreatedListName(name);
+        setShoppingLists((prev) => [created, ...prev]);
+        closeModal();
+        setCreated(true);
+      }
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Could not save this list. Please try again.",
       );
-      closeModal();
-    } else {
-      const name = listName.trim();
-      const newList: ShoppingList = {
-        id: `list-${Date.now()}`,
-        name,
-        items: addedItems,
-        updatedAt: "just now",
-      };
-      setCreatedListName(name);
-      setShoppingLists((prev) => [...prev, newList]);
-      closeModal();
-      setCreated(true);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -382,7 +481,18 @@ const Page = () => {
         </div>
       </div>
 
-      {shoppingLists.length === 0 ? (
+      {listsLoading ? (
+        <div className="flex items-center justify-center w-full py-10 text-grey-300">
+          Loading your shopping lists...
+        </div>
+      ) : listsError ? (
+        <div className="flex flex-col items-center justify-center w-full py-10 gap-3">
+          <p className="text-red-500">{listsError}</p>
+          <Button as="button" size="sm" variant="secondary" onClick={loadLists}>
+            Try again
+          </Button>
+        </div>
+      ) : shoppingLists.length === 0 ? (
         <Empty onCreate={openCreateModal} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full gap-3">
@@ -434,7 +544,7 @@ const Page = () => {
                 <div className="flex flex-col gap-2 w-full">
                   {addedItems.map((item) => (
                     <div
-                      key={item.name}
+                      key={item.productId || item.name}
                       className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-2 h-[70px]">
@@ -462,13 +572,21 @@ const Page = () => {
                       </div>
 
                       <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3">
-                        <button onClick={() => handleDecrement(item.name)}>
+                        <button
+                          onClick={() =>
+                            item.productId && handleDecrement(item.productId)
+                          }
+                        >
                           <Minus size={18} />
                         </button>
 
                         <span>{item.quantity}</span>
 
-                        <button onClick={() => handleIncrement(item.name)}>
+                        <button
+                          onClick={() =>
+                            item.productId && handleIncrement(item.productId)
+                          }
+                        >
                           <Plus size={18} />
                         </button>
                       </div>
@@ -510,7 +628,11 @@ const Page = () => {
                   Results
                 </p>
 
-                {filteredProducts.length === 0 ? (
+                {searchLoading ? (
+                  <div className="flex flex-col items-center justify-center gap-3 py-5">
+                    <p className="font-medium text-grey-300">Searching...</p>
+                  </div>
+                ) : filteredProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-3 py-5">
                     <Search className="w-10 h-10 text-grey-300" />
                     <p className="font-medium text-grey-300">No items found</p>
@@ -518,7 +640,7 @@ const Page = () => {
                 ) : (
                   filteredProducts.map((product) => (
                     <div
-                      key={product.name}
+                      key={product.id}
                       className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-2 h-[70px]">
@@ -560,12 +682,14 @@ const Page = () => {
         )}
 
         {/* Fixed Bottom */}
-        <div className="py-4">
+        <div className="py-4 flex flex-col gap-2">
+          {saveError && <p className="text-red-500 body-small">{saveError}</p>}
           <Button
             as="button"
             size="sm"
             variant="primary"
             isDisabled={!listName.trim() || addedItems.length < 2}
+            isLoading={saving}
             className="w-full"
             onClick={handleSave}
           >
@@ -604,6 +728,7 @@ const Page = () => {
             Once deleted, this shopping list cannot be restored. You&apos;ll
             need to create a new list if you still need these items.
           </p>
+          {deleteError && <p className="text-red-500 body-small">{deleteError}</p>}
         </div>
         <div className="flex items-center gap-2 w-full">
           <Button
@@ -619,6 +744,7 @@ const Page = () => {
             as="button"
             size="sm"
             variant="primary"
+            isLoading={deleting}
             className="w-full bg-red-500 text-white hover:bg-red-400"
             onClick={confirmDelete}
           >

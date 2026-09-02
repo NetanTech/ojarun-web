@@ -15,17 +15,17 @@ export const Cats: CategoriesType[] = [
 
 
 export const DEMO_PRODUCTS: ProductCardProps[] = [
-  { name: "Egusi (Melon Seeds)", category: "Meals", price: 3500, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true},
-  { name: "Garri (White)", category: "Meals", price: 2500, imageURL: "/assets/Untitled design.png", more: "Per kg" },
-  { name: "Garri (Yellow)", category: "Meals", price: 2700, imageURL: "/assets/Untitled design.png", more: "Per kg" },
-  { name: "Ogbono (Dried)", category: "Meals", price: 4000, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
-  { name: "Palm Oil", category: "Sauces", price: 3200, imageURL: "/assets/Untitled design.png", more: "Per bottle" },
-  { name: "Groundnut Oil", category: "Sauces", price: 3800, imageURL: "/assets/Untitled design.png", more: "Per bottle" },
-  { name: "Long Grain Rice", category: "Meals", price: 5200, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
-  { name: "Ofada Rice", category: "Meals", price: 5800, imageURL: "/assets/Untitled design.png", more: "Per kg" },
-  { name: "Honey Beans (Oloyin)", category: "Meals", price: 4500, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
-  { name: "Dried Stockfish", category: "Meals", price: 8500, imageURL: "/assets/Untitled design.png", more: "Per kg" },
-  { name: "Smoked Catfish", category: "Fresh Food", price: 6000, imageURL: "/assets/Untitled design.png", more: "Per kg" },
+  { id: "p-1", name: "Egusi (Melon Seeds)", category: "Meals", price: 3500, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true},
+  { id: "p-2", name: "Garri (White)", category: "Meals", price: 2500, imageURL: "/assets/Untitled design.png", more: "Per kg" },
+  { id: "p-3", name: "Garri (Yellow)", category: "Meals", price: 2700, imageURL: "/assets/Untitled design.png", more: "Per kg" },
+  { id: "p-4", name: "Ogbono (Dried)", category: "Meals", price: 4000, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
+  { id: "p-5", name: "Palm Oil", category: "Sauces", price: 3200, imageURL: "/assets/Untitled design.png", more: "Per bottle" },
+  { id: "p-6", name: "Groundnut Oil", category: "Sauces", price: 3800, imageURL: "/assets/Untitled design.png", more: "Per bottle" },
+  { id: "p-7", name: "Long Grain Rice", category: "Meals", price: 5200, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
+  { id: "p-8", name: "Ofada Rice", category: "Meals", price: 5800, imageURL: "/assets/Untitled design.png", more: "Per kg" },
+  { id: "p-9", name: "Honey Beans (Oloyin)", category: "Meals", price: 4500, imageURL: "/assets/Untitled design.png", more: "Per kg", wishlisted: true },
+  { id: "p-10", name: "Dried Stockfish", category: "Meals", price: 8500, imageURL: "/assets/Untitled design.png", more: "Per kg" },
+  { id: "p-11", name: "Smoked Catfish", category: "Fresh Food", price: 6000, imageURL: "/assets/Untitled design.png", more: "Per kg" },
 ];
 
 export const CARTPRODUCTS = [

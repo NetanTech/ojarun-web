@@ -2,13 +2,47 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { registerCustomer, setPendingEmail } from "@/lib/customerAuth";
 
 export default function SignupForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [deliveryArea, setDeliveryArea] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const { email: normalizedEmail } = await registerCustomer({
+        name,
+        phone,
+        email,
+        password,
+        deliveryArea,
+      });
+      setPendingEmail(normalizedEmail);
+      router.push("/verify-email");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form className="mx-auto w-full max-w-[500px] px-6 pt-10 mb-[-64px] relative z-100">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto w-full max-w-[500px] px-6 pt-10 mb-[-64px] relative z-100"
+    >
       <div className="text-center">
         <h1 className="text-2xl font-bold text-neutral-900">
           Create your account
@@ -19,38 +53,24 @@ export default function SignupForm() {
       </div>
 
       <div className="mt-8 space-y-5">
-        {/* First + Last name */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-semibold text-neutral-900"
-            >
-              First name
-            </label>
-            <input
-              id="firstName"
-              name="firstName"
-              type="text"
-              placeholder="Enter first name"
-              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="lastName"
-              className="block text-sm font-semibold text-neutral-900"
-            >
-              Last name
-            </label>
-            <input
-              id="lastName"
-              name="lastName"
-              type="text"
-              placeholder="Enter last name"
-              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-            />
-          </div>
+        {/* Full name */}
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-semibold text-neutral-900"
+          >
+            Full name
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your full name"
+            className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          />
         </div>
 
         {/* Phone number */}
@@ -69,26 +89,14 @@ export default function SignupForm() {
                 <span className="h-full w-1/3 bg-green-700" />
               </span>
               <span className="text-sm text-neutral-900">+234</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                className="text-neutral-500"
-              >
-                <path
-                  d="M3 4.5L6 7.5L9 4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
             </div>
             <input
               id="phone"
               name="phone"
               type="tel"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone Number"
               className="w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
@@ -107,6 +115,9 @@ export default function SignupForm() {
             id="email"
             name="email"
             type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Example@gmail.com"
             className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
@@ -125,6 +136,9 @@ export default function SignupForm() {
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full rounded-lg border border-neutral-200 px-4 py-3 pr-12 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
@@ -138,7 +152,31 @@ export default function SignupForm() {
             </button>
           </div>
         </div>
+
+        {/* Delivery area */}
+        <div>
+          <label
+            htmlFor="deliveryArea"
+            className="block text-sm font-semibold text-neutral-900"
+          >
+            Delivery area
+          </label>
+          <input
+            id="deliveryArea"
+            name="deliveryArea"
+            type="text"
+            required
+            value={deliveryArea}
+            onChange={(e) => setDeliveryArea(e.target.value)}
+            placeholder="e.g. Bodija, Ibadan"
+            className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          />
+        </div>
       </div>
+
+      {error && (
+        <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+      )}
 
       {/* Terms */}
       <p className="mt-6 text-center text-sm text-neutral-500">
@@ -157,9 +195,10 @@ export default function SignupForm() {
       {/* Submit */}
       <button
         type="submit"
-        className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        disabled={loading}
+        className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Log in
+        {loading ? "Creating account..." : "Continue"}
       </button>
 
       {/* Sign in link */}

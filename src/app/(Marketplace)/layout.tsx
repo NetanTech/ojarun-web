@@ -5,15 +5,21 @@ import Header from "./Acomponents/header";
 
 
 import Footer from "@/components/Footer";
+import { CartProvider } from "@/lib/cart";
+import { FavoritesProvider } from "@/lib/favoritesContext";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  
+
   return (
-    <div className="">
-      <Header />
-      {children}
-      <Footer />
-    </div>
+    <CartProvider>
+      <FavoritesProvider>
+        <div className="">
+          <Header />
+          {children}
+          <Footer />
+        </div>
+      </FavoritesProvider>
+    </CartProvider>
   );
 };
 

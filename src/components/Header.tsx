@@ -72,9 +72,19 @@ export default function Header() {
 
         {/* Right — CTA (desktop) + Hamburger (mobile) */}
         <div className="flex flex-1 justify-end items-center gap-3">
+          {/* Log in — hidden on mobile */}
+          <motion.div {...fade(0.2 + navLinks.length * 0.08)} className="hidden md:block">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-white/80 transition-colors duration-200 hover:text-white"
+            >
+              Log in
+            </Link>
+          </motion.div>
+
           {/* CTA — hidden on mobile */}
           <motion.a
-            {...fade(0.2 + navLinks.length * 0.08)}
+            {...fade(0.25 + navLinks.length * 0.08)}
             href="https://wa.me/2348025957234"
             target="_blank"
             rel="noopener noreferrer"
@@ -131,6 +141,15 @@ export default function Header() {
               </li>
             ))}
           </ul>
+
+          {/* Log in inside mobile menu */}
+          <Link
+            href="/login"
+            onClick={() => setMenuOpen(false)}
+            className="block py-2.5 border-b border-white/10 hover:text-white transition-colors duration-200"
+          >
+            Log in
+          </Link>
 
           {/* CTA inside mobile menu */}
           <a

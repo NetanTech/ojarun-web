@@ -6,8 +6,9 @@ import {
   Search,
 } from "../../../../public/svg/svg";
 import { Funnel, Home, Sort } from "../../../../public/svg/svg";
-import { usePathname } from "next/navigation";
-import { MOCK_ORDERS } from "../../../../constants/data";
+import { usePathname, useRouter } from "next/navigation";
+import { useCustomerSession } from "@/lib/customerAuth";
+import { fetchMyOrders } from "@/lib/orders";
 import OrderItemRow from "./components/OrderItemRow";
 import Empty from "./components/Empty";
 
@@ -24,9 +25,26 @@ interface Filtertype {
 
 const Page = () => {
   const pathName = usePathname();
+  const router = useRouter();
+  const { customer, ready } = useCustomerSession();
+  const [orders, setOrders] = useState<OrderProperties[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "in progress" | "completed">(
     "all",
   );
+
+  useEffect(() => {
+    if (!ready) return;
+    if (!customer) {
+      router.replace("/login");
+      return;
+    }
+    fetchMyOrders()
+      .then(setOrders)
+      .catch((err) => setError(err instanceof Error ? err.message : "Could not load your orders."))
+      .finally(() => setLoading(false));
+  }, [ready, customer, router]);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -125,9 +143,27 @@ const Page = () => {
 
       <div className="flex flex-col my-3  gap-6 w-full">
         {(() => {
-          const filtered = filter === 'all' ? MOCK_ORDERS : MOCK_ORDERS.filter(m => m.status === filter);
+          if (loading) {
+            return <p className="text-grey-300 body-medium">Loading your orders...</p>;
+          }
+          if (error) {
+            return <p className="text-red-600 body-medium">{error}</p>;
+          }
+          const matchesFilter = (status: OrderProperties["status"]) => {
+            if (filter === "all") return true;
+            if (filter === "completed") return status === "successful";
+            return status === filter;
+          };
+          const filtered = orders.filter((o) => matchesFilter(o.status));
+          const handleUpdated = (updated: OrderProperties) => {
+            setOrders((prev) =>
+              prev.map((o) => (o.orderId === updated.orderId ? updated : o)),
+            );
+          };
           return filtered.length > 0 ? (
-            filtered.map((m) => <OrderItemRow {...m} key={m.orderId} />)
+            filtered.map((m) => (
+              <OrderItemRow {...m} key={m.orderId} onUpdated={handleUpdated} />
+            ))
           ) : (
             <Empty />
           );

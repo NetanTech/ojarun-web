@@ -2,7 +2,7 @@ import Auth_header from "@/components/Auth_header";
 import Auth_footer from "@/components/Auth_footer";
 import VerifyForm from "./components/form";
 
-export default function Register() {
+export default function VerifyEmail() {
   return (
     <div className="flex min-h-[100vh] flex-col">
       <Auth_header />

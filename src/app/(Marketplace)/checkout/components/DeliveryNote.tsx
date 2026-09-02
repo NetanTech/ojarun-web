@@ -5,25 +5,44 @@ import Modal from "@/components/ui/Modal";
 import { ChevronRight, DeliveryBox } from "../../../../../public/svg/svg";
 import React, { useState } from "react";
 
-const DeliveryNote = () => {
-  const [openDNModal, setOpenDNModal] = useState(false); // delivery note
+interface DeliveryNoteProps {
+  note: string;
+  onSave: (note: string) => void;
+}
+
+const DeliveryNote = ({ note, onSave }: DeliveryNoteProps) => {
+  const [openDNModal, setOpenDNModal] = useState(false);
+  const [draft, setDraft] = useState(note);
+
+  const handleOpen = () => {
+    setDraft(note);
+    setOpenDNModal(true);
+  };
+
+  const handleSave = () => {
+    onSave(draft.trim());
+    setOpenDNModal(false);
+  };
+
   return (
     <div className="flex flex-col gap-2 items-start w-full">
       <p className="font-medium">Delivery note</p>
-      <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3" onClick={() => setOpenDNModal(true)}>
+      <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3" onClick={handleOpen}>
         <div className="flex items-center gap-2 md:gap-5">
           <DeliveryBox />
           <div className="flex flex-col gap-2">
             <p className="body-medium font-medium">
-              Leave a note for the agent
+              {note ? note : "Leave a note for the agent"}
             </p>
-            <p className="text-grey-300 body-small">
-              Special requests, preferences, packaging instructions...
-            </p>
+            {!note && (
+              <p className="text-grey-300 body-small">
+                Special requests, preferences, packaging instructions...
+              </p>
+            )}
           </div>
         </div>
 
-        <button onClick={() => setOpenDNModal(true)}>
+        <button onClick={handleOpen}>
           <ChevronRight />
         </button>
 
@@ -39,7 +58,9 @@ const DeliveryNote = () => {
                 <textarea
                   rows={3}
                   className="focus-within:outline-0 flex-1"
-                  placeholder="Enter a delivery address"
+                  placeholder="Enter a delivery note"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
                 />
               </div>
 
@@ -48,6 +69,7 @@ const DeliveryNote = () => {
                 size="lg"
                 variant="primary"
                 className="w-full"
+                onClick={handleSave}
               >
                 Add note
               </Button>
