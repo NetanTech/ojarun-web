@@ -149,6 +149,7 @@ interface OrderProperties {
 
 
 interface NotificationProps {
+  id?: string;
   type: "promotion" | "order" | "profile";
   title: string;
   message: string;
