@@ -137,6 +137,7 @@ interface OrderProperties {
   deliveryFee: number;
   discount?: number;
   total: number;
+  cancelReason?: string;
 
   payment: PaymentDetails;
   delivery: DeliveryDetails;

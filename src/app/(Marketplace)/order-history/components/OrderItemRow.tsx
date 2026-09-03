@@ -59,7 +59,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const router = useRouter();
   const cancelReasons = [
     "I added the wrong items",
-    "I no longer need th color",
+    "I no longer need these items",
     "I want to change my delivery address",
     "I found a better alternative",
   ];
@@ -86,12 +86,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   };
 
   const handleCancelOrder = async () => {
+    if (!cancelReason) return;
     setActionError(null);
     setActionLoading(true);
     try {
-      const updated = await cancelOrder(props.orderId);
+      const updated = await cancelOrder(props.orderId, cancelReason);
       onUpdated?.(updated);
       setCancelOrderModal(false);
+      setCancelReason(null);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -272,6 +274,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           </div>
         </div>
 
+        {props.status === "failed" && props.cancelReason && (
+          <div className="py-3 border-b border-b-[#E7E7E7]">
+            <p className="text-grey-300 body-small">
+              Cancelled: <span className="text-grey-400">{props.cancelReason}</span>
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-5 border-b border-b-[#E7E7E7] py-4">
           <p className="uppercase text-300 body-medium text-medium">
             items ordered({props.items.length})
@@ -396,6 +406,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             onClick={() => {
               setShowOrderDetails(false);
               setActionError(null);
+              setCancelReason(null);
               setCancelOrderModal(true);
             }}
           >
@@ -420,7 +431,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
       <Modal
         isOpen={showCOmodal}
         onClose={() => setShowCOModal(false)}
-        title="Delivery address"
+        title="Confirm order received"
         className="w-[35%]"
       >
         <div className="flex flex-col items-center justify-center gap-4 w-full">
@@ -499,7 +510,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             size="sm"
             variant="primary"
             className="w-full bg-red-500 text-white hover:bg-red-400"
-            isDisabled={actionLoading}
+            isDisabled={actionLoading || !cancelReason}
             onClick={handleCancelOrder}
           >
             {actionLoading ? "Cancelling..." : "Cancel order"}

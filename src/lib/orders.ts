@@ -108,8 +108,8 @@ export function fetchMyOrder(id: string): Promise<OrderProperties> {
   return authedRequest<OrderProperties>(`/customer-orders/${id}`);
 }
 
-export function cancelOrder(id: string): Promise<OrderProperties> {
-  return authedRequest<OrderProperties>(`/customer-orders/${id}/cancel`, "POST");
+export function cancelOrder(id: string, reason?: string): Promise<OrderProperties> {
+  return authedRequest<OrderProperties>(`/customer-orders/${id}/cancel`, "POST", { reason });
 }
 
 export function confirmOrder(id: string): Promise<OrderProperties> {
