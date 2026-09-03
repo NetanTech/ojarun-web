@@ -19,9 +19,10 @@ interface OrderSummaryProps {
   paymentMethod: "cash" | "card";
   note?: string;
   promo?: PromoValidation | null;
+  deliveryAddress: string;
 }
 
-const OrderSummary = ({ paymentMethod, note, promo }: OrderSummaryProps) => {
+const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSummaryProps) => {
   const cart = useCart();
   const router = useRouter();
   const { customer, ready } = useCustomerSession();
@@ -39,6 +40,10 @@ const OrderSummary = ({ paymentMethod, note, promo }: OrderSummaryProps) => {
 
   const handlePlaceOrder = async () => {
     if (!hasItems || !customer) return;
+    if (!deliveryAddress.trim()) {
+      setError("Add a delivery address before placing your order.");
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -49,7 +54,7 @@ const OrderSummary = ({ paymentMethod, note, promo }: OrderSummaryProps) => {
           price: line.price,
           quantity: line.quantity,
         })),
-        deliveryAddress: customer.deliveryArea || "Not provided",
+        deliveryAddress,
         paymentMethod,
         note: note?.trim() || undefined,
         promoCode: promo?.code,
@@ -152,7 +157,7 @@ const OrderSummary = ({ paymentMethod, note, promo }: OrderSummaryProps) => {
           as="button"
           size="sm"
           variant="primary"
-          isDisabled={!hasItems || loggedOut || loading}
+          isDisabled={!hasItems || loggedOut || loading || !deliveryAddress.trim()}
           onClick={handlePlaceOrder}
         >
           {loading ? "Placing order..." : "Place order"}
