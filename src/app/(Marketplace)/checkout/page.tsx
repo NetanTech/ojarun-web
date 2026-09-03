@@ -16,6 +16,7 @@ const Page = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoValidation | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   return (
     <div className="bg-[#F9F9F9] min-h-screen">
@@ -41,7 +42,7 @@ const Page = () => {
         <div className="flex flex-col lg:flex-row items-start gap-2 w-full">
           <div className="flex-1 w-full bg-white rounded-xl p-5 flex flex-col gap-5">
             {/* Delivery address */}
-            <DeliveryAddress />
+            <DeliveryAddress selected={deliveryAddress} onSelect={setDeliveryAddress} />
 
             {/* Delivery note */}
             <DeliveryNote note={note} onSave={setNote} />
@@ -74,7 +75,12 @@ const Page = () => {
             </div>
           </div>
 
-          <OrderSummary paymentMethod={paymentMethod} note={note} promo={appliedPromo} />
+          <OrderSummary
+            paymentMethod={paymentMethod}
+            note={note}
+            promo={appliedPromo}
+            deliveryAddress={deliveryAddress}
+          />
         </div>
       </div>
     </div>
