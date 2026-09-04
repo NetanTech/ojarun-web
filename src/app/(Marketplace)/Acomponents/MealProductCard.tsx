@@ -6,12 +6,14 @@ import React, { useState } from "react";
 import { formatCurrency } from "../../../../lib/utils";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import { useCart } from "@/lib/cart";
 
 interface MealProductCardProps extends Meal {
   onClick?: () => void;
 }
 
 const MealProductCard = ({
+  id,
   name,
   imageURL,
   servings,
@@ -22,7 +24,16 @@ const MealProductCard = ({
 }: MealProductCardProps) => {
   const [addToWishlist, setAddToWishlist] = useState(false);
   const [showMealDetail, setShowMealDetail] = useState(false);
-  const [quantity, setQuantity] = useState(0);
+  const cart = useCart();
+  const quantity = cart.getQuantity(id);
+
+  const addMealToCart = () => {
+    cart.addItem(
+      { id, name, price: totalPrice, image: imageURL, unit: servings },
+      1,
+    );
+    setShowMealDetail(false);
+  };
 
   return (
     <div
@@ -86,15 +97,13 @@ const MealProductCard = ({
             className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 bg-primary text-white rounded-full shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setQuantity((prev) => Math.max(prev - 1, 0))}
-            >
+            <button onClick={() => cart.setQuantity(id, quantity - 1)}>
               <Minus size={12} className="sm:size-3.75" />
             </button>
 
             <span className="body-small">{quantity}</span>
 
-            <button onClick={() => setQuantity((prev) => prev + 1)}>
+            <button onClick={addMealToCart}>
               <Plus size={12} className="sm:size-3.75" />
             </button>
           </div>
@@ -147,24 +156,9 @@ const MealProductCard = ({
                       <p>{formatCurrency(ingredient.product.price)}</p>
                     </div>
 
-                    <div
-                      className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 bg-primary text-white rounded-full shrink-0"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() =>
-                          setQuantity((prev) => Math.max(prev - 1, 0))
-                        }
-                      >
-                        <Minus size={15} className="sm:size-3.75" />
-                      </button>
-
-                      <span className="body-small">{ingredient.quantity}</span>
-
-                      <button onClick={() => setQuantity((prev) => prev + 1)}>
-                        <Plus size={15} className="sm:size-3.75" />
-                      </button>
-                    </div> 
+                    <div className="flex items-center justify-center px-3 py-1.5 bg-primary text-white rounded-full shrink-0">
+                      <span className="body-small">x{ingredient.quantity}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -174,6 +168,7 @@ const MealProductCard = ({
                 as="button"
                 size="sm"
                 variant="primary"
+                onClick={addMealToCart}
               >
                 Add to cart {formatCurrency(totalPrice)}
               </Button>

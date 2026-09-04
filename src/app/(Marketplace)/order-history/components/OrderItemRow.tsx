@@ -17,6 +17,7 @@ import { Repeat } from "../../../../../public/svg/svg";
 import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
+import { cancelOrder, confirmOrder } from "@/lib/orders";
 
 const statusVariants = {
   "in progress": "bg-warning-50 text-warning-500",
@@ -28,13 +29,6 @@ const statusIcon = {
   "in progress": <HourGlass />,
   successful: <TickCircle />,
   failed: <CancelCircle />,
-};
-
-const timelineStatus: OrderTimeline = {
-  orderReceived: true,
-  shoppingInProgress: false,
-  readyForPickup: false,
-  delivered: false,
 };
 
 const orderTimelines = [
@@ -57,19 +51,55 @@ const orderTimelines = [
   },
 ];
 
-const OrderItemRow = ({ ...props }: OrderProperties) => {
+interface OrderItemRowProps extends OrderProperties {
+  onUpdated?: (updated: OrderProperties) => void;
+}
+
+const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const router = useRouter();
   const cancelReasons = [
     "I added the wrong items",
-    "I no longer need th color",
+    "I no longer need these items",
     "I want to change my delivery address",
     "I found a better alternative",
   ];
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [cancelReason, setCancelReason] = useState<string | null>(null);
   const [showCOmodal, setShowCOModal] = useState(false); // confirm order modal
-  const [cancelOrder, setCancelOrder] = useState(false); // cancel order modal
+  const [cancelOrderModal, setCancelOrderModal] = useState(false); // cancel order modal
   const [order, setOrder] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleConfirmReceived = async () => {
+    setActionError(null);
+    setActionLoading(true);
+    try {
+      const updated = await confirmOrder(props.orderId);
+      onUpdated?.(updated);
+      setShowCOModal(false);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelReason) return;
+    setActionError(null);
+    setActionLoading(true);
+    try {
+      const updated = await cancelOrder(props.orderId, cancelReason);
+      onUpdated?.(updated);
+      setCancelOrderModal(false);
+      setCancelReason(null);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setActionLoading(false);
+    }
+  };
   return (
     <React.Fragment>
       <div
@@ -244,6 +274,14 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
           </div>
         </div>
 
+        {props.status === "failed" && props.cancelReason && (
+          <div className="py-3 border-b border-b-[#E7E7E7]">
+            <p className="text-grey-300 body-small">
+              Cancelled: <span className="text-grey-400">{props.cancelReason}</span>
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-5 border-b border-b-[#E7E7E7] py-4">
           <p className="uppercase text-300 body-medium text-medium">
             items ordered({props.items.length})
@@ -322,7 +360,7 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
           </p>
 
           {orderTimelines.map((item, index) => {
-            const completed = timelineStatus[item.key as keyof OrderTimeline];
+            const completed = props.timeline[item.key as keyof OrderTimeline];
 
             const isLast = index === orderTimelines.length - 1;
 
@@ -367,7 +405,9 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             className="text-red-500 border-red-500 hover:border-red-400 hover:text-red-400 w-full"
             onClick={() => {
               setShowOrderDetails(false);
-              setCancelOrder(true);
+              setActionError(null);
+              setCancelReason(null);
+              setCancelOrderModal(true);
             }}
           >
             Cancel
@@ -380,6 +420,7 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             className="w-full"
             onClick={() => {
               setShowOrderDetails(false);
+              setActionError(null);
               setShowCOModal(true);
             }}
           >
@@ -390,7 +431,7 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
       <Modal
         isOpen={showCOmodal}
         onClose={() => setShowCOModal(false)}
-        title="Delivery address"
+        title="Confirm order received"
         className="w-[35%]"
       >
         <div className="flex flex-col items-center justify-center gap-4 w-full">
@@ -398,26 +439,37 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             Please confirm that you have received your order. By confirming,
             this order will be marked as completed.
           </p>
+          {actionError && (
+            <p className="text-red-600 body-small text-center">{actionError}</p>
+          )}
           <div className="flex items-center gap-2 w-full">
             <Button
               as="button"
               size="sm"
               variant="secondary"
               className="bg-grey-50 text-black border-none w-full"
+              onClick={() => setShowCOModal(false)}
             >
               Cancel
             </Button>
 
-            <Button as="button" size="sm" variant="primary" className="w-full">
-              Confirm
+            <Button
+              as="button"
+              size="sm"
+              variant="primary"
+              className="w-full"
+              isDisabled={actionLoading}
+              onClick={handleConfirmReceived}
+            >
+              {actionLoading ? "Confirming..." : "Confirm"}
             </Button>
           </div>
         </div>
       </Modal>
 
       <Modal
-        isOpen={cancelOrder}
-        onClose={() => setCancelOrder(false)}
+        isOpen={cancelOrderModal}
+        onClose={() => setCancelOrderModal(false)}
         className="w-[35%]"
       >
         <div className="flex flex-col items-center justify-center gap-3 w-full">
@@ -439,12 +491,16 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             </div>
           ))}
         </div>
+        {actionError && (
+          <p className="text-red-600 body-small text-center">{actionError}</p>
+        )}
         <div className="flex items-center gap-2 w-full">
           <Button
             as="button"
             size="sm"
             variant="secondary"
             className="bg-grey-50 text-black border-none w-full"
+            onClick={() => setCancelOrderModal(false)}
           >
             Keep order
           </Button>
@@ -454,8 +510,10 @@ const OrderItemRow = ({ ...props }: OrderProperties) => {
             size="sm"
             variant="primary"
             className="w-full bg-red-500 text-white hover:bg-red-400"
+            isDisabled={actionLoading || !cancelReason}
+            onClick={handleCancelOrder}
           >
-            Cancel order
+            {actionLoading ? "Cancelling..." : "Cancel order"}
           </Button>
         </div>
       </Modal>

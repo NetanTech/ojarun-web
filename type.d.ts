@@ -14,6 +14,7 @@ interface CategoriesType {
 
 // Product Card Props
 interface ProductCardProps {
+  id: string;
   name: string;
   category: string;
   price: number;
@@ -23,6 +24,8 @@ interface ProductCardProps {
 }
 
 interface ShoppingListItem {
+  id?: string;
+  productId?: string;
   name: string;
   price: number;
   imageURL: string;
@@ -132,7 +135,9 @@ interface OrderProperties {
   subtotal: number;
   agentFee: number;
   deliveryFee: number;
+  discount?: number;
   total: number;
+  cancelReason?: string;
 
   payment: PaymentDetails;
   delivery: DeliveryDetails;
@@ -144,6 +149,7 @@ interface OrderProperties {
 
 
 interface NotificationProps {
+  id?: string;
   type: "promotion" | "order" | "profile";
   title: string;
   message: string;

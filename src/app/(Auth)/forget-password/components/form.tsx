@@ -3,12 +3,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { forgotPassword, verifyResetOtp, resetPassword } from "@/lib/customerAuth";
 
 type Step = "email" | "verify" | "newPassword" | "success";
 
 export default function ForgotPasswordFlow() {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
 
   return (
     <div className="mx-auto w-full max-w-[480px] px-6 pt-10">
@@ -20,10 +22,16 @@ export default function ForgotPasswordFlow() {
         />
       )}
       {step === "verify" && (
-        <VerifyStep email={email} onNext={() => setStep("newPassword")} />
+        <VerifyStep
+          email={email}
+          onNext={(token) => {
+            setResetToken(token);
+            setStep("newPassword");
+          }}
+        />
       )}
       {step === "newPassword" && (
-        <NewPasswordStep onNext={() => setStep("success")} />
+        <NewPasswordStep resetToken={resetToken} onNext={() => setStep("success")} />
       )}
       {step === "success" && <SuccessStep />}
     </div>
@@ -40,10 +48,21 @@ function EmailStep({
   setEmail: (v: string) => void;
   onNext: () => void;
 }) {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: send reset code to `email`
-    onNext();
+    setError(null);
+    setLoading(true);
+    try {
+      await forgotPassword(email);
+      onNext();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,11 +89,14 @@ function EmailStep({
         />
       </div>
 
+      {error && <p className="mt-4 text-center text-sm text-red-600">{error}</p>}
+
       <button
         type="submit"
-        className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+        disabled={loading}
+        className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        Continue
+        {loading ? "Sending code..." : "Continue"}
       </button>
     </form>
   );
@@ -83,9 +105,17 @@ function EmailStep({
 /* ---------- Step 2: Verify OTP ---------- */
 const OTP_LENGTH = 6;
 
-function VerifyStep({ email, onNext }: { email: string; onNext: () => void }) {
+function VerifyStep({
+  email,
+  onNext,
+}: {
+  email: string;
+  onNext: (resetToken: string) => void;
+}) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
@@ -118,10 +148,29 @@ function VerifyStep({ email, onNext }: { email: string; onNext: () => void }) {
     inputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: verify otp.join("")
-    onNext();
+    setError(null);
+    setLoading(true);
+    try {
+      const { resetToken } = await verifyResetOtp(email, otp.join(""));
+      onNext(resetToken);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (seconds > 0) return;
+    setError(null);
+    try {
+      await forgotPassword(email);
+      setSeconds(59);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
   };
 
   const isComplete = otp.every((d) => d !== "");
@@ -157,19 +206,21 @@ function VerifyStep({ email, onNext }: { email: string; onNext: () => void }) {
         ))}
       </div>
 
+      {error && <p className="mt-4 text-center text-sm text-red-600">{error}</p>}
+
       <button
         type="submit"
-        disabled={!isComplete}
+        disabled={!isComplete || loading}
         className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Verify
+        {loading ? "Verifying..." : "Verify"}
       </button>
 
       <p className="mt-4 text-center text-sm text-neutral-500">
         Did not receive the OTP?{" "}
         <button
           type="button"
-          onClick={() => seconds === 0 && setSeconds(59)}
+          onClick={handleResend}
           disabled={seconds > 0}
           className="font-semibold text-primary underline disabled:no-underline disabled:opacity-60"
         >
@@ -182,19 +233,35 @@ function VerifyStep({ email, onNext }: { email: string; onNext: () => void }) {
 }
 
 /* ---------- Step 3: New password ---------- */
-function NewPasswordStep({ onNext }: { onNext: () => void }) {
+function NewPasswordStep({
+  resetToken,
+  onNext,
+}: {
+  resetToken: string;
+  onNext: () => void;
+}) {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const mismatch = confirm.length > 0 && password !== confirm;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mismatch || !password) return;
-    // TODO: submit new password
-    onNext();
+    setError(null);
+    setLoading(true);
+    try {
+      await resetPassword(resetToken, password);
+      onNext();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -230,12 +297,14 @@ function NewPasswordStep({ onNext }: { onNext: () => void }) {
         </div>
       </div>
 
+      {error && <p className="mt-4 text-center text-sm text-red-600">{error}</p>}
+
       <button
         type="submit"
-        disabled={mismatch || !password}
+        disabled={mismatch || !password || loading}
         className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Continue
+        {loading ? "Updating..." : "Continue"}
       </button>
     </form>
   );

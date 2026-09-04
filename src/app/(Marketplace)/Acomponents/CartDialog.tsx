@@ -2,20 +2,20 @@
 
 import { Minus, Plus } from "../../../../public/svg/svg";
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BasketEmpty, TrashCan } from "../../../../public/svg/svg";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import { formatCurrency } from "../../../../lib/utils";
 import { useRouter } from "next/navigation";
+import { useCart, CartLine } from "@/lib/cart";
 
 interface CartDrawerProps {
   onClose: () => void;
   isOpen: boolean;
-  products: CartItem[];
 }
 
-const Empty = () => {
+const Empty = ({ onShopNow }: { onShopNow: () => void }) => {
   return (
     <div className="flex items-center text-black justify-center w-full h-full flex-col gap-5">
       <BasketEmpty />
@@ -23,22 +23,29 @@ const Empty = () => {
       <p className="body-medium text-regular text-grey-300">
         Add items from the market to get started
       </p>
-      <Button as="button" size="sm" variant="primary">
+      <Button as="button" size="sm" variant="primary" onClick={onShopNow}>
         Shop now
       </Button>
     </div>
   );
 };
 
-const ItemRow = ({ img, productName, meta, price }: CartItem) => {
-  const [quantity, setQuantity] = useState(1);
+const ItemRow = ({
+  line,
+  onSetQuantity,
+  onRemove,
+}: {
+  line: CartLine;
+  onSetQuantity: (id: string, qty: number) => void;
+  onRemove: (id: string) => void;
+}) => {
   return (
     <div className="flex border-b-2 items-center justify-between py-3 pb-5 border-b-[#E7E7E7] text-black">
       <div className="flex items-start gap-2">
         <div className="w-20 h-20 rounded-[6.1px] overflow-hidden border border-[#E7E7E7]">
           <Image
-            src={img || "/assets/Untitled design.png"}
-            alt={productName}
+            src={line.image || "/assets/Untitled design.png"}
+            alt={line.name}
             width={100}
             height={100}
             className="object-cover w-full h-full"
@@ -46,11 +53,11 @@ const ItemRow = ({ img, productName, meta, price }: CartItem) => {
         </div>
 
         <div className="flex flex-col">
-          <p className="body-medium text-medium capitalize">{productName}</p>
-          <p className="body-xsmall text-grey-300 capitalize">{meta}</p>
+          <p className="body-medium text-medium capitalize">{line.name}</p>
+          <p className="body-xsmall text-grey-300 capitalize">{line.unit}</p>
           <p className="body-medium text-medium">
             {" "}
-            {formatCurrency(price, "NGN")}{" "}
+            {formatCurrency(line.price, "NGN")}{" "}
           </p>
         </div>
       </div>
@@ -59,20 +66,19 @@ const ItemRow = ({ img, productName, meta, price }: CartItem) => {
         <div className="flex items-center gap-4 bg-green-500 rounded-full p-2 text-white hover:bg-green-400">
           <Minus
             size={15}
-            onClick={() => {
-              if (quantity > 0) setQuantity((prev) => prev - 1);
-            }}
+            onClick={() => onSetQuantity(line.id, line.quantity - 1)}
           />
-          {quantity}
+          {line.quantity}
           <Plus
             size={15}
-            onClick={() => {
-              if (quantity) setQuantity((prev) => prev + 1);
-            }}
+            onClick={() => onSetQuantity(line.id, line.quantity + 1)}
           />
         </div>
 
-        <button className="bg-red-50 p-2 rounded-full flex items-center justify-center text-red-500">
+        <button
+          className="bg-red-50 p-2 rounded-full flex items-center justify-center text-red-500"
+          onClick={() => onRemove(line.id)}
+        >
           <TrashCan className="w-5 h-5" />
         </button>
       </div>
@@ -80,8 +86,10 @@ const ItemRow = ({ img, productName, meta, price }: CartItem) => {
   );
 };
 
-const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
+const CartDrawer = ({ onClose, isOpen }: CartDrawerProps) => {
   const route = useRouter();
+  const cart = useCart();
+
   useEffect(() => {
     const handleEscClick = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -103,34 +111,32 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
     };
   }, [isOpen, onClose]);
 
+  const goShopping = () => {
+    onClose();
+    route.push("/marketplace");
+  };
+
   const cartContent = (
     <>
-      {products.length > 0 ? (
+      {cart.lines.length > 0 ? (
         <div
           className="flex flex-col gap-3 overflow-y-auto pb-10"
           style={{ scrollbarWidth: "none" }}
         >
-          {products.map((product, i) => (
+          {cart.lines.map((line) => (
             <ItemRow
-              productName={product.productName}
-              meta={product.meta}
-              img={product.img}
-              quantity={product.quantity}
-              key={i}
-              price={product.price}
+              line={line}
+              key={line.id}
+              onSetQuantity={cart.setQuantity}
+              onRemove={cart.removeItem}
             />
           ))}
 
           <div className="flex items-center justify-between my-3">
             <p className="body-medium capitalize text-grey-400">
-              Subtotal({products.length + " " + "items"})
+              Subtotal({cart.totalItems + " " + "items"})
             </p>
-            <p className="text-black">
-              {formatCurrency(
-                products.reduce((prev, n) => prev + n.price, 0),
-                "NGN"
-              )}
-            </p>
+            <p className="text-black">{formatCurrency(cart.subtotal, "NGN")}</p>
           </div>
 
           <Button
@@ -139,7 +145,7 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
             variant="primary"
             size="sm"
             onClick={() => {
-              onClose()
+              onClose();
               route.push("/checkout");
             }}
           >
@@ -147,7 +153,7 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
           </Button>
         </div>
       ) : (
-        <Empty />
+        <Empty onShopNow={goShopping} />
       )}
     </>
   );
@@ -159,7 +165,7 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
         style={{ maxHeight: "85vh" }}
       >
         <div
-          className={`flex items-center text-black justify-between my-3 ${products.length > 0 && "border-b border-b-[#E7E7E7] py-3"}`}
+          className={`flex items-center text-black justify-between my-3 ${cart.lines.length > 0 && "border-b border-b-[#E7E7E7] py-3"}`}
         >
           <h6 className="font-medium">Cart</h6>
           <X className="text cursor-pointer" onClick={onClose} />
@@ -176,7 +182,7 @@ const CartDrawer = ({ onClose, isOpen, products }: CartDrawerProps) => {
         className={`hidden md:block w-[550px] top-0 bottom-0 fixed z-50 right-0 bg-white py-4 px-6 ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out`}
       >
         <div
-          className={`flex items-center text-black justify-between my-3 ${products.length > 0 && "border-b border-b-[#E7E7E7] py-3"}`}
+          className={`flex items-center text-black justify-between my-3 ${cart.lines.length > 0 && "border-b border-b-[#E7E7E7] py-3"}`}
         >
           <h6 className="font-medium">Cart</h6>
           <X className="text cursor-pointer" onClick={onClose} />

@@ -1,17 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import BreadCrumb from "../Acomponents/bread-crumb";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Home, SafeDelivery } from "../../../../public/svg/svg";
+import { Home, SafeDelivery } from "../../../../public/svg/svg";
 import DeliveryAddress from "./components/DeliveryAddress";
 import DeliveryNote from "./components/DeliveryNote";
 import PromoCode from "./components/PromoCode";
 import BankTransfer from "./components/BankTransfer";
 import OrderSummary from "./components/OrderSummary";
+import { PromoValidation } from "@/lib/orders";
 
 const Page = () => {
   const pathName = usePathname();
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
+  const [note, setNote] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoValidation | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+
   return (
     <div className="bg-[#F9F9F9] min-h-screen">
       <div className="lg:max-w-300 lg:w-full mx-3 lg:mx-auto flex flex-col items-start gap-2 py-5">
@@ -36,34 +42,45 @@ const Page = () => {
         <div className="flex flex-col lg:flex-row items-start gap-2 w-full">
           <div className="flex-1 w-full bg-white rounded-xl p-5 flex flex-col gap-5">
             {/* Delivery address */}
-            <DeliveryAddress />
+            <DeliveryAddress selected={deliveryAddress} onSelect={setDeliveryAddress} />
 
             {/* Delivery note */}
-            <DeliveryNote />
+            <DeliveryNote note={note} onSave={setNote} />
 
             {/* Payment method */}
             <div className="flex flex-col gap-2 items-start w-full">
               <p className="font-medium">Payment</p>
               <div className="flex flex-col gap-2 w-full">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-                  <div className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4">
+                  <div
+                    className={`flex items-center gap-3 flex-1 w-full justify-between border p-2 rounded-xl py-4 cursor-pointer ${
+                      paymentMethod === "cash"
+                        ? "border-primary bg-primary/5"
+                        : "border-[#E7E7E7]"
+                    }`}
+                    onClick={() => setPaymentMethod("cash")}
+                  >
                     <div className="flex items-center gap-2 md:gap-5">
                       <SafeDelivery />
                       <p className="body-medium">Pay on Delivery</p>
                     </div>
-
-                    <button>
-                      <ChevronRight />
-                    </button>
                   </div>
-                  <BankTransfer />
+                  <BankTransfer
+                    selected={paymentMethod === "card"}
+                    onSelect={() => setPaymentMethod("card")}
+                  />
                 </div>
-                <PromoCode />
+                <PromoCode applied={appliedPromo} onApply={setAppliedPromo} />
               </div>
             </div>
           </div>
 
-          <OrderSummary />
+          <OrderSummary
+            paymentMethod={paymentMethod}
+            note={note}
+            promo={appliedPromo}
+            deliveryAddress={deliveryAddress}
+          />
         </div>
       </div>
     </div>

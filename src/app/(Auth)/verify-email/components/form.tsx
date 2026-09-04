@@ -1,13 +1,34 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  verifyOtp,
+  resendOtp,
+  saveSession,
+  getPendingEmail,
+  clearPendingEmail,
+} from "@/lib/customerAuth";
 
 const OTP_LENGTH = 6;
 
-export default function VerifyForm({ phone = "**********80" }: { phone?: string }) {
+export default function VerifyForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+
+  useEffect(() => {
+    const pending = getPendingEmail();
+    if (!pending) {
+      router.replace("/login");
+      return;
+    }
+    setEmail(pending);
+  }, [router]);
 
   // Resend countdown
   useEffect(() => {
@@ -45,17 +66,32 @@ export default function VerifyForm({ phone = "**********80" }: { phone?: string 
     inputsRef.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const code = otp.join("");
-    // TODO: call your verify endpoint with `code`
-    console.log("Verifying:", code);
+    if (!email) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const { accessToken, customer } = await verifyOtp(email, otp.join(""));
+      saveSession(accessToken, customer);
+      clearPendingEmail();
+      router.push("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleResend = () => {
-    if (seconds > 0) return;
-    setSeconds(59);
-    // TODO: trigger resend
+  const handleResend = async () => {
+    if (seconds > 0 || !email) return;
+    setError(null);
+    try {
+      await resendOtp(email);
+      setSeconds(59);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
   };
 
   const isComplete = otp.every((d) => d !== "");
@@ -69,7 +105,7 @@ export default function VerifyForm({ phone = "**********80" }: { phone?: string 
         <h1 className="text-2xl font-bold text-neutral-900">Verification</h1>
         <p className="mt-2 text-sm text-neutral-500">
           A verification code has been sent to{" "}
-          <span className="font-medium text-neutral-700">{phone}</span>
+          <span className="font-medium text-neutral-700">{email ?? "..."}</span>
         </p>
       </div>
 
@@ -93,13 +129,17 @@ export default function VerifyForm({ phone = "**********80" }: { phone?: string 
         ))}
       </div>
 
+      {error && (
+        <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+      )}
+
       {/* Verify button */}
       <button
         type="submit"
-        disabled={!isComplete}
+        disabled={!isComplete || loading}
         className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Verify
+        {loading ? "Verifying..." : "Verify"}
       </button>
 
       {/* Resend */}

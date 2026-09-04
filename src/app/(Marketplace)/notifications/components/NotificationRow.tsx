@@ -3,14 +3,21 @@
 import React from "react";
 import { getNotificationIcon } from "../../../../../lib/utils";
 
-const NotificationRow = ({ ...props }: NotificationProps) => {
+interface NotificationRowProps extends NotificationProps {
+  onClick?: () => void;
+}
+
+const NotificationRow = ({ onClick, ...props }: NotificationRowProps) => {
   return (
-    <div className="flex items-center gap-3 md:gap-5 w-full border border-[#E7E7E7] py-3 md:py-4 rounded-xl px-3 md:px-5 hover:bg-green-50/40 cursor-default">
+    <div
+      className="flex items-center gap-3 md:gap-5 w-full border border-[#E7E7E7] py-3 md:py-4 rounded-xl px-3 md:px-5 hover:bg-green-50/40 cursor-pointer"
+      onClick={onClick}
+    >
       <div className="relative">
         {getNotificationIcon(props.type)}
 
-        {props.isRead && (
-          <div className="absolute bg-red-500 p-2 rounded-full -top-3 -right-2" />
+        {!props.isRead && (
+          <div className="absolute bg-red-500 w-2.5 h-2.5 rounded-full -top-0.5 -right-0.5" />
         )}
       </div>
 

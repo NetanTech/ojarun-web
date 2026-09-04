@@ -5,9 +5,13 @@ import BreadCrumb from "../Acomponents/bread-crumb";
 import { CheckCheck, Home } from "../../../../public/svg/svg";
 import { usePathname } from "next/navigation";
 import Button from "@/components/ui/Button";
-import { MOCK_NOTIFICATIONS } from "../../../../constants/data";
 import NotificationRow from "./components/NotificationRow";
 import { NotificationBell } from "../../../../public/svg/svg";
+import {
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+} from "@/lib/notifications";
 
 interface FilterType {
   name: string;
@@ -34,6 +38,50 @@ const Page = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const [notifications, setNotifications] = useState<NotificationProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [markingAll, setMarkingAll] = useState(false);
+
+  const loadNotifications = () => {
+    setLoading(true);
+    setError(null);
+    fetchNotifications()
+      .then(setNotifications)
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Could not load notifications."),
+      )
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadNotifications();
+  }, []);
+
+  const handleRowClick = async (notification: NotificationProps) => {
+    if (notification.isRead || !notification.id) return;
+    try {
+      const updated = await markNotificationRead(notification.id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === updated.id ? updated : n)),
+      );
+    } catch {
+      // Non-critical — leave it unread rather than surface an error for this.
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    setMarkingAll(true);
+    try {
+      await markAllNotificationsRead();
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not mark all as read.");
+    } finally {
+      setMarkingAll(false);
+    }
+  };
 
   useEffect(() => {
     const activeButton = buttonRefs.current[activeIndex];
@@ -89,25 +137,48 @@ const Page = () => {
           ))}
         </div>
 
-        <Button as="button" className="text-green-500" size="sm"variant="secondary" leftIcon={ <CheckCheck /> }>
-            Mark all as read
+        <Button
+          as="button"
+          className="text-green-500"
+          size="sm"
+          variant="secondary"
+          leftIcon={<CheckCheck />}
+          isDisabled={markingAll || notifications.every((n) => n.isRead)}
+          onClick={handleMarkAllRead}
+        >
+          Mark all as read
         </Button>
       </div>
 
       <div className="flex flex-col gap-5 w-full my-3">
-        {(() => {
-          const filtered = filter === 'all' ? MOCK_NOTIFICATIONS : MOCK_NOTIFICATIONS.filter(n => !n.isRead);
-          return filtered.length > 0 ? (
-            filtered.map((notification, i) => (
-              <NotificationRow { ...notification } key={i} />
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 w-full gap-3">
-              <NotificationBell />
-              <p className="text-grey-300 body-medium">No notifications to show</p>
-            </div>
-          );
-        })()}
+        {loading ? (
+          <p className="text-grey-300 body-medium py-10 text-center">Loading notifications...</p>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-10 w-full gap-3">
+            <p className="text-red-500 body-small">{error}</p>
+            <Button as="button" size="sm" variant="secondary" onClick={loadNotifications}>
+              Try again
+            </Button>
+          </div>
+        ) : (
+          (() => {
+            const filtered = filter === "all" ? notifications : notifications.filter((n) => !n.isRead);
+            return filtered.length > 0 ? (
+              filtered.map((notification) => (
+                <NotificationRow
+                  {...notification}
+                  key={notification.id}
+                  onClick={() => handleRowClick(notification)}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 w-full gap-3">
+                <NotificationBell />
+                <p className="text-grey-300 body-medium">No notifications to show</p>
+              </div>
+            );
+          })()
+        )}
       </div>
     </div>
   );
