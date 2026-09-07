@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -92,12 +94,12 @@ const TOKEN_KEY = "ojarun_token";
 const CUSTOMER_KEY = "ojarun_customer";
 const PENDING_EMAIL_KEY = "ojarun_pending_email";
 
-export function saveSession(token: string, customer: Customer) {
+function persistSession(token: string, customer: Customer) {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(CUSTOMER_KEY, JSON.stringify(customer));
 }
 
-export function getStoredCustomer(): Customer | null {
+function getStoredCustomer(): Customer | null {
   if (typeof window === "undefined") return null;
   const raw = localStorage.getItem(CUSTOMER_KEY);
   return raw ? (JSON.parse(raw) as Customer) : null;
@@ -108,7 +110,7 @@ export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-export function clearSession() {
+function forgetSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(CUSTOMER_KEY);
 }
@@ -128,24 +130,54 @@ export function clearPendingEmail() {
   sessionStorage.removeItem(PENDING_EMAIL_KEY);
 }
 
-/**
- * Reads the logged-in customer from localStorage on mount. `ready` stays
- * false for one render so pages don't briefly flash a "logged out" state
- * before the client has had a chance to check storage.
- */
-export function useCustomerSession() {
-  const [customer, setCustomerState] = useState<Customer | null>(null);
+// --- Shared session state ---
+//
+// Every component that needs to know who's logged in shares this one
+// context instead of each independently reading localStorage into its own
+// state. Without that, logging out in one component (e.g. the header) left
+// every other already-mounted component (checkout, order history, the
+// favourites provider) still holding onto the old customer until it
+// happened to remount — the "still works as if I'm logged in" bug.
+
+type CustomerSessionValue = {
+  customer: Customer | null;
+  ready: boolean;
+  login: (token: string, customer: Customer) => void;
+  logout: () => void;
+};
+
+const CustomerSessionContext = createContext<CustomerSessionValue | null>(null);
+
+export function CustomerSessionProvider({ children }: { children: React.ReactNode }) {
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setCustomerState(getStoredCustomer());
+    setCustomer(getStoredCustomer());
     setReady(true);
   }, []);
 
-  const logout = () => {
-    clearSession();
-    setCustomerState(null);
+  const login = (token: string, nextCustomer: Customer) => {
+    persistSession(token, nextCustomer);
+    setCustomer(nextCustomer);
   };
 
-  return { customer, ready, logout };
+  const logout = () => {
+    forgetSession();
+    setCustomer(null);
+  };
+
+  return (
+    <CustomerSessionContext.Provider value={{ customer, ready, login, logout }}>
+      {children}
+    </CustomerSessionContext.Provider>
+  );
+}
+
+export function useCustomerSession(): CustomerSessionValue {
+  const ctx = useContext(CustomerSessionContext);
+  if (!ctx) {
+    throw new Error("useCustomerSession must be used inside a CustomerSessionProvider");
+  }
+  return ctx;
 }
