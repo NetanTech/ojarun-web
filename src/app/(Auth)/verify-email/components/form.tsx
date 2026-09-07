@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import {
   verifyOtp,
   resendOtp,
-  saveSession,
   getPendingEmail,
   clearPendingEmail,
+  useCustomerSession,
 } from "@/lib/customerAuth";
 
 const OTP_LENGTH = 6;
 
 export default function VerifyForm() {
   const router = useRouter();
+  const { login } = useCustomerSession();
   const [email, setEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
@@ -73,7 +74,7 @@ export default function VerifyForm() {
     setLoading(true);
     try {
       const { accessToken, customer } = await verifyOtp(email, otp.join(""));
-      saveSession(accessToken, customer);
+      login(accessToken, customer);
       clearPendingEmail();
       router.push("/marketplace");
     } catch (err) {
