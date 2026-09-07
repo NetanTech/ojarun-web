@@ -8,7 +8,7 @@ import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 const footerLinks = {
   Company: [
     { label: "About us", href: "/about" },
-    { label: "Contact us", href: "/contact" },
+    { label: "Contact us", href: "/contact-us" },
     { label: "FAQ", href: "/faq" },
   ],
   Product: [
