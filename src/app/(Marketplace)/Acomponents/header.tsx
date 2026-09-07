@@ -17,7 +17,7 @@ import {
   ShoppingCart,
   User,
 } from "../../../../public/svg/svg";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import CartDrawer from "./CartDialog";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -77,11 +77,13 @@ const Header = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = searchValue.trim();
+    setShowMobileSearch(false);
     router.push(trimmed ? `/marketplace?q=${encodeURIComponent(trimmed)}` : "/marketplace");
   };
   const [showMenu, setShowMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showLocModal, setShowLocModal] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -227,32 +229,61 @@ const Header = () => {
           )}
         </div>
 
-        <div className="lg:hidden z-20 text-black flex items-center gap-3">
-          <button
-            className="bg-white px-3 py-2 flex rounded-lg items-center justify-center"
-            onClick={() => router.push("/marketplace")}
-            aria-label="Search"
-          >
-            <Search2 size={20} />
-          </button>
-          <button
-            className="relative bg-white px-3 py-2 flex rounded-lg items-center justify-center"
-            onClick={() => setShowCart(true)}
-          >
-            <ShoppingCart />
-            {cart.totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-semibold text-white">
-                {cart.totalItems}
-              </span>
-            )}
-          </button>
+        <div
+          className={`lg:hidden z-20 text-black flex items-center gap-3 ${showMobileSearch ? "flex-1" : ""}`}
+        >
+          {showMobileSearch ? (
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex items-center gap-1 p-2 bg-white rounded-lg w-full"
+            >
+              <button type="submit" aria-label="Search">
+                <Search2 className="text-primary" size={18} />
+              </button>
+              <input
+                autoFocus
+                className="focus-within:outline-0 flex-1 text-black text-sm min-w-0"
+                placeholder="Search items, meals, market"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+              <button
+                type="button"
+                aria-label="Close search"
+                onClick={() => setShowMobileSearch(false)}
+              >
+                <X size={18} className="text-grey-400" />
+              </button>
+            </form>
+          ) : (
+            <>
+              <button
+                className="bg-white px-3 py-2 flex rounded-lg items-center justify-center"
+                onClick={() => setShowMobileSearch(true)}
+                aria-label="Search"
+              >
+                <Search2 size={20} />
+              </button>
+              <button
+                className="relative bg-white px-3 py-2 flex rounded-lg items-center justify-center"
+                onClick={() => setShowCart(true)}
+              >
+                <ShoppingCart />
+                {cart.totalItems > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-semibold text-white">
+                    {cart.totalItems}
+                  </span>
+                )}
+              </button>
 
-          <button
-            className="border text-white border-white rounded-lg p-2"
-            onClick={() => setShowMobileMenu(true)}
-          >
-            <Menu size={20} />
-          </button>
+              <button
+                className="border text-white border-white rounded-lg p-2"
+                onClick={() => setShowMobileMenu(true)}
+              >
+                <Menu size={20} />
+              </button>
+            </>
+          )}
         </div>
       </div>
       <CartDrawer isOpen={showCart} onClose={() => setShowCart(false)} />
