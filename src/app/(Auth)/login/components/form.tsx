@@ -21,7 +21,7 @@ export default function LoginForm() {
     try {
       const { accessToken, customer } = await loginCustomer({ phone, password });
       saveSession(accessToken, customer);
-      router.push("/");
+      router.push("/marketplace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

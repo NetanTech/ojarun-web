@@ -28,7 +28,7 @@ export default function SuccessCard() {
 
       <button
         type="button"
-        onClick={() => router.push("/market")}
+        onClick={() => router.push("/marketplace")}
         className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
       >
         Proceed to market
