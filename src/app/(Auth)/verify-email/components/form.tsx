@@ -75,7 +75,7 @@ export default function VerifyForm() {
       const { accessToken, customer } = await verifyOtp(email, otp.join(""));
       saveSession(accessToken, customer);
       clearPendingEmail();
-      router.push("/");
+      router.push("/marketplace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
