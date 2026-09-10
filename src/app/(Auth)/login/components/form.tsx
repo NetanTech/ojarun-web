@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { loginCustomer, saveSession } from "@/lib/customerAuth";
+import { loginCustomer, useCustomerSession } from "@/lib/customerAuth";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useCustomerSession();
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +21,7 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const { accessToken, customer } = await loginCustomer({ phone, password });
-      saveSession(accessToken, customer);
+      login(accessToken, customer);
       router.push("/marketplace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
