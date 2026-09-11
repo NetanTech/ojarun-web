@@ -198,6 +198,10 @@ const ShoppingListCard = ({
               className="flex-1 overflow-y-auto py-4 flex flex-col gap-4"
               style={{ scrollbarWidth: "thin" }}
             >
+              <p className="uppercase text-grey-300 body-xsmall font-medium">
+                Items ({items.length})
+              </p>
+
               {items.map((item) => (
                 <div
                   key={item.productId || item.name}
