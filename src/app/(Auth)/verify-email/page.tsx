@@ -7,7 +7,7 @@ export default function VerifyEmail() {
     <div className="flex min-h-[100vh] flex-col">
       <Auth_header />
 
-      <main className="flex flex-1 items-center justify-center">
+      <main className="flex flex-1 justify-center">
         <VerifyForm />
       </main>
 
