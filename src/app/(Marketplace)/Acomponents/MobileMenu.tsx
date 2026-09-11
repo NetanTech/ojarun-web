@@ -97,17 +97,28 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
             </nav>
 
             <div className="border-t border-[#E7E7E7] px-5 py-4">
-              <button
-                className="flex items-center gap-4 text-red-500 w-full py-2"
-                onClick={() => {
-                  onClose();
-                  logout();
-                  router.push("/login");
-                }}
-              >
-                <LogOut />
-                <p className="body-medium">Log out</p>
-              </button>
+              {customer ? (
+                <button
+                  className="flex items-center gap-4 text-red-500 w-full py-2"
+                  onClick={() => {
+                    onClose();
+                    logout();
+                    router.push("/login");
+                  }}
+                >
+                  <LogOut />
+                  <p className="body-medium">Log out</p>
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={onClose}
+                  className="flex items-center gap-4 text-green-500 w-full py-2"
+                >
+                  <LogOut />
+                  <p className="body-medium">Log in</p>
+                </Link>
+              )}
             </div>
       </div>
     </>

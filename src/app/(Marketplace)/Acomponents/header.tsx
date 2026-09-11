@@ -30,7 +30,7 @@ import { useCart } from "@/lib/cart";
 const routes = [
   {
     icon: BagCheck,
-    name: "order hisotry",
+    name: "order history",
     href: "/order-history",
   },
   {
