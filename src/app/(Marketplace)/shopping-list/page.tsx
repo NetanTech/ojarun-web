@@ -463,7 +463,7 @@ const Page = () => {
             href: "/",
             icon: <Home size={18} className="text-grey-300" />,
           },
-          { title: "Shopping lists", href: "/shopping-list" },
+          { title: "Shopping list", href: "/shopping-list" },
         ]}
       />
 

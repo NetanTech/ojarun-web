@@ -1038,8 +1038,8 @@ export function BasketEmpty({
           y2="52.8881"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F1F1F1" />
-          <stop offset="1" stop-color="#CECECE" />
+          <stop stopColor="#F1F1F1" />
+          <stop offset="1" stopColor="#CECECE" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_927_11024"
@@ -1049,8 +1049,8 @@ export function BasketEmpty({
           y2="44.7347"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F4F4F4" />
-          <stop offset="1" stop-color="#B6B6B6" />
+          <stop stopColor="#F4F4F4" />
+          <stop offset="1" stopColor="#B6B6B6" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_927_11024"
@@ -1060,8 +1060,8 @@ export function BasketEmpty({
           y2="17.9716"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F5F5F5" />
-          <stop offset="1" stop-color="#C8C8C8" />
+          <stop stopColor="#F5F5F5" />
+          <stop offset="1" stopColor="#C8C8C8" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_927_11024"
@@ -1071,7 +1071,7 @@ export function BasketEmpty({
           y2="42.761"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#353535" />
+          <stop stopColor="#353535" />
           <stop offset="1" />
         </linearGradient>
         <clipPath id="clip0_927_11024">
@@ -2013,8 +2013,8 @@ export function ShoppingBags({
           y2="163.833"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7451A0" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#7451A0" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_953_6964"
@@ -2024,8 +2024,8 @@ export function ShoppingBags({
           y2="11.5872"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_953_6964"
@@ -2035,8 +2035,8 @@ export function ShoppingBags({
           y2="90.9173"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_953_6964"
@@ -2046,8 +2046,8 @@ export function ShoppingBags({
           y2="99.4163"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_953_6964"
@@ -2057,8 +2057,8 @@ export function ShoppingBags({
           y2="19.3685"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_953_6964"
@@ -2068,8 +2068,8 @@ export function ShoppingBags({
           y2="149.475"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#3F2B59" />
-          <stop offset="1" stop-color="#653E95" />
+          <stop stopColor="#3F2B59" />
+          <stop offset="1" stopColor="#653E95" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_953_6964"
@@ -2079,8 +2079,8 @@ export function ShoppingBags({
           y2="112.63"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_953_6964"
@@ -2090,8 +2090,8 @@ export function ShoppingBags({
           y2="112.794"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_953_6964"
@@ -2101,8 +2101,8 @@ export function ShoppingBags({
           y2="180.149"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_953_6964"
@@ -2112,8 +2112,8 @@ export function ShoppingBags({
           y2="104.514"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_953_6964"
@@ -2123,8 +2123,8 @@ export function ShoppingBags({
           y2="101.021"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_953_6964"
@@ -2134,8 +2134,8 @@ export function ShoppingBags({
           y2="111.084"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_953_6964"
@@ -2145,8 +2145,8 @@ export function ShoppingBags({
           y2="188.534"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FCADB7" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FCADB7" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_953_6964"
@@ -2156,8 +2156,8 @@ export function ShoppingBags({
           y2="192.554"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0.01" stop-color="#B6DE4D" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop offset="0.01" stopColor="#B6DE4D" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_953_6964"
@@ -2167,8 +2167,8 @@ export function ShoppingBags({
           y2="236.77"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#A9D82E" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop stopColor="#A9D82E" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_953_6964"
@@ -2178,9 +2178,9 @@ export function ShoppingBags({
           y2="-30.4792"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#A9D82E" />
-          <stop offset="0.22" stop-color="#94C724" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop stopColor="#A9D82E" />
+          <stop offset="0.22" stopColor="#94C724" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_953_6964"
@@ -2190,8 +2190,8 @@ export function ShoppingBags({
           y2="92.5868"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.99" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.99" stopColor="#7E1003" />
         </linearGradient>
         <linearGradient
           id="paint17_linear_953_6964"
@@ -2201,8 +2201,8 @@ export function ShoppingBags({
           y2="86.1793"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.99" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.99" stopColor="#7E1003" />
         </linearGradient>
         <linearGradient
           id="paint18_linear_953_6964"
@@ -2212,11 +2212,11 @@ export function ShoppingBags({
           y2="188.521"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.2" stop-color="#C31D07" />
-          <stop offset="0.47" stop-color="#B21A06" />
-          <stop offset="0.77" stop-color="#971504" />
-          <stop offset="1" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.2" stopColor="#C31D07" />
+          <stop offset="0.47" stopColor="#B21A06" />
+          <stop offset="0.77" stopColor="#971504" />
+          <stop offset="1" stopColor="#7E1003" />
         </linearGradient>
       </defs>
     </svg>
