@@ -6,6 +6,7 @@ const Empty = () => {
   return (
     <div className="py-30 flex flex-col items-center w-full justify-center gap-3">
       <PaymentSlip />
+      <h6>No orders yet</h6>
       <p className="body-medium text-300">
         Your orders show here, make your first order
       </p>
