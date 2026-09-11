@@ -27,7 +27,7 @@ const Page = () => {
           },
         ]}
       />
-      <h6 className="text-green-500">Favourites</h6>
+      <h6>Favourites</h6>
       {loading ? (
         <ProductGrid products={[]} loading />
       ) : products.length > 0 ? (
