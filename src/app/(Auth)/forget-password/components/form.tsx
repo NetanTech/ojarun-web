@@ -28,6 +28,7 @@ export default function ForgotPasswordFlow() {
             setResetToken(token);
             setStep("newPassword");
           }}
+          onBack={() => setStep("email")}
         />
       )}
       {step === "newPassword" && (
@@ -108,9 +109,11 @@ const OTP_LENGTH = 6;
 function VerifyStep({
   email,
   onNext,
+  onBack,
 }: {
   email: string;
   onNext: (resetToken: string) => void;
+  onBack: () => void;
 }) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
@@ -177,6 +180,14 @@ function VerifyStep({
 
   return (
     <form onSubmit={handleSubmit}>
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-6 text-sm font-semibold text-neutral-500 hover:text-neutral-700"
+      >
+        ← Back
+      </button>
+
       <div className="text-center">
         <h1 className="text-2xl font-bold text-neutral-900">Email verification</h1>
         <p className="mt-2 text-sm text-neutral-500">

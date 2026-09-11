@@ -9,7 +9,8 @@ import { registerCustomer, setPendingEmail } from "@/lib/customerAuth";
 export default function SignupForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,7 @@ export default function SignupForm() {
     setLoading(true);
     try {
       const { email: normalizedEmail } = await registerCustomer({
-        name,
+        name: `${firstName} ${lastName}`.trim(),
         phone,
         email,
         password,
@@ -53,24 +54,44 @@ export default function SignupForm() {
       </div>
 
       <div className="mt-8 space-y-5">
-        {/* Full name */}
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-neutral-900"
-          >
-            Full name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
-            className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-          />
+        {/* First / Last name */}
+        <div className="flex gap-3">
+          <div className="w-full">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-semibold text-neutral-900"
+            >
+              First name
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter first name"
+              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div className="w-full">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-semibold text-neutral-900"
+            >
+              Last name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter last name"
+              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
         </div>
 
         {/* Phone number */}
