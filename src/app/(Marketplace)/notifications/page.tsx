@@ -110,7 +110,7 @@ const Page = () => {
           },
         ]}
       />
-      <h6 className="text-green-500">Notifications</h6>
+      <h6>Notifications</h6>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
         <div
           ref={filterRef}
