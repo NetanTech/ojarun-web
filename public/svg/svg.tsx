@@ -2515,18 +2515,18 @@ export function MapPin2({
       <path
         d="M7 18C5.17107 18.4117 4 19.0443 4 19.7537C4 20.9943 7.58172 22 12 22C16.4183 22 20 20.9943 20 19.7537C20 19.0443 18.8289 18.4117 17 18"
         stroke="black"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
       <path
         d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
         stroke="black"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
       <path
         d="M13.2574 17.4936C12.9201 17.8184 12.4693 18 12.0002 18C11.531 18 11.0802 17.8184 10.7429 17.4936C7.6543 14.5008 3.51519 11.1575 5.53371 6.30373C6.6251 3.67932 9.24494 2 12.0002 2C14.7554 2 17.3752 3.67933 18.4666 6.30373C20.4826 11.1514 16.3536 14.5111 13.2574 17.4936Z"
         stroke="black"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
     </svg>
   );
@@ -3091,40 +3091,40 @@ export function ShoppingCart({
       <path
         d="M6.66699 13.3333L13.9337 12.7278C16.2075 12.5383 16.7179 12.0417 16.9699 9.77406L17.5003 5"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <path
         d="M5 5L18.3333 5"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <circle
         cx="5.00065"
         cy="16.6667"
         r="1.66667"
         stroke="black"
-        stroke-width="1.25"
+        strokeWidth="1.25"
       />
       <circle
         cx="14.1667"
         cy="16.6667"
         r="1.66667"
         stroke="black"
-        stroke-width="1.25"
+        strokeWidth="1.25"
       />
       <path
         d="M6.66667 16.6667L12.5 16.6667"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <path
         d="M1.66699 1.66675L2.47199 1.66675C3.25923 1.66675 3.94544 2.18724 4.13637 2.92919L6.61576 12.5638C6.74105 13.0507 6.63383 13.5665 6.32386 13.968L5.5271 15.0001"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
     </svg>
   );
