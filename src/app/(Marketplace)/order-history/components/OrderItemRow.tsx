@@ -59,7 +59,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const router = useRouter();
   const cancelReasons = [
     "I added the wrong items",
-    "I no longer need these items",
+    "I no longer need the order",
     "I want to change my delivery address",
     "I found a better alternative",
   ];
@@ -325,6 +325,10 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             <p className="text-grey-300">Delivery fee</p>
             <p>{formatCurrency(props.deliveryFee, "NGN")}</p>
           </div>
+          <div className="flex items-center justify-between w-full">
+            <p className="font-medium">Total</p>
+            <p className="font-medium">{formatCurrency(props.total, "NGN")}</p>
+          </div>
         </div>
         <div className="flex flex-col gap-5 border-b border-b-[#E7E7E7] py-4">
           <p className="text-grey-300 font-medium uppercase">payment details</p>
@@ -398,20 +402,22 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
         </div>
 
         <div className="flex items-center justify-between gap-5 py-4 w-full">
-          <Button
-            as="button"
-            size="sm"
-            variant="secondary"
-            className="text-red-500 border-red-500 hover:border-red-400 hover:text-red-400 w-full"
-            onClick={() => {
-              setShowOrderDetails(false);
-              setActionError(null);
-              setCancelReason(null);
-              setCancelOrderModal(true);
-            }}
-          >
-            Cancel
-          </Button>
+          {!props.timeline.shoppingInProgress && (
+            <Button
+              as="button"
+              size="sm"
+              variant="secondary"
+              className="text-red-500 border-red-500 hover:border-red-400 hover:text-red-400 w-full"
+              onClick={() => {
+                setShowOrderDetails(false);
+                setActionError(null);
+                setCancelReason(null);
+                setCancelOrderModal(true);
+              }}
+            >
+              Cancel
+            </Button>
+          )}
 
           <Button
             as="button"
@@ -431,7 +437,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
       <Modal
         isOpen={showCOmodal}
         onClose={() => setShowCOModal(false)}
-        title="Confirm order received"
+        title="Confirm delivery"
         className="w-[35%]"
       >
         <div className="flex flex-col items-center justify-center gap-4 w-full">
