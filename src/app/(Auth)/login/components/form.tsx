@@ -85,7 +85,7 @@ export default function LoginForm() {
 
             <Link
               href="/forget-password"
-              className="font-semibold text-neutral-900 underline font-sm"
+              className="text-sm font-semibold text-primary"
             >
               Forgot password?
             </Link>
@@ -131,7 +131,7 @@ export default function LoginForm() {
         Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-neutral-900 underline"
+          className="font-semibold text-primary underline"
         >
           Sign up
         </Link>

@@ -203,11 +203,11 @@ export default function SignupForm() {
       <p className="mt-6 text-center text-sm text-neutral-500">
         By clicking continue, you acknowledge that you have read and agreed to
         our{" "}
-        <Link href="/terms" className="font-semibold text-neutral-900 underline">
+        <Link href="/terms" className="font-semibold text-primary underline">
           Terms of Use
         </Link>{" "}
         and{" "}
-        <Link href="/privacy" className="font-semibold text-neutral-900 underline">
+        <Link href="/privacy" className="font-semibold text-primary underline">
           Privacy Policy
         </Link>
         .
@@ -225,7 +225,7 @@ export default function SignupForm() {
       {/* Sign in link */}
       <p className="mt-4 text-center text-sm text-neutral-500">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-neutral-900 underline">
+        <Link href="/login" className="font-semibold text-primary underline">
           Log in
         </Link>
       </p>
