@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { registerCustomer, setPendingEmail } from "@/lib/customerAuth";
 
 export default function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const referralCode = searchParams.get("ref") || undefined;
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -29,6 +31,7 @@ export default function SignupForm() {
         email,
         password,
         deliveryArea,
+        referralCode,
       });
       setPendingEmail(normalizedEmail);
       router.push("/verify-email");

@@ -39,6 +39,7 @@ export function registerCustomer(input: {
   email: string;
   password: string;
   deliveryArea: string;
+  referralCode?: string;
 }) {
   return request<{ message: string; email: string }>("/customer-auth/register", {
     method: "POST",

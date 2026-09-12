@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Auth_header from "@/components/Auth_header";
 import Auth_footer from "@/components/Auth_footer";
 import SignupForm from "./components/form";
@@ -8,7 +9,9 @@ export default function Register() {
       <Auth_header />
 
       <main className="flex flex-1 justify-center">
-        <SignupForm />
+        <Suspense fallback={null}>
+          <SignupForm />
+        </Suspense>
       </main>
 
       <Auth_footer />
