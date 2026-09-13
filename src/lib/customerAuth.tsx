@@ -89,6 +89,35 @@ export function resetPassword(resetToken: string, password: string) {
   });
 }
 
+export function updateProfile(
+  token: string,
+  input: { name?: string; email?: string; deliveryArea?: string },
+) {
+  return request<Customer>("/customer-auth/me", {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(input),
+  });
+}
+
+export function changePassword(
+  token: string,
+  input: { currentPassword: string; newPassword: string },
+) {
+  return request<{ message: string }>("/customer-auth/change-password", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(input),
+  });
+}
+
+export function deactivateAccount(token: string) {
+  return request<{ message: string }>("/customer-auth/deactivate", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 // --- Session storage (browser-only) ---
 
 const TOKEN_KEY = "ojarun_token";
