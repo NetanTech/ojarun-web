@@ -1,15 +1,13 @@
-import { Meals, FreshFood, Grains, Sauce, Drinks, Canned, Soaps, Utensils, Stationery } from "../public/svg/CategoriesSvg/svg";
-
 export const Cats: CategoriesType[] = [
-    { name: 'Meals', icon: Meals },
-    { name: 'Fresh Food', icon: FreshFood },
-    { name: 'Grains', icon: Grains },
-    { name: 'Sauces', icon: Sauce },
-    { name: 'Drinks', icon: Drinks },
-    { name: 'Canned', icon: Canned },
-    { name: 'Toiletries', icon: Soaps },
-    { name: 'Kitchen', icon: Utensils },
-    { name: 'Stationery', icon: Stationery },
+    { name: 'Meals', icon: '/svg/CategoriesSvg/meals.svg' },
+    { name: 'Fresh Food', icon: '/svg/CategoriesSvg/fresh-food.svg' },
+    { name: 'Grains', icon: '/svg/CategoriesSvg/grains.svg' },
+    { name: 'Sauces', icon: '/svg/CategoriesSvg/sauce.svg' },
+    { name: 'Drinks', icon: '/svg/CategoriesSvg/drinks.svg' },
+    { name: 'Canned', icon: '/svg/CategoriesSvg/canned.svg' },
+    { name: 'Toiletries', icon: '/svg/CategoriesSvg/soaps.svg' },
+    { name: 'Kitchen', icon: '/svg/CategoriesSvg/utensils.svg' },
+    { name: 'Stationery', icon: '/svg/CategoriesSvg/stationery.svg' },
 ];
 
 

@@ -8,7 +8,7 @@ const Empty = () => {
             <Favourite />
             <h6>No favourite yet</h6>
             <p className="body-medium text-300">Saved items and meals will appear here</p>
-            <Button as="button" size="sm" variant="primary">
+            <Button as="link" to="/marketplace" size="sm" variant="primary">
                 Browse market
             </Button>
         </div>

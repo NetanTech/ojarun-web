@@ -121,19 +121,19 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           setOrder(props.orderId);
         }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <p className="text-grey-400 text-xs">Order ID</p>
-              <p className="text-sm font-medium">{props.orderId}</p>
+              <p className="text-sm font-medium truncate">{props.orderId}</p>
             </div>
           </div>
           <p
             className={clsx(
-              "py-0.5 px-2 rounded-full body-xsmall capitalize flex items-center gap-1",
+              "py-0.5 px-2 rounded-full body-xsmall capitalize flex items-center gap-1 shrink-0",
               statusVariants[props.status],
             )}
           >
@@ -193,14 +193,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           setOrder(props.orderId);
         }}
       >
-        <div className="flex items-start gap-2">
-          <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="flex items-start gap-2 min-w-0">
+          <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
             <ShoppingBag />
           </div>
 
-          <div className=" flex flex-col items-start">
+          <div className="flex flex-col items-start min-w-0 w-full">
             <p className="text-gray-400">Order ID</p>
-            <p>{props.orderId}</p>
+            <p className="truncate w-full">{props.orderId}</p>
           </div>
         </div>
         <div className=" flex flex-col items-start">
@@ -260,19 +260,19 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
         isOpen={showOrderDetails}
         onClose={() => setShowOrderDetails(false)}
       >
-        <div className="border border-[#E7E7E7] px-3.5 py-4 flex items-center justify-between w-full rounded-md">
-          <div className="flex items-start gap-2">
-            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="border border-[#E7E7E7] px-3.5 py-4 flex items-center justify-between gap-2 w-full rounded-md">
+          <div className="flex items-start gap-2 min-w-0">
+            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
 
-            <div className=" flex flex-col items-start">
+            <div className="flex flex-col items-start min-w-0 w-full">
               <p className="text-gray-400">Order ID</p>
-              <p>{props.orderId}</p>
+              <p className="truncate w-full">{props.orderId}</p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end shrink-0">
             <p
               className={clsx(
                 "py-0.5 px-1.5 rounded-full body-small capitalize flex items-center gap-2",
