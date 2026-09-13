@@ -2269,7 +2269,7 @@ export function MessageIconUnread({
         d="M22 10V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H14"
         stroke="white"
         strokeWidth="1.5"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -2324,7 +2324,7 @@ export function MessageIcon({
         d="M22 10V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H14"
         stroke="white"
         strokeWidth="1.5"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -2431,7 +2431,7 @@ export function Like({ className, ...props }: React.SVGProps<SVGSVGElement>) {
       <path
         d="M4.98633 12.2332L7.05299 13.8331C7.31966 14.0998 7.91966 14.2331 8.31966 14.2331H10.853C11.653 14.2331 12.5197 13.6331 12.7197 12.8331L14.3197 7.96648C14.653 7.03315 14.053 6.23315 13.053 6.23315H10.3863C9.98633 6.23315 9.65299 5.89982 9.71966 5.43315L10.053 3.29982C10.1863 2.69982 9.78633 2.03315 9.18633 1.83315C8.65299 1.63315 7.98633 1.89982 7.71966 2.29982L4.98633 6.36648"
         stroke="white"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M1.58594 12.2331V5.69977C1.58594 4.76644 1.98594 4.43311 2.91927 4.43311H3.58594C4.51927 4.43311 4.91927 4.76644 4.91927 5.69977V12.2331C4.91927 13.1664 4.51927 13.4998 3.58594 13.4998H2.91927C1.98594 13.4998 1.58594 13.1664 1.58594 12.2331Z"
@@ -2460,7 +2460,7 @@ export function DisLike({
       <path
         d="M11.0138 3.7666L8.94714 2.1666C8.68047 1.89993 8.08047 1.7666 7.68047 1.7666H5.14714C4.34714 1.7666 3.48047 2.3666 3.28047 3.1666L1.68047 8.03327C1.34714 8.9666 1.94714 9.7666 2.94714 9.7666H5.61381C6.01381 9.7666 6.34714 10.0999 6.28047 10.5666L5.94714 12.6999C5.81381 13.2999 6.21381 13.9666 6.81381 14.1666C7.34714 14.3666 8.01381 14.0999 8.28047 13.6999L11.0138 9.63327"
         stroke="white"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M14.4134 3.76667V10.3C14.4134 11.2333 14.0134 11.5667 13.0801 11.5667H12.4134C11.4801 11.5667 11.0801 11.2333 11.0801 10.3V3.76667C11.0801 2.83333 11.4801 2.5 12.4134 2.5H13.0801C14.0134 2.5 14.4134 2.83333 14.4134 3.76667Z"
@@ -3041,34 +3041,34 @@ export function Repeat({ className, ...props }: React.SVGProps<SVGSVGElement>) {
       <path
         d="M2.9834 4.30005H14.5168C15.9001 4.30005 17.0168 5.41672 17.0168 6.80005V9.56672"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M5.61673 1.66675L2.9834 4.30006L5.61673 6.93342"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M17.0168 15.7H5.4834C4.10007 15.7 2.9834 14.5834 2.9834 13.2V10.4333"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M14.3838 18.3333L17.0171 15.7L14.3838 13.0667"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
