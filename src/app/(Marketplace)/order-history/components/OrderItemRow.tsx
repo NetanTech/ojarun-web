@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { formatCurrency } from "../../../../../lib/utils";
 import Drawer from "@/components/ui/Drawer";
 import Image from "next/image";
 import Modal from "@/components/ui/Modal";
 import Radio from "@/components/ui/Radio";
+import StarRating from "@/components/ui/StarRating";
 import {
   ShoppingBag,
   HourGlass,
@@ -18,6 +19,8 @@ import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { cancelOrder, confirmOrder } from "@/lib/orders";
+import { fetchReviewForOrder, Review } from "@/lib/reviews";
+import ReviewModal from "./ReviewModal";
 
 const statusVariants = {
   "in progress": "bg-warning-50 text-warning-500",
@@ -70,6 +73,15 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const [order, setOrder] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [review, setReview] = useState<Review | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  useEffect(() => {
+    if (props.status !== "successful") return;
+    fetchReviewForOrder(props.orderId)
+      .then(setReview)
+      .catch(() => {});
+  }, [props.status, props.orderId]);
 
   const handleConfirmReceived = async () => {
     setActionError(null);
@@ -288,9 +300,9 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           </p>
           <div className="flex flex-col gap-2">
             {props.items.map((item) => (
-              <div className="flex items-center justify-between" key={item.id}>
-                <div className="flex items-center gap-2">
-                  <div className="w-12.5 h-12.5 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between gap-2" key={item.id}>
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-12.5 h-12.5 rounded-xl overflow-hidden shrink-0">
                     <Image
                       src={item.image || "/assets/Untitled design.png"}
                       alt={item.name}
@@ -299,14 +311,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <p>
+                  <div className="flex flex-col min-w-0">
+                    <p className="truncate">
                       {item.name} x{item.quantity}
                     </p>
                     <p className="text-grey-300">{item.unit}</p>
                   </div>
                 </div>
-                <p>{formatCurrency(item.price, "NGN")}</p>
+                <p className="shrink-0">{formatCurrency(item.price, "NGN")}</p>
               </div>
             ))}
           </div>
@@ -400,6 +412,33 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             );
           })}
         </div>
+
+        {props.status === "successful" && (
+          <div className="flex flex-col gap-3 border-b border-b-[#E7E7E7] py-4">
+            <p className="text-grey-300 font-medium uppercase">your feedback</p>
+            {review ? (
+              <div className="flex flex-col gap-2">
+                <StarRating value={review.overallRating} readOnly size={18} />
+                {review.comment && (
+                  <p className="text-grey-400 body-small">{review.comment}</p>
+                )}
+              </div>
+            ) : (
+              <Button
+                as="button"
+                size="sm"
+                variant="secondary"
+                className="w-full"
+                onClick={() => {
+                  setShowOrderDetails(false);
+                  setShowReviewModal(true);
+                }}
+              >
+                Rate this order
+              </Button>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-5 py-4 w-full">
           {!props.timeline.shoppingInProgress && (
@@ -530,6 +569,13 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           onClick={() => setShowOrderDetails(false)}
         />
       )}
+
+      <ReviewModal
+        orderId={props.orderId}
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onSubmitted={setReview}
+      />
     </React.Fragment>
   );
 };
