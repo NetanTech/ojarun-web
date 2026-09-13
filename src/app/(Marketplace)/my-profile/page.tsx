@@ -48,8 +48,8 @@ const MyProfilePage = () => {
 
       <h5>Profile</h5>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[292px_1fr] gap-6 w-full items-start">
-        <div className="bg-[#F9F9F9] rounded-2xl p-6 flex flex-col gap-2 w-full lg:sticky lg:top-5">
+      <div className="grid grid-cols-1 md:grid-cols-[292px_1fr] gap-6 w-full items-start">
+        <div className="bg-[#F9F9F9] rounded-2xl p-6 flex flex-col gap-2 w-full md:sticky md:top-5">
           <button
             type="button"
             onClick={() => setTab("profile")}
