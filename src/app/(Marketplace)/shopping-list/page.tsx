@@ -463,12 +463,12 @@ const Page = () => {
             href: "/",
             icon: <Home size={18} className="text-grey-300" />,
           },
-          { title: "Shopping list", href: "/shopping-list" },
+          { title: "Shopping lists", href: "/shopping-list" },
         ]}
       />
 
       <div className="flex flex-col gap-2 w-full items-start">
-        <h6>Shopping list</h6>
+        <h6>Shopping lists</h6>
         <div className="flex flex-col items-start md:flex-row md:items-center justify-between w-full gap-3">
           <p className="text-grey-300">
             Create and reorder your favourite lists instantly
@@ -618,7 +618,7 @@ const Page = () => {
           <div className="flex gap-3 flex-col items-center justify-center py-3">
             <Search className="w-10 h-10 text-grey-300" />
             <p className="font-medium text-grey-300">
-              Search items will appear here
+              Searched items will appear here
             </p>
           </div>
         ) : (

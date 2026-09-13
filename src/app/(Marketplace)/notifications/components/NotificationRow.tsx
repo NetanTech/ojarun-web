@@ -1,7 +1,10 @@
 "use client";
 
 import React from "react";
-import { getNotificationIcon } from "../../../../../lib/utils";
+import {
+  getNotificationIcon,
+  formatNotificationTimestamp,
+} from "../../../../../lib/utils";
 
 interface NotificationRowProps extends NotificationProps {
   onClick?: () => void;
@@ -24,6 +27,11 @@ const NotificationRow = ({ onClick, ...props }: NotificationRowProps) => {
       <div className="flex flex-col gap-2">
         <p className="body-medium font-medium text-black">{props.title}</p>
         <p className="body-small text-grey-300">{props.message}</p>
+        {props.createdAt && (
+          <p className="body-xsmall text-grey-300">
+            {formatNotificationTimestamp(props.createdAt)}
+          </p>
+        )}
       </div>
     </div>
   );

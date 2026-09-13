@@ -83,6 +83,8 @@ const Page = () => {
     }
   };
 
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   useEffect(() => {
     const activeButton = buttonRefs.current[activeIndex];
     if (!activeButton || !filterRef.current) return;
@@ -94,7 +96,7 @@ const Page = () => {
       left: buttonRect.left - containerRect.left,
       width: buttonRect.width,
     });
-  }, [activeIndex]);
+  }, [activeIndex, unreadCount]);
   return (
     <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full flex flex-col items-start gap-2 my-5">
       <BreadCrumb
@@ -132,7 +134,9 @@ const Page = () => {
                 setFilter(f.value);
               }}
             >
-              {f.name}
+              {f.value === "unread" && unreadCount > 0
+                ? `${f.name} (${unreadCount})`
+                : f.name}
             </button>
           ))}
         </div>
