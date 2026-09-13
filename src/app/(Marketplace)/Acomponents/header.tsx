@@ -7,7 +7,6 @@ import {
   ChevronDown,
   GiftCard,
   Heart,
-  HelpCircle,
   HeroTop,
   Logo,
   LogOut,
@@ -52,11 +51,6 @@ const routes = [
     icon: NotificationBell,
     name: "Notifications",
     href: "/notifications",
-  },
-  {
-    icon: HelpCircle,
-    name: "Help and support ",
-    href: "/helpme",
   },
   {
     icon: User,
