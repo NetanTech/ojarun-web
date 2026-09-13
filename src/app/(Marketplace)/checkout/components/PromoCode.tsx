@@ -47,9 +47,9 @@ const PromoCode = ({ applied, onApply }: PromoCodeProps) => {
         className="flex items-center gap-3 flex-1 w-full justify-between border border-[#E7E7E7] p-2 rounded-xl py-4"
         onClick={() => setOpenPCModal(true)}
       >
-        <div className="flex items-center gap-2 md:gap-5">
-          <Tag />
-          <p className="body-medium">
+        <div className="flex items-center gap-2 md:gap-5 min-w-0 flex-1">
+          <Tag className="shrink-0" />
+          <p className="body-medium truncate">
             {applied
               ? `"${applied.code}" applied — -${formatCurrency(applied.discountAmount)}`
               : "Use promo code"}
@@ -62,12 +62,12 @@ const PromoCode = ({ applied, onApply }: PromoCodeProps) => {
               e.stopPropagation();
               handleRemove();
             }}
-            className="text-red-500 text-sm font-medium"
+            className="text-red-500 text-sm font-medium shrink-0"
           >
             Remove
           </button>
         ) : (
-          <button onClick={() => setOpenPCModal(true)}>
+          <button onClick={() => setOpenPCModal(true)} className="shrink-0">
             <ChevronRight />
           </button>
         )}

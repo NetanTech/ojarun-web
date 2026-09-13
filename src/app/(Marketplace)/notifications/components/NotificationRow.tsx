@@ -16,7 +16,7 @@ const NotificationRow = ({ onClick, ...props }: NotificationRowProps) => {
       className="flex items-center gap-3 md:gap-5 w-full border border-[#E7E7E7] py-3 md:py-4 rounded-xl px-3 md:px-5 hover:bg-green-50/40 cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative shrink-0">
         {getNotificationIcon(props.type)}
 
         {!props.isRead && (
@@ -24,7 +24,7 @@ const NotificationRow = ({ onClick, ...props }: NotificationRowProps) => {
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 min-w-0">
         <p className="body-medium font-medium text-black">{props.title}</p>
         <p className="body-small text-grey-300">{props.message}</p>
         {props.createdAt && (

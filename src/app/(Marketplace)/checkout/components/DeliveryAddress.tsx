@@ -94,13 +94,13 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
         className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3"
         onClick={() => setOpenDAModal(true)}
       >
-        <div className="flex items-center gap-2 md:gap-5">
-          <MapPin2 />
-          <p>{selected || (loading ? "Loading your addresses..." : "Add a delivery address")}</p>
+        <div className="flex items-center gap-2 md:gap-5 min-w-0 flex-1">
+          <MapPin2 className="shrink-0" />
+          <p className="truncate">{selected || (loading ? "Loading your addresses..." : "Add a delivery address")}</p>
         </div>
 
         <button
-          className="bg-green-500 text-white p-2 px-4 rounded-full flex items-center justify-center"
+          className="bg-green-500 text-white p-2 px-4 rounded-full flex items-center justify-center shrink-0"
           onClick={(e) => {
             e.stopPropagation();
             setOpenDAModal(true);
@@ -131,11 +131,11 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
                   }`}
                   onClick={() => handleSelect(a)}
                 >
-                  <div className="flex items-start gap-2">
-                    <MapPin2 />
-                    <div className="flex flex-col">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <MapPin2 className="shrink-0" />
+                    <div className="flex flex-col min-w-0">
                       {a.label && <p className="font-medium">{a.label}</p>}
-                      <p className="body-small">{formatAddress(a)}</p>
+                      <p className="body-small break-words">{formatAddress(a)}</p>
                       {a.isDefault && (
                         <p className="text-grey-300 body-xsmall">Default</p>
                       )}
