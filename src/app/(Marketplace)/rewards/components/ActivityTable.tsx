@@ -16,6 +16,22 @@ const statusIcon: Record<RewardTransaction["status"], React.ReactNode> = {
   failed: <CancelCircle />,
 };
 
+function getPageNumbers(current: number, total: number): (number | "ellipsis")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages: (number | "ellipsis")[] = [1];
+  if (current > 3) pages.push("ellipsis");
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (current < total - 2) pages.push("ellipsis");
+  pages.push(total);
+
+  return pages;
+}
+
 interface ActivityTableProps {
   items: RewardTransaction[];
   loading: boolean;
@@ -83,25 +99,50 @@ const ActivityTable = ({ items, loading, page, totalPages, onPageChange }: Activ
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 py-4 border-t border-t-[#E7E7E7]">
-          <button
-            className="w-9 h-9 rounded-full bg-white border border-[#E7E7E7] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
-            disabled={page <= 1}
-            onClick={() => onPageChange(page - 1)}
-            aria-label="Previous page"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <p className="body-small text-grey-400">
-            Page {page} of {totalPages}
-          </p>
-          <button
-            className="w-9 h-9 rounded-full bg-white border border-[#E7E7E7] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
-            disabled={page >= totalPages}
-            onClick={() => onPageChange(page + 1)}
-            aria-label="Next page"
-          >
-            <ChevronRight size={18} />
-          </button>
+          <div className="flex items-center gap-1">
+            {getPageNumbers(page, totalPages).map((p, idx) =>
+              p === "ellipsis" ? (
+                <span
+                  key={`ellipsis-${idx}`}
+                  className="w-6 h-6 flex items-center justify-center body-small text-grey-200"
+                >
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => onPageChange(p)}
+                  className={clsx(
+                    "w-6 h-6 flex items-center justify-center rounded-md body-small",
+                    p === page
+                      ? "border border-[#445D3C] text-black font-medium"
+                      : "text-grey-200 hover:text-grey-400",
+                  )}
+                >
+                  {p}
+                </button>
+              ),
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              className="w-9 h-9 rounded-full bg-white border border-[#E7E7E7] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={page <= 1}
+              onClick={() => onPageChange(page - 1)}
+              aria-label="Previous page"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              className="w-9 h-9 rounded-full bg-white border border-[#E7E7E7] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={page >= totalPages}
+              onClick={() => onPageChange(page + 1)}
+              aria-label="Next page"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       )}
     </div>
