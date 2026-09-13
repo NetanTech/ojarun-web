@@ -37,7 +37,7 @@ const MyProfilePage = () => {
           {
             icon: <Home size={18} className="text-grey-300" />,
             title: "Home",
-            href: "/",
+            href: "/marketplace",
           },
           {
             title: "Profile",

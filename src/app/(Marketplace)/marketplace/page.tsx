@@ -36,7 +36,7 @@ const MarketplaceContent = () => {
           item={[
             {
               title: "Home",
-              href: "/",
+              href: "/marketplace",
               icon: <Home size={18} className="text-grey-300" />,
              },
             { title: "Marketplace", href: "/marketplace" },
