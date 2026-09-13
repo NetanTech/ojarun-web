@@ -11,9 +11,15 @@ const TIERS: Array<{ name: string; range: string }> = [
 ];
 
 const TIER_COPY: Record<RewardsSummary["tier"], string> = {
-  Bronze: "Keep ordering to unlock Silver benefits.",
-  Silver: "Keep ordering to unlock Gold benefits.",
+  Bronze: "You're getting started! Keep earning points to unlock Silver benefits.",
+  Silver: "Great progress! Keep earning points to unlock exclusive Gold benefits.",
   Gold: "You've reached the highest tier. Enjoy all your exclusive Gold benefits.",
+};
+
+const TIER_BANNER_COPY: Record<RewardsSummary["tier"], string> = {
+  Bronze: "Keep ordering to reach Silver and unlock more benefits",
+  Silver: "You're on your way to Gold! Keep earning points to unlock more rewards.",
+  Gold: "Congratulations! You've reached the highest tier.",
 };
 
 const TierCard = ({ summary }: { summary: RewardsSummary }) => {
@@ -24,9 +30,6 @@ const TierCard = ({ summary }: { summary: RewardsSummary }) => {
       ? 1
       : Math.min(1, Math.max(0, (summary.points - summary.tierMin) / ((nextTierMin ?? 1) - summary.tierMin)));
   const percent = ((segmentIndex + progressWithinTier) / 3) * 100;
-
-  const pointsToNext =
-    nextTierMin !== null ? Math.max(0, nextTierMin - summary.points) : 0;
 
   return (
     <div className="border border-[#E7E7E7] rounded-[20px] p-6 flex flex-col gap-6 bg-white w-full">
@@ -63,9 +66,7 @@ const TierCard = ({ summary }: { summary: RewardsSummary }) => {
       <div className="flex items-center justify-center gap-2 bg-green-50/50 rounded-2xl py-4 px-2.5 w-full">
         <PartyPopper size={20} className="text-green-600 shrink-0" />
         <p className="body-medium text-green-500 text-center">
-          {summary.tierIndex === 3
-            ? "Congratulations! You've reached the highest tier."
-            : `${pointsToNext.toLocaleString()} points to reach the next tier.`}
+          {TIER_BANNER_COPY[summary.tier]}
         </p>
       </div>
     </div>
