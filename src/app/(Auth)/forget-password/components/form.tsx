@@ -198,7 +198,7 @@ function VerifyStep({
         </p>
       </div>
 
-      <div className="mt-8 flex justify-center gap-3" onPaste={handlePaste}>
+      <div className="mt-8 flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
         {otp.map((digit, i) => (
           <input
             key={i}
@@ -212,7 +212,7 @@ function VerifyStep({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             aria-label={`Digit ${i + 1}`}
-            className="h-14 w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-12 w-9 sm:h-14 sm:w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
         ))}
       </div>
