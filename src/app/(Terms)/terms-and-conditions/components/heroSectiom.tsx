@@ -1,29 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { HeroBackdrop, HeroTop, HeroBottom, HeroLeft, HeroRight } from "../../../../../public/svg/svg";
+import { HeroBackdrop, HeroTop } from "../../../../../public/svg/svg";
 import { fadeUp, stagger } from "@/lib/motion";
 
 export default function HeroSection() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-
-  const update =
-    (field: keyof typeof form) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // TODO: wire to API
-    console.log("Contact form submitted", form);
-  };
-
   return (
     <section className="relative w-full overflow-hidden px-4 sm:px-8 pt-40 pb-40">
       {/* Solid green background with a single smooth bottom curve */}
