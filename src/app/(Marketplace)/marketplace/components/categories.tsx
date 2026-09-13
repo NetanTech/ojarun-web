@@ -10,7 +10,7 @@ const Categories = ({ selectedCat, setSelectedCat } : {
   setSelectedCat: (b: string) => void;
 }) => {
   return (
-    <div className="flex items-center md:flex-wrap md:gap-5 overflow-y-auto gap-5 md:max-w-300 w-full lg:mx-auto">
+    <div className="flex items-center md:flex-wrap md:gap-5 overflow-x-auto overflow-y-hidden gap-5 md:max-w-300 w-full lg:mx-auto">
       <button className={`flex flex-col items-center shrink-0 gap-2 hover:bg-green-50 ${ selectedCat === 'all' ? 'bg-green-50' : 'bg-transparent' } p-2 rounded-xl`} onClick={() => setSelectedCat('all')}>
         <FullBox />
         <span className="text-sm font-medium">Browse all</span>

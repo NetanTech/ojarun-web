@@ -82,7 +82,7 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
 
   return (
     <>
-      <div className="bg-white rounded-xl flex flex-col w-full md:w-[30%] gap-2 p-3">
+      <div className="bg-white rounded-xl flex flex-col w-full lg:w-[30%] gap-2 p-3">
         <p className="body-medium font-medium">Order summary</p>
 
         {hasItems ? (
@@ -91,8 +91,8 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
               className="flex items-center justify-between  border-b border-[#E7E7E7] py-3"
               key={line.id}
             >
-              <div className="flex items-center gap-2">
-                <div className="w-12.5 h-12.5 rounded-xl overflow-hidden">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <div className="w-12.5 h-12.5 rounded-xl overflow-hidden shrink-0">
                   <Image
                     src={line.image || "/assets/Untitled design.png"}
                     alt={line.name}
@@ -102,15 +102,15 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
                   />
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <p className="body-medium font-medium">{line.name}</p>
+                <div className="flex flex-col gap-2 min-w-0">
+                  <p className="body-medium font-medium truncate">{line.name}</p>
                   <p className="text-grey-300 body-small">
                     {formatCurrency(line.price)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 body-medium text-white">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-500 body-medium text-white shrink-0">
                 x{line.quantity}
               </div>
             </div>
