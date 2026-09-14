@@ -28,6 +28,7 @@ export default function ForgotPasswordFlow() {
             setResetToken(token);
             setStep("newPassword");
           }}
+          onBack={() => setStep("email")}
         />
       )}
       {step === "newPassword" && (
@@ -108,9 +109,11 @@ const OTP_LENGTH = 6;
 function VerifyStep({
   email,
   onNext,
+  onBack,
 }: {
   email: string;
   onNext: (resetToken: string) => void;
+  onBack: () => void;
 }) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
@@ -177,6 +180,14 @@ function VerifyStep({
 
   return (
     <form onSubmit={handleSubmit}>
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-6 text-sm font-semibold text-neutral-500 hover:text-neutral-700"
+      >
+        ← Back
+      </button>
+
       <div className="text-center">
         <h1 className="text-2xl font-bold text-neutral-900">Email verification</h1>
         <p className="mt-2 text-sm text-neutral-500">
@@ -187,7 +198,7 @@ function VerifyStep({
         </p>
       </div>
 
-      <div className="mt-8 flex justify-center gap-3" onPaste={handlePaste}>
+      <div className="mt-8 flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
         {otp.map((digit, i) => (
           <input
             key={i}
@@ -201,7 +212,7 @@ function VerifyStep({
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             aria-label={`Digit ${i + 1}`}
-            className="h-14 w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-12 w-9 sm:h-14 sm:w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
         ))}
       </div>

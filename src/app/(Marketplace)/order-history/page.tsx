@@ -85,7 +85,7 @@ const Page = () => {
           {
             icon: <Home size={18} className="text-grey-300" />,
             title: "Home",
-            href: "/",
+            href: "/marketplace",
           },
           {
             title: "Order History",
@@ -93,7 +93,7 @@ const Page = () => {
           },
         ]}
       />
-      <h6 className="text-green-500">Order history</h6>
+      <h6>Order history</h6>
       <div
         ref={filterRef}
         className="relative bg-[#F9F9F9] flex items-center p-1.5 rounded-xl overflow-hidden"

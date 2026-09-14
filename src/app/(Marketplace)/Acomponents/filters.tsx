@@ -13,7 +13,7 @@ const Filters = ({ selectedCat, setSelectedCat }: FiltersProps) => {
   return (
     <div className='flex flex-col gap-2 lg:mx-auto md:max-w-300 w-full px-4 py-3'>
         <Categories selectedCat={ selectedCat } setSelectedCat={setSelectedCat}/>
-        <div className='flex items-center gap-3 w-full md:gap-5 overflow-y-auto'>
+        <div className='flex items-center gap-3 w-full md:gap-5 overflow-x-auto overflow-y-hidden'>
             <button className='flex items-center gap-2 bg-grayScale-50 font-medium px-2 py-1 rounded-2xl text-black'>
                 <Tag />
                 Offers

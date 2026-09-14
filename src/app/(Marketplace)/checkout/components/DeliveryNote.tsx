@@ -28,10 +28,10 @@ const DeliveryNote = ({ note, onSave }: DeliveryNoteProps) => {
     <div className="flex flex-col gap-2 items-start w-full">
       <p className="font-medium">Delivery note</p>
       <div className="border w-full flex items-center justify-between gap-3 border-[#E7E7E7] p-2 rounded-xl py-3" onClick={handleOpen}>
-        <div className="flex items-center gap-2 md:gap-5">
-          <DeliveryBox />
-          <div className="flex flex-col gap-2">
-            <p className="body-medium font-medium">
+        <div className="flex items-center gap-2 md:gap-5 min-w-0 flex-1">
+          <DeliveryBox className="shrink-0" />
+          <div className="flex flex-col gap-2 min-w-0">
+            <p className="body-medium font-medium break-words">
               {note ? note : "Leave a note for the agent"}
             </p>
             {!note && (
@@ -42,7 +42,7 @@ const DeliveryNote = ({ note, onSave }: DeliveryNoteProps) => {
           </div>
         </div>
 
-        <button onClick={handleOpen}>
+        <button onClick={handleOpen} className="shrink-0">
           <ChevronRight />
         </button>
 

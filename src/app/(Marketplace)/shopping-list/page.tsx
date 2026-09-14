@@ -198,13 +198,17 @@ const ShoppingListCard = ({
               className="flex-1 overflow-y-auto py-4 flex flex-col gap-4"
               style={{ scrollbarWidth: "thin" }}
             >
+              <p className="uppercase text-grey-300 body-xsmall font-medium">
+                Items ({items.length})
+              </p>
+
               {items.map((item) => (
                 <div
                   key={item.productId || item.name}
                   className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                 >
-                  <div className="flex items-center gap-2 h-[70px]">
-                    <div className="w-[80px] h-full rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-2 h-[70px] min-w-0 flex-1">
+                    <div className="w-[80px] h-full rounded-lg overflow-hidden shrink-0">
                       <Image
                         src={item.imageURL}
                         alt={item.name}
@@ -214,8 +218,8 @@ const ShoppingListCard = ({
                       />
                     </div>
 
-                    <div className="flex flex-col justify-between h-full">
-                      <p className="font-medium">{item.name}</p>
+                    <div className="flex flex-col justify-between h-full min-w-0">
+                      <p className="font-medium truncate">{item.name}</p>
 
                       <p className="body-xsmall font-light text-grey-300">
                         {item.more}
@@ -227,7 +231,7 @@ const ShoppingListCard = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3">
+                  <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3 shrink-0">
                     <button
                       onClick={() =>
                         item.productId && handleDecrement(item.productId)
@@ -456,7 +460,7 @@ const Page = () => {
         item={[
           {
             title: "Home",
-            href: "/",
+            href: "/marketplace",
             icon: <Home size={18} className="text-grey-300" />,
           },
           { title: "Shopping lists", href: "/shopping-list" },
@@ -464,7 +468,7 @@ const Page = () => {
       />
 
       <div className="flex flex-col gap-2 w-full items-start">
-        <h6>Shopping list</h6>
+        <h6>Shopping lists</h6>
         <div className="flex flex-col items-start md:flex-row md:items-center justify-between w-full gap-3">
           <p className="text-grey-300">
             Create and reorder your favourite lists instantly
@@ -547,8 +551,8 @@ const Page = () => {
                       key={item.productId || item.name}
                       className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                     >
-                      <div className="flex items-center gap-2 h-[70px]">
-                        <div className="w-[80px] h-full rounded-lg overflow-hidden">
+                      <div className="flex items-center gap-2 h-[70px] min-w-0 flex-1">
+                        <div className="w-[80px] h-full rounded-lg overflow-hidden shrink-0">
                           <Image
                             src={item.imageURL}
                             alt={item.name}
@@ -558,8 +562,8 @@ const Page = () => {
                           />
                         </div>
 
-                        <div className="flex flex-col justify-between h-full">
-                          <p className="font-medium">{item.name}</p>
+                        <div className="flex flex-col justify-between h-full min-w-0">
+                          <p className="font-medium truncate">{item.name}</p>
 
                           <p className="body-xsmall font-light text-grey-300">
                             {item.more}
@@ -571,7 +575,7 @@ const Page = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3">
+                      <div className="flex items-center gap-5 bg-primary rounded-full text-white px-4 py-3 shrink-0">
                         <button
                           onClick={() =>
                             item.productId && handleDecrement(item.productId)
@@ -614,7 +618,7 @@ const Page = () => {
           <div className="flex gap-3 flex-col items-center justify-center py-3">
             <Search className="w-10 h-10 text-grey-300" />
             <p className="font-medium text-grey-300">
-              Search items will appear here
+              Searched items will appear here
             </p>
           </div>
         ) : (
@@ -643,8 +647,8 @@ const Page = () => {
                       key={product.id}
                       className="border border-[#e7e7e7] rounded-lg w-full p-2 flex items-center justify-between gap-3"
                     >
-                      <div className="flex items-center gap-2 h-[70px]">
-                        <div className="w-[80px] h-full rounded-lg overflow-hidden">
+                      <div className="flex items-center gap-2 h-[70px] min-w-0 flex-1">
+                        <div className="w-[80px] h-full rounded-lg overflow-hidden shrink-0">
                           <Image
                             src={product.imageURL}
                             alt={product.name}
@@ -654,8 +658,8 @@ const Page = () => {
                           />
                         </div>
 
-                        <div className="flex flex-col justify-between h-full">
-                          <p className="font-medium">{product.name}</p>
+                        <div className="flex flex-col justify-between h-full min-w-0">
+                          <p className="font-medium truncate">{product.name}</p>
 
                           <p className="body-xsmall font-light text-grey-300">
                             {product.more}
@@ -669,7 +673,7 @@ const Page = () => {
 
                       <button
                         onClick={() => handleAddItem(product)}
-                        className="p-4 rounded-full bg-primary text-white"
+                        className="p-4 rounded-full bg-primary text-white shrink-0"
                       >
                         <Plus size={16} />
                       </button>

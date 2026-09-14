@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import {
   verifyOtp,
   resendOtp,
-  saveSession,
   getPendingEmail,
   clearPendingEmail,
+  useCustomerSession,
 } from "@/lib/customerAuth";
 
 const OTP_LENGTH = 6;
 
 export default function VerifyForm() {
   const router = useRouter();
+  const { login } = useCustomerSession();
   const [email, setEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [seconds, setSeconds] = useState(59);
@@ -73,9 +74,9 @@ export default function VerifyForm() {
     setLoading(true);
     try {
       const { accessToken, customer } = await verifyOtp(email, otp.join(""));
-      saveSession(accessToken, customer);
+      login(accessToken, customer);
       clearPendingEmail();
-      router.push("/");
+      router.push("/marketplace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -110,7 +111,7 @@ export default function VerifyForm() {
       </div>
 
       {/* OTP inputs */}
-      <div className="mt-8 flex justify-center gap-3" onPaste={handlePaste}>
+      <div className="mt-8 flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
         {otp.map((digit, i) => (
           <input
             key={i}
@@ -124,7 +125,7 @@ export default function VerifyForm() {
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             aria-label={`Digit ${i + 1}`}
-            className="h-14 w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-12 w-9 sm:h-14 sm:w-12 rounded-lg border border-neutral-200 text-center text-lg font-semibold text-neutral-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           />
         ))}
       </div>

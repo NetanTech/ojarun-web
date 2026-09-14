@@ -1038,8 +1038,8 @@ export function BasketEmpty({
           y2="52.8881"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F1F1F1" />
-          <stop offset="1" stop-color="#CECECE" />
+          <stop stopColor="#F1F1F1" />
+          <stop offset="1" stopColor="#CECECE" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_927_11024"
@@ -1049,8 +1049,8 @@ export function BasketEmpty({
           y2="44.7347"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F4F4F4" />
-          <stop offset="1" stop-color="#B6B6B6" />
+          <stop stopColor="#F4F4F4" />
+          <stop offset="1" stopColor="#B6B6B6" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_927_11024"
@@ -1060,8 +1060,8 @@ export function BasketEmpty({
           y2="17.9716"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#F5F5F5" />
-          <stop offset="1" stop-color="#C8C8C8" />
+          <stop stopColor="#F5F5F5" />
+          <stop offset="1" stopColor="#C8C8C8" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_927_11024"
@@ -1071,7 +1071,7 @@ export function BasketEmpty({
           y2="42.761"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#353535" />
+          <stop stopColor="#353535" />
           <stop offset="1" />
         </linearGradient>
         <clipPath id="clip0_927_11024">
@@ -2013,8 +2013,8 @@ export function ShoppingBags({
           y2="163.833"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#7451A0" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#7451A0" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_953_6964"
@@ -2024,8 +2024,8 @@ export function ShoppingBags({
           y2="11.5872"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_953_6964"
@@ -2035,8 +2035,8 @@ export function ShoppingBags({
           y2="90.9173"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_953_6964"
@@ -2046,8 +2046,8 @@ export function ShoppingBags({
           y2="99.4163"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_953_6964"
@@ -2057,8 +2057,8 @@ export function ShoppingBags({
           y2="19.3685"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#653E95" />
-          <stop offset="1" stop-color="#3F2B59" />
+          <stop stopColor="#653E95" />
+          <stop offset="1" stopColor="#3F2B59" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_953_6964"
@@ -2068,8 +2068,8 @@ export function ShoppingBags({
           y2="149.475"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#3F2B59" />
-          <stop offset="1" stop-color="#653E95" />
+          <stop stopColor="#3F2B59" />
+          <stop offset="1" stopColor="#653E95" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_953_6964"
@@ -2079,8 +2079,8 @@ export function ShoppingBags({
           y2="112.63"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_953_6964"
@@ -2090,8 +2090,8 @@ export function ShoppingBags({
           y2="112.794"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_953_6964"
@@ -2101,8 +2101,8 @@ export function ShoppingBags({
           y2="180.149"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#19A3D9" />
-          <stop offset="1" stop-color="#0170B0" />
+          <stop stopColor="#19A3D9" />
+          <stop offset="1" stopColor="#0170B0" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_953_6964"
@@ -2112,8 +2112,8 @@ export function ShoppingBags({
           y2="104.514"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_953_6964"
@@ -2123,8 +2123,8 @@ export function ShoppingBags({
           y2="101.021"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_953_6964"
@@ -2134,8 +2134,8 @@ export function ShoppingBags({
           y2="111.084"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FC9FAA" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FC9FAA" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_953_6964"
@@ -2145,8 +2145,8 @@ export function ShoppingBags({
           y2="188.534"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FCADB7" />
-          <stop offset="0.99" stop-color="#CA6170" />
+          <stop stopColor="#FCADB7" />
+          <stop offset="0.99" stopColor="#CA6170" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_953_6964"
@@ -2156,8 +2156,8 @@ export function ShoppingBags({
           y2="192.554"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0.01" stop-color="#B6DE4D" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop offset="0.01" stopColor="#B6DE4D" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_953_6964"
@@ -2167,8 +2167,8 @@ export function ShoppingBags({
           y2="236.77"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#A9D82E" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop stopColor="#A9D82E" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_953_6964"
@@ -2178,9 +2178,9 @@ export function ShoppingBags({
           y2="-30.4792"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#A9D82E" />
-          <stop offset="0.22" stop-color="#94C724" />
-          <stop offset="0.99" stop-color="#4A8A02" />
+          <stop stopColor="#A9D82E" />
+          <stop offset="0.22" stopColor="#94C724" />
+          <stop offset="0.99" stopColor="#4A8A02" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_953_6964"
@@ -2190,8 +2190,8 @@ export function ShoppingBags({
           y2="92.5868"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.99" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.99" stopColor="#7E1003" />
         </linearGradient>
         <linearGradient
           id="paint17_linear_953_6964"
@@ -2201,8 +2201,8 @@ export function ShoppingBags({
           y2="86.1793"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.99" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.99" stopColor="#7E1003" />
         </linearGradient>
         <linearGradient
           id="paint18_linear_953_6964"
@@ -2212,11 +2212,11 @@ export function ShoppingBags({
           y2="188.521"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C91F08" />
-          <stop offset="0.2" stop-color="#C31D07" />
-          <stop offset="0.47" stop-color="#B21A06" />
-          <stop offset="0.77" stop-color="#971504" />
-          <stop offset="1" stop-color="#7E1003" />
+          <stop stopColor="#C91F08" />
+          <stop offset="0.2" stopColor="#C31D07" />
+          <stop offset="0.47" stopColor="#B21A06" />
+          <stop offset="0.77" stopColor="#971504" />
+          <stop offset="1" stopColor="#7E1003" />
         </linearGradient>
       </defs>
     </svg>
@@ -2269,7 +2269,7 @@ export function MessageIconUnread({
         d="M22 10V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H14"
         stroke="white"
         strokeWidth="1.5"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -2324,7 +2324,7 @@ export function MessageIcon({
         d="M22 10V13C22 17 20 19 16 19H15.5C15.19 19 14.89 19.15 14.7 19.4L13.2 21.4C12.54 22.28 11.46 22.28 10.8 21.4L9.3 19.4C9.14 19.18 8.77 19 8.5 19H8C4 19 2 18 2 13V8C2 4 4 2 8 2H14"
         stroke="white"
         strokeWidth="1.5"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -2431,7 +2431,7 @@ export function Like({ className, ...props }: React.SVGProps<SVGSVGElement>) {
       <path
         d="M4.98633 12.2332L7.05299 13.8331C7.31966 14.0998 7.91966 14.2331 8.31966 14.2331H10.853C11.653 14.2331 12.5197 13.6331 12.7197 12.8331L14.3197 7.96648C14.653 7.03315 14.053 6.23315 13.053 6.23315H10.3863C9.98633 6.23315 9.65299 5.89982 9.71966 5.43315L10.053 3.29982C10.1863 2.69982 9.78633 2.03315 9.18633 1.83315C8.65299 1.63315 7.98633 1.89982 7.71966 2.29982L4.98633 6.36648"
         stroke="white"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M1.58594 12.2331V5.69977C1.58594 4.76644 1.98594 4.43311 2.91927 4.43311H3.58594C4.51927 4.43311 4.91927 4.76644 4.91927 5.69977V12.2331C4.91927 13.1664 4.51927 13.4998 3.58594 13.4998H2.91927C1.98594 13.4998 1.58594 13.1664 1.58594 12.2331Z"
@@ -2460,7 +2460,7 @@ export function DisLike({
       <path
         d="M11.0138 3.7666L8.94714 2.1666C8.68047 1.89993 8.08047 1.7666 7.68047 1.7666H5.14714C4.34714 1.7666 3.48047 2.3666 3.28047 3.1666L1.68047 8.03327C1.34714 8.9666 1.94714 9.7666 2.94714 9.7666H5.61381C6.01381 9.7666 6.34714 10.0999 6.28047 10.5666L5.94714 12.6999C5.81381 13.2999 6.21381 13.9666 6.81381 14.1666C7.34714 14.3666 8.01381 14.0999 8.28047 13.6999L11.0138 9.63327"
         stroke="white"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M14.4134 3.76667V10.3C14.4134 11.2333 14.0134 11.5667 13.0801 11.5667H12.4134C11.4801 11.5667 11.0801 11.2333 11.0801 10.3V3.76667C11.0801 2.83333 11.4801 2.5 12.4134 2.5H13.0801C14.0134 2.5 14.4134 2.83333 14.4134 3.76667Z"
@@ -2515,18 +2515,18 @@ export function MapPin2({
       <path
         d="M7 18C5.17107 18.4117 4 19.0443 4 19.7537C4 20.9943 7.58172 22 12 22C16.4183 22 20 20.9943 20 19.7537C20 19.0443 18.8289 18.4117 17 18"
         stroke="black"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
       <path
         d="M14.5 9C14.5 10.3807 13.3807 11.5 12 11.5C10.6193 11.5 9.5 10.3807 9.5 9C9.5 7.61929 10.6193 6.5 12 6.5C13.3807 6.5 14.5 7.61929 14.5 9Z"
         stroke="black"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
       <path
         d="M13.2574 17.4936C12.9201 17.8184 12.4693 18 12.0002 18C11.531 18 11.0802 17.8184 10.7429 17.4936C7.6543 14.5008 3.51519 11.1575 5.53371 6.30373C6.6251 3.67932 9.24494 2 12.0002 2C14.7554 2 17.3752 3.67933 18.4666 6.30373C20.4826 11.1514 16.3536 14.5111 13.2574 17.4936Z"
         stroke="black"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
     </svg>
   );
@@ -3041,34 +3041,34 @@ export function Repeat({ className, ...props }: React.SVGProps<SVGSVGElement>) {
       <path
         d="M2.9834 4.30005H14.5168C15.9001 4.30005 17.0168 5.41672 17.0168 6.80005V9.56672"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M5.61673 1.66675L2.9834 4.30006L5.61673 6.93342"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M17.0168 15.7H5.4834C4.10007 15.7 2.9834 14.5834 2.9834 13.2V10.4333"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M14.3838 18.3333L17.0171 15.7L14.3838 13.0667"
         stroke="white"
-        stroke-width="1.25"
-        stroke-miterlimit="10"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.25"
+        strokeMiterlimit="10"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -3091,40 +3091,40 @@ export function ShoppingCart({
       <path
         d="M6.66699 13.3333L13.9337 12.7278C16.2075 12.5383 16.7179 12.0417 16.9699 9.77406L17.5003 5"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <path
         d="M5 5L18.3333 5"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <circle
         cx="5.00065"
         cy="16.6667"
         r="1.66667"
         stroke="black"
-        stroke-width="1.25"
+        strokeWidth="1.25"
       />
       <circle
         cx="14.1667"
         cy="16.6667"
         r="1.66667"
         stroke="black"
-        stroke-width="1.25"
+        strokeWidth="1.25"
       />
       <path
         d="M6.66667 16.6667L12.5 16.6667"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
       <path
         d="M1.66699 1.66675L2.47199 1.66675C3.25923 1.66675 3.94544 2.18724 4.13637 2.92919L6.61576 12.5638C6.74105 13.0507 6.63383 13.5665 6.32386 13.968L5.5271 15.0001"
         stroke="black"
-        stroke-width="1.25"
-        stroke-linecap="round"
+        strokeWidth="1.25"
+        strokeLinecap="round"
       />
     </svg>
   );

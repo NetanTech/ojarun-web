@@ -40,9 +40,9 @@ const ItemRow = ({
   onRemove: (id: string) => void;
 }) => {
   return (
-    <div className="flex border-b-2 items-center justify-between py-3 pb-5 border-b-[#E7E7E7] text-black">
-      <div className="flex items-start gap-2">
-        <div className="w-20 h-20 rounded-[6.1px] overflow-hidden border border-[#E7E7E7]">
+    <div className="flex border-b-2 items-center justify-between gap-2 py-3 pb-5 border-b-[#E7E7E7] text-black">
+      <div className="flex items-start gap-2 min-w-0 flex-1">
+        <div className="w-20 h-20 rounded-[6.1px] overflow-hidden border border-[#E7E7E7] shrink-0">
           <Image
             src={line.image || "/assets/Untitled design.png"}
             alt={line.name}
@@ -52,8 +52,8 @@ const ItemRow = ({
           />
         </div>
 
-        <div className="flex flex-col">
-          <p className="body-medium text-medium capitalize">{line.name}</p>
+        <div className="flex flex-col min-w-0">
+          <p className="body-medium text-medium capitalize truncate">{line.name}</p>
           <p className="body-xsmall text-grey-300 capitalize">{line.unit}</p>
           <p className="body-medium text-medium">
             {" "}
@@ -62,7 +62,7 @@ const ItemRow = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 shrink-0">
         <div className="flex items-center gap-4 bg-green-500 rounded-full p-2 text-white hover:bg-green-400">
           <Minus
             size={15}

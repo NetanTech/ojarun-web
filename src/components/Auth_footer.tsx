@@ -5,10 +5,10 @@ export default function Auth_footer() {
   return (
     <div className="w-full ">
       <Image
-        src="/assets/Auth_footer.png"
-        alt="Woman shopping for fresh tomatoes at a local market"
-        width={1920}
-        height={100}
+        src="/assets/Group 1215948444.png"
+        alt="Fresh groceries laid out on a counter"
+        width={4320}
+        height={680}
         priority
         sizes="100vw"
         className="w-full h-auto object-cover object-bottom"

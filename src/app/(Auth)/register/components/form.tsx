@@ -2,14 +2,17 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { registerCustomer, setPendingEmail } from "@/lib/customerAuth";
 
 export default function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const referralCode = searchParams.get("ref") || undefined;
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,11 +26,12 @@ export default function SignupForm() {
     setLoading(true);
     try {
       const { email: normalizedEmail } = await registerCustomer({
-        name,
+        name: `${firstName} ${lastName}`.trim(),
         phone,
         email,
         password,
         deliveryArea,
+        referralCode,
       });
       setPendingEmail(normalizedEmail);
       router.push("/verify-email");
@@ -53,24 +57,44 @@ export default function SignupForm() {
       </div>
 
       <div className="mt-8 space-y-5">
-        {/* Full name */}
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-neutral-900"
-          >
-            Full name
-          </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
-            className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-          />
+        {/* First / Last name */}
+        <div className="flex gap-3">
+          <div className="w-full">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-semibold text-neutral-900"
+            >
+              First name
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter first name"
+              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div className="w-full">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-semibold text-neutral-900"
+            >
+              Last name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter last name"
+              className="mt-2 w-full rounded-lg border border-neutral-200 px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
         </div>
 
         {/* Phone number */}
@@ -182,11 +206,11 @@ export default function SignupForm() {
       <p className="mt-6 text-center text-sm text-neutral-500">
         By clicking continue, you acknowledge that you have read and agreed to
         our{" "}
-        <Link href="/terms" className="font-semibold text-neutral-900 underline">
+        <Link href="/terms" className="font-semibold text-primary underline">
           Terms of Use
         </Link>{" "}
         and{" "}
-        <Link href="/privacy" className="font-semibold text-neutral-900 underline">
+        <Link href="/privacy" className="font-semibold text-primary underline">
           Privacy Policy
         </Link>
         .
@@ -204,7 +228,7 @@ export default function SignupForm() {
       {/* Sign in link */}
       <p className="mt-4 text-center text-sm text-neutral-500">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-neutral-900 underline">
+        <Link href="/login" className="font-semibold text-primary underline">
           Log in
         </Link>
       </p>

@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { loginCustomer, saveSession } from "@/lib/customerAuth";
+import { loginCustomer, useCustomerSession } from "@/lib/customerAuth";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useCustomerSession();
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -20,8 +21,8 @@ export default function LoginForm() {
     setLoading(true);
     try {
       const { accessToken, customer } = await loginCustomer({ phone, password });
-      saveSession(accessToken, customer);
-      router.push("/");
+      login(accessToken, customer);
+      router.push("/marketplace");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -84,7 +85,7 @@ export default function LoginForm() {
 
             <Link
               href="/forget-password"
-              className="font-semibold text-neutral-900 underline font-sm"
+              className="text-sm font-semibold text-primary"
             >
               Forgot password?
             </Link>
@@ -130,7 +131,7 @@ export default function LoginForm() {
         Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="font-semibold text-neutral-900 underline"
+          className="font-semibold text-primary underline"
         >
           Sign up
         </Link>

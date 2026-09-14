@@ -9,7 +9,7 @@ interface SvgProps extends React.SVGProps<SVGSVGElement> {
 // Category type
 interface CategoriesType {
   name: string;
-  icon: React.FC<SvgProps>;
+  icon: string;
 }
 
 // Product Card Props
@@ -154,4 +154,5 @@ interface NotificationProps {
   title: string;
   message: string;
   isRead: boolean;
+  createdAt?: string;
 }

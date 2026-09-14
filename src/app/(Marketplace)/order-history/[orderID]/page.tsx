@@ -201,16 +201,16 @@ const Page = () => {
           )}
         </AnimatePresence>
 
-        <div className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="w-full flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
-            <p className="text-lg font-medium">{order?.orderId}</p>
+            <p className="text-lg font-medium truncate">{order?.orderId}</p>
           </div>
 
           <button
-            className={`transition duration-150 ${showSub ? "rotate-180" : ""}`}
+            className={`shrink-0 transition duration-150 ${showSub ? "rotate-180" : ""}`}
           >
             {isMobile ? <ChevronUp /> : <ChevronDown />}
           </button>

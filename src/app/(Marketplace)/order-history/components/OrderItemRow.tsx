@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { formatCurrency } from "../../../../../lib/utils";
 import Drawer from "@/components/ui/Drawer";
 import Image from "next/image";
 import Modal from "@/components/ui/Modal";
 import Radio from "@/components/ui/Radio";
+import StarRating from "@/components/ui/StarRating";
 import {
   ShoppingBag,
   HourGlass,
@@ -18,6 +19,8 @@ import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { cancelOrder, confirmOrder } from "@/lib/orders";
+import { fetchReviewForOrder, Review } from "@/lib/reviews";
+import ReviewModal from "./ReviewModal";
 
 const statusVariants = {
   "in progress": "bg-warning-50 text-warning-500",
@@ -59,7 +62,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const router = useRouter();
   const cancelReasons = [
     "I added the wrong items",
-    "I no longer need these items",
+    "I no longer need the order",
     "I want to change my delivery address",
     "I found a better alternative",
   ];
@@ -70,6 +73,15 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const [order, setOrder] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [review, setReview] = useState<Review | null>(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  useEffect(() => {
+    if (props.status !== "successful") return;
+    fetchReviewForOrder(props.orderId)
+      .then(setReview)
+      .catch(() => {});
+  }, [props.status, props.orderId]);
 
   const handleConfirmReceived = async () => {
     setActionError(null);
@@ -109,19 +121,19 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           setOrder(props.orderId);
         }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col min-w-0">
               <p className="text-grey-400 text-xs">Order ID</p>
-              <p className="text-sm font-medium">{props.orderId}</p>
+              <p className="text-sm font-medium truncate">{props.orderId}</p>
             </div>
           </div>
           <p
             className={clsx(
-              "py-0.5 px-2 rounded-full body-xsmall capitalize flex items-center gap-1",
+              "py-0.5 px-2 rounded-full body-xsmall capitalize flex items-center gap-1 shrink-0",
               statusVariants[props.status],
             )}
           >
@@ -181,14 +193,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           setOrder(props.orderId);
         }}
       >
-        <div className="flex items-start gap-2">
-          <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="flex items-start gap-2 min-w-0">
+          <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
             <ShoppingBag />
           </div>
 
-          <div className=" flex flex-col items-start">
+          <div className="flex flex-col items-start min-w-0 w-full">
             <p className="text-gray-400">Order ID</p>
-            <p>{props.orderId}</p>
+            <p className="truncate w-full">{props.orderId}</p>
           </div>
         </div>
         <div className=" flex flex-col items-start">
@@ -248,19 +260,19 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
         isOpen={showOrderDetails}
         onClose={() => setShowOrderDetails(false)}
       >
-        <div className="border border-[#E7E7E7] px-3.5 py-4 flex items-center justify-between w-full rounded-md">
-          <div className="flex items-start gap-2">
-            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md">
+        <div className="border border-[#E7E7E7] px-3.5 py-4 flex items-center justify-between gap-2 w-full rounded-md">
+          <div className="flex items-start gap-2 min-w-0">
+            <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
 
-            <div className=" flex flex-col items-start">
+            <div className="flex flex-col items-start min-w-0 w-full">
               <p className="text-gray-400">Order ID</p>
-              <p>{props.orderId}</p>
+              <p className="truncate w-full">{props.orderId}</p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2 items-end shrink-0">
             <p
               className={clsx(
                 "py-0.5 px-1.5 rounded-full body-small capitalize flex items-center gap-2",
@@ -288,9 +300,9 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           </p>
           <div className="flex flex-col gap-2">
             {props.items.map((item) => (
-              <div className="flex items-center justify-between" key={item.id}>
-                <div className="flex items-center gap-2">
-                  <div className="w-12.5 h-12.5 rounded-xl overflow-hidden">
+              <div className="flex items-center justify-between gap-2" key={item.id}>
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-12.5 h-12.5 rounded-xl overflow-hidden shrink-0">
                     <Image
                       src={item.image || "/assets/Untitled design.png"}
                       alt={item.name}
@@ -299,14 +311,14 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
                       className="object-cover w-full h-full"
                     />
                   </div>
-                  <div className="flex flex-col">
-                    <p>
+                  <div className="flex flex-col min-w-0">
+                    <p className="truncate">
                       {item.name} x{item.quantity}
                     </p>
                     <p className="text-grey-300">{item.unit}</p>
                   </div>
                 </div>
-                <p>{formatCurrency(item.price, "NGN")}</p>
+                <p className="shrink-0">{formatCurrency(item.price, "NGN")}</p>
               </div>
             ))}
           </div>
@@ -324,6 +336,10 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           <div className="flex items-center justify-between w-full">
             <p className="text-grey-300">Delivery fee</p>
             <p>{formatCurrency(props.deliveryFee, "NGN")}</p>
+          </div>
+          <div className="flex items-center justify-between w-full">
+            <p className="font-medium">Total</p>
+            <p className="font-medium">{formatCurrency(props.total, "NGN")}</p>
           </div>
         </div>
         <div className="flex flex-col gap-5 border-b border-b-[#E7E7E7] py-4">
@@ -397,21 +413,50 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           })}
         </div>
 
+        {props.status === "successful" && (
+          <div className="flex flex-col gap-3 border-b border-b-[#E7E7E7] py-4">
+            <p className="text-grey-300 font-medium uppercase">your feedback</p>
+            {review ? (
+              <div className="flex flex-col gap-2">
+                <StarRating value={review.overallRating} readOnly size={18} />
+                {review.comment && (
+                  <p className="text-grey-400 body-small">{review.comment}</p>
+                )}
+              </div>
+            ) : (
+              <Button
+                as="button"
+                size="sm"
+                variant="secondary"
+                className="w-full"
+                onClick={() => {
+                  setShowOrderDetails(false);
+                  setShowReviewModal(true);
+                }}
+              >
+                Rate this order
+              </Button>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between gap-5 py-4 w-full">
-          <Button
-            as="button"
-            size="sm"
-            variant="secondary"
-            className="text-red-500 border-red-500 hover:border-red-400 hover:text-red-400 w-full"
-            onClick={() => {
-              setShowOrderDetails(false);
-              setActionError(null);
-              setCancelReason(null);
-              setCancelOrderModal(true);
-            }}
-          >
-            Cancel
-          </Button>
+          {!props.timeline.shoppingInProgress && (
+            <Button
+              as="button"
+              size="sm"
+              variant="secondary"
+              className="text-red-500 border-red-500 hover:border-red-400 hover:text-red-400 w-full"
+              onClick={() => {
+                setShowOrderDetails(false);
+                setActionError(null);
+                setCancelReason(null);
+                setCancelOrderModal(true);
+              }}
+            >
+              Cancel
+            </Button>
+          )}
 
           <Button
             as="button"
@@ -431,7 +476,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
       <Modal
         isOpen={showCOmodal}
         onClose={() => setShowCOModal(false)}
-        title="Confirm order received"
+        title="Confirm delivery"
         className="w-[35%]"
       >
         <div className="flex flex-col items-center justify-center gap-4 w-full">
@@ -524,6 +569,13 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
           onClick={() => setShowOrderDetails(false)}
         />
       )}
+
+      <ReviewModal
+        orderId={props.orderId}
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        onSubmitted={setReview}
+      />
     </React.Fragment>
   );
 };

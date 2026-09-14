@@ -19,7 +19,7 @@ const Page = () => {
           {
             icon: <Home size={18} className="text-grey-300"/>,
             title: "Home",
-            href: "/",
+            href: "/marketplace",
           },
           {
             title: "Favourites",
@@ -27,7 +27,7 @@ const Page = () => {
           },
         ]}
       />
-      <h6 className="text-green-500">Favourites</h6>
+      <h6>Favourites</h6>
       {loading ? (
         <ProductGrid products={[]} loading />
       ) : products.length > 0 ? (

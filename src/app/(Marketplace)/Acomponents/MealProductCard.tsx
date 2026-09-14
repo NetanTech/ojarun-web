@@ -128,9 +128,9 @@ const MealProductCard = ({
                   className="object-cover w-full h-full"
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <p className="body-large font-medium">{name}</p>
-                <p className="body-large font-medium">
+              <div className="flex items-center justify-between gap-2">
+                <p className="body-large font-medium truncate min-w-0">{name}</p>
+                <p className="body-large font-medium shrink-0">
                   {formatCurrency(totalPrice)}
                 </p>
               </div>
@@ -145,11 +145,11 @@ const MealProductCard = ({
               >
                 {ingredients.map((ingredient, i) => (
                   <div
-                    className="w-full flex items-center justify-between border border-[#e7e7e7] rounded-lg p-2 px-2.5"
+                    className="w-full flex items-center justify-between gap-2 border border-[#e7e7e7] rounded-lg p-2 px-2.5"
                     key={i}
                   >
-                    <div className="flex flex-col gap-2">
-                      <h6>{ingredient.product.name}</h6>
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <h6 className="truncate">{ingredient.product.name}</h6>
                       <p className="body-small text-grey-300">
                         {ingredient.product.unit}
                       </p>
