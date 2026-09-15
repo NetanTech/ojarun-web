@@ -4,9 +4,11 @@ import ContactForm from "./components/contactform";
 
 export default function ContactPage() {
   return (
-    <main>
+    <main className="flex min-h-screen flex-col">
       <Header />
-      <ContactForm />
+      <div className="flex-1">
+        <ContactForm />
+      </div>
       <SubFooter className="-mt-42.5" />
     </main>
   );

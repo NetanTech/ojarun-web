@@ -137,27 +137,29 @@ export default function Steps() {
                 {s.body}
               </p>
 
-              {/* CTA as Link */}
-              <Link
-                href={s.ctaHref}
-                target={s.ctaHref.startsWith("http") ? "_blank" : undefined}
-                rel={s.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="mt-8 inline-flex items-center gap-2.5 rounded-xl bg-primary px-5 py-3.5 text-sm font-medium text-white transition hover:opacity-90 cursor-pointer"
-              >
-                {s.cta}
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              {/* CTA as Link — hidden for sections with no real destination yet */}
+              {s.ctaHref !== "#" && (
+                <Link
+                  href={s.ctaHref}
+                  target={s.ctaHref.startsWith("http") ? "_blank" : undefined}
+                  rel={s.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="mt-8 inline-flex items-center gap-2.5 rounded-xl bg-primary px-5 py-3.5 text-sm font-medium text-white transition hover:opacity-90 cursor-pointer"
                 >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </Link>
+                  {s.cta}
+                  <svg
+                    className="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </Link>
+              )}
             </motion.div>
 
             {/* Image Card */}
