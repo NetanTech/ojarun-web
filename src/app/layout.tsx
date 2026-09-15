@@ -55,9 +55,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${geistMono.variable} h-full antialiased overflow-x-hidden`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col overflow-x-hidden">
         <CustomerSessionProvider>{children}</CustomerSessionProvider>
       </body>
     </html>
