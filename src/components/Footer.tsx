@@ -12,9 +12,9 @@ const footerLinks = {
     { label: "FAQ", href: "/faq" },
   ],
   Product: [
-    { label: "Customer", href: "/customer" },
-    { label: "Agent", href: "/agent" },
-    { label: "Rider", href: "/rider" },
+    { label: "Customer", href: "/#customer" },
+    { label: "Agent", href: "/#agent" },
+    { label: "Rider", href: "/#rider" },
   ],
   Terms: [
     { label: "Privacy policy", href: "/privacy-policy" },

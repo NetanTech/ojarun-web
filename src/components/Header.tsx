@@ -6,7 +6,13 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Logo, WhatsAppIcon } from "../../public/svg/svg";
 import { EASE } from "@/lib/motion";
 
-const navLinks = ["Agents", "Riders", "FAQs", "About", "Contact us"];
+const navLinks = [
+  { label: "Agents", href: "/#agent" },
+  { label: "Riders", href: "/#rider" },
+  { label: "FAQs", href: "/faqs" },
+  { label: "About", href: "/about" },
+  { label: "Contact us", href: "/contact-us" },
+];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,12 +64,12 @@ export default function Header() {
         <nav aria-label="Main navigation" className="hidden md:block">
           <ul className="flex items-center gap-7 text-sm font-medium text-white/80">
             {navLinks.map((link, i) => (
-              <motion.li key={link} {...fadeFromTop(0.2 + i * 0.08)}>
+              <motion.li key={link.label} {...fadeFromTop(0.2 + i * 0.08)}>
                 <Link
-                  href={`/${link.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={link.href}
                   className="relative inline-block py-1 transition-colors duration-200 hover:text-white after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full"
                 >
-                  {link}
+                  {link.label}
                 </Link>
               </motion.li>
             ))}
@@ -130,13 +136,13 @@ export default function Header() {
         <nav aria-label="Mobile navigation" className="px-6 pb-5 pt-1">
           <ul className="flex flex-col gap-1 text-sm font-medium text-white/80">
             {navLinks.map((link) => (
-              <li key={link}>
+              <li key={link.label}>
                 <Link
-                  href={`/${link.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={link.href}
                   onClick={() => setMenuOpen(false)}
                   className="block py-2.5 border-b border-white/10 hover:text-white transition-colors duration-200"
                 >
-                  {link}
+                  {link.label}
                 </Link>
               </li>
             ))}
