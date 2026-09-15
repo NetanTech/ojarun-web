@@ -6,11 +6,13 @@ import Team from "./component/team";
 
 export default function AboutPage() {
   return (
-    <main>
+    <main className="flex min-h-screen flex-col">
       <Header />
-      <AboutHero />
-      <MissionVision />
-      <Team />
+      <div className="flex-1">
+        <AboutHero />
+        <MissionVision />
+        <Team />
+      </div>
       <SubFooter />
     </main>
   );
