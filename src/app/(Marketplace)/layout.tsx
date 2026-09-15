@@ -15,9 +15,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <CartProvider>
       <FavoritesProvider>
         <MealFavoritesProvider>
-          <div className="">
+          <div className="flex min-h-screen flex-col">
             <Header />
-            {children}
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </MealFavoritesProvider>
