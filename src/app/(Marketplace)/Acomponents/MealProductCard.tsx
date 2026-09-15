@@ -7,6 +7,8 @@ import { formatCurrency } from "../../../../lib/utils";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import { useCart } from "@/lib/cart";
+import { useMealFavorites } from "@/lib/mealFavoritesContext";
+import { useToast } from "@/components/ui/Toast";
 
 interface MealProductCardProps extends Meal {
   onClick?: () => void;
@@ -19,13 +21,14 @@ const MealProductCard = ({
   servings,
   totalPrice,
   ingredients,
-  wishlisted,
   onClick,
 }: MealProductCardProps) => {
-  const [addToWishlist, setAddToWishlist] = useState(false);
   const [showMealDetail, setShowMealDetail] = useState(false);
   const cart = useCart();
+  const mealFavorites = useMealFavorites();
+  const { showToast } = useToast();
   const quantity = cart.getQuantity(id);
+  const favorited = mealFavorites.isFavorited(id);
 
   const addMealToCart = () => {
     cart.addItem(
@@ -51,20 +54,29 @@ const MealProductCard = ({
 
         <button
           className={`absolute top-2 right-2 ${
-            addToWishlist || wishlisted
+            favorited
               ? "bg-green-50 text-[#004A19]"
               : "bg-white/70"
           } p-1.5 sm:p-2 rounded-full`}
           onClick={(e) => {
             e.stopPropagation();
-            setAddToWishlist((prev) => !prev);
+            const wasFavorited = favorited;
+            mealFavorites.toggle({
+              id,
+              name,
+              imageURL,
+              servings,
+              totalPrice,
+              ingredientCount: ingredients.length,
+            });
+            if (!wasFavorited) showToast("Added to favourites");
           }}
         >
           <Heart
             size={16}
             className="sm:size-5"
-            fill={addToWishlist || wishlisted ? "#004A19" : "none"}
-            stroke={addToWishlist || wishlisted ? "#004A19" : "black"}
+            fill={favorited ? "#004A19" : "none"}
+            stroke={favorited ? "#004A19" : "black"}
           />
         </button>
       </div>

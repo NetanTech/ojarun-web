@@ -6,10 +6,12 @@ import React from "react";
 import { formatCurrency } from "../../../../lib/utils";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favoritesContext";
+import { useToast } from "@/components/ui/Toast";
 
 const ProductCard = (props: ProductCardProps) => {
   const cart = useCart();
   const favorites = useFavorites();
+  const { showToast } = useToast();
   const quantity = cart.getQuantity(props.id);
   const favorited = favorites.isFavorited(props.id);
 
@@ -39,7 +41,10 @@ const ProductCard = (props: ProductCardProps) => {
 
         <button
           className={`absolute top-2 right-2 ${favorited ? "bg-green-50 text-green-500" : "bg-grayScale-50/60"} p-1.5 sm:p-2 flex items-center justify-center rounded-full`}
-          onClick={() => favorites.toggle(props)}
+          onClick={() => {
+            if (!favorited) showToast("Added to favourites");
+            favorites.toggle(props);
+          }}
         >
           <Heart
             size={16}

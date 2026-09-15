@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import { CustomerSessionProvider } from "@/lib/customerAuth";
+import { ToastProvider } from "@/components/ui/Toast";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -58,7 +59,9 @@ export default function RootLayout({
       className={`${dmSans.variable} ${geistMono.variable} h-full antialiased overflow-x-hidden`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden">
-        <CustomerSessionProvider>{children}</CustomerSessionProvider>
+        <CustomerSessionProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </CustomerSessionProvider>
       </body>
     </html>
   );
