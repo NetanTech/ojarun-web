@@ -17,6 +17,8 @@ import {
   ChatHistoryMessage,
   OrderDraftItem,
 } from "@/lib/aiChat";
+import { fetchProducts } from "@/lib/products";
+import { useCart } from "@/lib/cart";
 
 type ChatMessage = {
   id: string;
@@ -50,7 +52,16 @@ function mergeDraftItems(
 ): OrderDraftItem[] {
   const byName = new Map(prev.map((item) => [item.name.toLowerCase(), item]));
   for (const item of incoming) {
-    byName.set(item.name.toLowerCase(), item);
+    const key = item.name.toLowerCase();
+    const existing = byName.get(key);
+    // Same item, same unit mentioned again — treat it as more of the same
+    // rather than losing the earlier quantity (e.g. "2kg tomatoes" then
+    // later "1kg tomatoes" should total 3kg, not drop back to 1kg).
+    if (existing && existing.unit.toLowerCase() === item.unit.toLowerCase()) {
+      byName.set(key, { ...item, quantity: existing.quantity + item.quantity });
+    } else {
+      byName.set(key, item);
+    }
   }
   return Array.from(byName.values());
 }
@@ -59,6 +70,72 @@ function formatDraftList(items: OrderDraftItem[]): string {
   return items
     .map((item) => `• ${item.quantity} ${item.unit} ${item.name}`)
     .join("\n");
+}
+
+type MatchedItem = {
+  productId: string;
+  productName: string;
+  price: number;
+  image: string;
+  unit: string;
+  quantity: number;
+};
+
+// The AI only ever knows item names/quantities it inferred from chat — it has
+// no idea what's actually in the catalog or what it costs. Real matching and
+// pricing has to happen here, against the real product list, not the model's guess.
+function parseNairaWorth(unit: string): number | null {
+  const match = unit.match(/n\s*([\d,]+)\s*worth/i);
+  if (!match) return null;
+  const amount = Number(match[1].replace(/,/g, ""));
+  return Number.isFinite(amount) && amount > 0 ? amount : null;
+}
+
+async function matchDraftItemsToProducts(
+  items: OrderDraftItem[],
+): Promise<{ matched: MatchedItem[]; unmatched: OrderDraftItem[] }> {
+  const matched: MatchedItem[] = [];
+  const unmatched: OrderDraftItem[] = [];
+
+  for (const item of items) {
+    let candidates: ProductCardProps[] = [];
+    try {
+      candidates = await fetchProducts({ search: item.name });
+    } catch {
+      candidates = [];
+    }
+
+    const lowerName = item.name.toLowerCase();
+    const best =
+      candidates.find((p) => p.name.toLowerCase() === lowerName) ??
+      candidates.find(
+        (p) =>
+          p.name.toLowerCase().includes(lowerName) ||
+          lowerName.includes(p.name.toLowerCase()),
+      ) ??
+      candidates[0];
+
+    if (!best) {
+      unmatched.push(item);
+      continue;
+    }
+
+    const nairaWorth = parseNairaWorth(item.unit);
+    const quantity = nairaWorth
+      ? Math.max(1, Math.round(nairaWorth / best.price))
+      : Math.max(1, Math.round(item.quantity) || 1);
+
+    matched.push({
+      productId: best.id,
+      productName: best.name,
+      price: best.price,
+      image: best.imageURL,
+      unit: best.more,
+      quantity,
+    });
+  }
+
+  return { matched, unmatched };
 }
 
 const AIAgent = () => {
@@ -72,6 +149,7 @@ const AIAgent = () => {
   const draftItemsRef = useRef<OrderDraftItem[]>([]);
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const { addItem } = useCart();
 
   const closeChat = () => {
     setOpen(false);
@@ -162,14 +240,55 @@ const AIAgent = () => {
           "assistant",
           `Got it! Here's your list so far:\n${list}${addressLine}\n\nAnything else, or say "that's all" when you're ready?`,
         );
-      } else {
-        const list = formatDraftList(draftItemsRef.current);
+      } else if (draftItemsRef.current.length === 0) {
         appendMessage(
           "assistant",
-          list
-            ? `Here's your final list:\n${list}\n\nHead to checkout to complete your order, or keep chatting if you'd like to add more.`
-            : `Let's get your list started first — tell me what you'd like to buy.`,
+          `Let's get your list started first — tell me what you'd like to buy.`,
         );
+      } else {
+        const { matched, unmatched } = await matchDraftItemsToProducts(
+          draftItemsRef.current,
+        );
+        draftItemsRef.current = [];
+
+        for (const item of matched) {
+          addItem(
+            {
+              id: item.productId,
+              name: item.productName,
+              price: item.price,
+              image: item.image,
+              unit: item.unit,
+            },
+            item.quantity,
+          );
+        }
+
+        const parts: string[] = [];
+        if (matched.length > 0) {
+          const addedLines = matched
+            .map(
+              (m) =>
+                `• ${m.quantity} x ${m.productName} (₦${m.price.toLocaleString()} each)`,
+            )
+            .join("\n");
+          parts.push(`Added to your cart:\n${addedLines}`);
+        }
+        if (unmatched.length > 0) {
+          const missingLines = unmatched
+            .map((i) => `• ${i.name}`)
+            .join("\n");
+          parts.push(
+            `I couldn't find these in our catalog, so please add them yourself from the marketplace:\n${missingLines}`,
+          );
+        }
+        parts.push(
+          matched.length > 0
+            ? `Head to checkout when you're ready.`
+            : `Nothing on your list matched a product we sell — try searching the marketplace directly.`,
+        );
+
+        appendMessage("assistant", parts.join("\n\n"));
       }
     } catch (err) {
       appendMessage(
