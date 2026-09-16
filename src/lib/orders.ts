@@ -34,6 +34,7 @@ async function authedRequest<T>(
 }
 
 export type CreateOrderItemInput = {
+  productId?: string;
   name: string;
   unit: string;
   price: number;

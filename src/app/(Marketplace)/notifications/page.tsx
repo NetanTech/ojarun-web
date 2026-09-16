@@ -12,6 +12,7 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/lib/notifications";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 
 interface FilterType {
   name: string;
@@ -33,6 +34,7 @@ const filters: FilterType[] = [
 
 const Page = () => {
   const pathName = usePathname();
+  const { customer, ready } = useRequireAuth();
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const filterRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -56,8 +58,9 @@ const Page = () => {
   };
 
   useEffect(() => {
+    if (!ready || !customer) return;
     loadNotifications();
-  }, []);
+  }, [ready, customer]);
 
   const handleRowClick = async (notification: NotificationProps) => {
     if (notification.isRead || !notification.id) return;
@@ -97,6 +100,15 @@ const Page = () => {
       width: buttonRect.width,
     });
   }, [activeIndex, unreadCount]);
+
+  if (!ready || !customer) {
+    return (
+      <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full my-5">
+        <p className="text-grey-300 body-medium">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full flex flex-col items-start gap-2 my-5">
       <BreadCrumb

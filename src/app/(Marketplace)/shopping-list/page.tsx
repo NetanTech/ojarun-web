@@ -24,6 +24,7 @@ import {
   deleteShoppingList,
 } from "@/lib/shoppingLists";
 import { SuccessIcon } from "../../../../public/svg/AnimatedSvgs/fun-svg";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 
 const Empty = ({ onCreate }: { onCreate: () => void }) => {
   return (
@@ -273,6 +274,7 @@ const ShoppingListCard = ({
 };
 
 const Page = () => {
+  const { customer, ready } = useRequireAuth();
   const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null);
   const [editingList, setEditingList] = useState<ShoppingList | null>(null);
   const [created, setCreated] = useState(false);
@@ -307,8 +309,9 @@ const Page = () => {
   };
 
   useEffect(() => {
+    if (!ready || !customer) return;
     loadLists();
-  }, []);
+  }, [ready, customer]);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -453,6 +456,14 @@ const Page = () => {
       setSaving(false);
     }
   };
+
+  if (!ready || !customer) {
+    return (
+      <div className="md:max-w-300 w-full lg:mx-auto px-4 lg:px-0 my-3">
+        <p className="text-grey-300 body-medium">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="md:max-w-300 w-full lg:mx-auto px-4 lg:px-0 flex flex-col gap-4 mb-6 my-3">

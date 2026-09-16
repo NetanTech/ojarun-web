@@ -49,6 +49,11 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
     try {
       const result = await createOrder({
         items: cart.lines.map((line) => ({
+          // Cart line ids are real product UUIDs for regular items, but a
+          // plain string (e.g. "meal-1") for meal bundles — only send it as
+          // productId when it's actually a product, so the server can look
+          // up the real price for it.
+          productId: /^[0-9a-f-]{36}$/i.test(line.id) ? line.id : undefined,
           name: line.name,
           unit: line.unit,
           price: line.price,

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Logo, WhatsAppIcon } from "../../public/svg/svg";
 import { EASE } from "@/lib/motion";
+import { useCustomerSession } from "@/lib/customerAuth";
 
 const navLinks = [
   { label: "Agents", href: "/#agent" },
@@ -18,6 +19,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const reduced = useReducedMotion();
+  const { customer } = useCustomerSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -78,13 +80,13 @@ export default function Header() {
 
         {/* Right — CTA (desktop) + Hamburger (mobile) */}
         <div className="flex flex-1 justify-end items-center gap-3">
-          {/* Log in — hidden on mobile */}
+          {/* Log in / account — hidden on mobile */}
           <motion.div {...fade(0.2 + navLinks.length * 0.08)} className="hidden md:block">
             <Link
-              href="/login"
+              href={customer ? "/marketplace" : "/login"}
               className="text-sm font-medium text-white/80 transition-colors duration-200 hover:text-white"
             >
-              Log in
+              {customer ? customer.name || "My account" : "Log in"}
             </Link>
           </motion.div>
 
@@ -148,13 +150,13 @@ export default function Header() {
             ))}
           </ul>
 
-          {/* Log in inside mobile menu */}
+          {/* Log in / account inside mobile menu */}
           <Link
-            href="/login"
+            href={customer ? "/marketplace" : "/login"}
             onClick={() => setMenuOpen(false)}
             className="block py-2.5 border-b border-white/10 hover:text-white transition-colors duration-200"
           >
-            Log in
+            {customer ? customer.name || "My account" : "Log in"}
           </Link>
 
           {/* CTA inside mobile menu */}

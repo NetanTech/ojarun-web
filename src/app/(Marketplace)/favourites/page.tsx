@@ -10,9 +10,11 @@ import Empty from "./components/Empty";
 import { useFavorites } from "@/lib/favoritesContext";
 import { useMealFavorites } from "@/lib/mealFavoritesContext";
 import { mockMeals } from "../../../../constants/data";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 
 const Page = () => {
   const pathName = usePathname();
+  const { customer, ready } = useRequireAuth();
   const { products, loading } = useFavorites();
   const { meals: mealFavorites, loading: mealsLoading } = useMealFavorites();
 
@@ -33,6 +35,14 @@ const Page = () => {
 
   const anyLoading = loading || mealsLoading;
   const hasAnyFavorites = products.length > 0 || favoritedMeals.length > 0;
+
+  if (!ready || !customer) {
+    return (
+      <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full my-5">
+        <p className="text-grey-300 body-medium">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full flex flex-col items-start gap-6 my-5">
