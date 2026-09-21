@@ -44,6 +44,8 @@ export type CreateOrderItemInput = {
 export type CreateOrderInput = {
   items: CreateOrderItemInput[];
   deliveryAddress: string;
+  lat: number;
+  lng: number;
   note?: string;
   paymentMethod: "cash" | "card";
   promoCode?: string;

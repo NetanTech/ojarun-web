@@ -7,6 +7,8 @@ export type SavedAddress = {
   label: string | null;
   address: string;
   landmark: string | null;
+  lat: number | null;
+  lng: number | null;
   isDefault: boolean;
 };
 
@@ -45,6 +47,8 @@ export type SaveAddressInput = {
   label?: string;
   address: string;
   landmark?: string;
+  lat: number;
+  lng: number;
   isDefault?: boolean;
 };
 
@@ -69,4 +73,8 @@ export function deleteAddress(id: string): Promise<{ message: string }> {
 
 export function formatAddress(a: SavedAddress): string {
   return a.landmark ? `${a.address} (${a.landmark})` : a.address;
+}
+
+export function hasPin(a: SavedAddress): boolean {
+  return a.lat != null && a.lng != null;
 }

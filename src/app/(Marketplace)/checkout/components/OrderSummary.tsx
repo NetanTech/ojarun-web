@@ -9,20 +9,29 @@ import Modal from "@/components/ui/Modal";
 import { useCart } from "@/lib/cart";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { createOrder, PromoValidation } from "@/lib/orders";
+import { DeliveryQuote, DeliverySelection } from "@/lib/delivery";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-const AGENT_FEE = 1200;
-const DELIVERY_FEE = 700;
 
 interface OrderSummaryProps {
   paymentMethod: "cash" | "card";
   note?: string;
   promo?: PromoValidation | null;
-  deliveryAddress: string;
+  delivery: DeliverySelection | null;
+  quote: DeliveryQuote | null;
+  quoteLoading?: boolean;
+  quoteError?: string | null;
 }
 
-const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSummaryProps) => {
+const OrderSummary = ({
+  paymentMethod,
+  note,
+  promo,
+  delivery,
+  quote,
+  quoteLoading = false,
+  quoteError = null,
+}: OrderSummaryProps) => {
   const cart = useCart();
   const router = useRouter();
   const { customer, ready } = useCustomerSession();
@@ -32,34 +41,34 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
 
   const hasItems = cart.lines.length > 0;
   const discount = hasItems ? promo?.discountAmount || 0 : 0;
-  const total = Math.max(
-    cart.subtotal + (hasItems ? AGENT_FEE + DELIVERY_FEE : 0) - discount,
-    0,
-  );
+  const serviceFee = hasItems && quote?.serviceable ? quote.serviceFee : 0;
+  const deliveryFee = hasItems && quote?.serviceable ? quote.deliveryFee : 0;
+  const total = Math.max(cart.subtotal + serviceFee + deliveryFee - discount, 0);
   const loggedOut = ready && !customer;
+  const canPlace =
+    hasItems &&
+    !loggedOut &&
+    !loading &&
+    !quoteLoading &&
+    !!delivery &&
+    !!quote?.serviceable;
 
   const handlePlaceOrder = async () => {
-    if (!hasItems || !customer) return;
-    if (!deliveryAddress.trim()) {
-      setError("Add a delivery address before placing your order.");
-      return;
-    }
+    if (!hasItems || !customer || !delivery || !quote?.serviceable) return;
     setError(null);
     setLoading(true);
     try {
       const result = await createOrder({
         items: cart.lines.map((line) => ({
-          // Cart line ids are real product UUIDs for regular items, but a
-          // plain string (e.g. "meal-1") for meal bundles — only send it as
-          // productId when it's actually a product, so the server can look
-          // up the real price for it.
           productId: /^[0-9a-f-]{36}$/i.test(line.id) ? line.id : undefined,
           name: line.name,
           unit: line.unit,
           price: line.price,
           quantity: line.quantity,
         })),
-        deliveryAddress,
+        deliveryAddress: delivery.address,
+        lat: delivery.lat,
+        lng: delivery.lng,
         paymentMethod,
         note: note?.trim() || undefined,
         promoCode: promo?.code,
@@ -129,12 +138,23 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
           <p> {formatCurrency(cart.subtotal)} </p>
         </div>
         <div className="flex items-center justify-between text-grey-300">
-          <p>Agent fee</p>
-          <p> {formatCurrency(hasItems ? AGENT_FEE : 0)} </p>
+          <p>Shopper fee</p>
+          <p>
+            {quoteLoading
+              ? "…"
+              : formatCurrency(serviceFee)}
+          </p>
         </div>
         <div className="flex items-center justify-between text-grey-300">
-          <p>Delivery fee</p>
-          <p> {formatCurrency(hasItems ? DELIVERY_FEE : 0)} </p>
+          <p>
+            Delivery
+            {quote?.distanceKm != null ? ` (~${quote.distanceKm} km)` : ""}
+          </p>
+          <p>
+            {quoteLoading
+              ? "…"
+              : formatCurrency(deliveryFee)}
+          </p>
         </div>
         {discount > 0 && (
           <div className="flex items-center justify-between text-green-600">
@@ -146,6 +166,14 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
           <p>Total</p>
           <p> {formatCurrency(total)} </p>
         </div>
+
+        {!delivery && hasItems && (
+          <p className="text-sm text-amber-700">
+            Drop a map pin so we can calculate your delivery fee.
+          </p>
+        )}
+
+        {quoteError && <p className="text-sm text-red-600">{quoteError}</p>}
 
         {loggedOut && (
           <p className="text-sm text-red-600">
@@ -162,10 +190,14 @@ const OrderSummary = ({ paymentMethod, note, promo, deliveryAddress }: OrderSumm
           as="button"
           size="sm"
           variant="primary"
-          isDisabled={!hasItems || loggedOut || loading || !deliveryAddress.trim()}
+          isDisabled={!canPlace}
           onClick={handlePlaceOrder}
         >
-          {loading ? "Placing order..." : "Place order"}
+          {loading
+            ? "Placing order..."
+            : quoteLoading
+              ? "Calculating delivery..."
+              : "Place order"}
         </Button>
       </div>
 
