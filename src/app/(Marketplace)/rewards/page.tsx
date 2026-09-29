@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Diamond } from "lucide-react";
+import { Diamond, Award } from "lucide-react";
 import BreadCrumb from "../Acomponents/bread-crumb";
 import { Home } from "../../../../public/svg/svg";
 import { useCustomerSession } from "@/lib/customerAuth";
@@ -91,6 +91,12 @@ const RewardsPage = () => {
       ) : (
         <>
           <div className="bg-linear-to-r from-[#00892E] to-[#004A19] rounded-[20px] w-full p-6 md:p-10 flex flex-col gap-6 overflow-hidden relative">
+            <Award
+              size={240}
+              strokeWidth={1}
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-8 -top-12 rotate-12 text-amber-300/25 md:-right-4 md:-top-16 md:size-80"
+            />
             <div className="flex items-center gap-1">
               <p className="text-grey-50 h6">Total OjaPoints</p>
               <Diamond size={16} className="text-white" />
