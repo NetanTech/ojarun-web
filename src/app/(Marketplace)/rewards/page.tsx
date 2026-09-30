@@ -91,6 +91,12 @@ const RewardsPage = () => {
       ) : (
         <>
           <div className="bg-linear-to-r from-[#00892E] to-[#004A19] rounded-[20px] w-full p-6 md:p-10 flex flex-col gap-6 overflow-hidden relative">
+            <img
+              src="/svg/rewards-coins.svg"
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 right-0 w-[180px] md:w-[304px]"
+            />
             <div className="flex items-center gap-1">
               <p className="text-grey-50 h6">Total OjaPoints</p>
               <Diamond size={16} className="text-white" />
