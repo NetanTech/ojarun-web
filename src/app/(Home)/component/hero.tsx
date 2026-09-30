@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { WhatsAppIcon } from "../../../../public/svg/svg";
 
@@ -38,6 +39,21 @@ export default function Hero() {
           to you without the stress, time, or guesswork.
         </motion.p>
 
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+
+        <motion.div
+          initial={hidden}
+          animate={shown}
+          transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
+        >
+          <Link
+            href="/marketplace"
+            className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 mt-4 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"
+          >
+            Get started
+          </Link>
+        </motion.div>
+
         <motion.a
           initial={hidden}
           animate={shown}
@@ -45,11 +61,12 @@ export default function Hero() {
           href="https://wa.me/2348025957234"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 mt-4 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"
+          className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 px-4 py-2.5 mt-4 text-sm font-medium text-background shadow-sm transition-all duration-200 hover:bg-accent hover:shadow-md active:translate-y-0"
         >
           <WhatsAppIcon className="h-5 w-5 shrink-0" />
-          Get started
+          Continue With Whatsapp
         </motion.a>
+        </div>
       </div>
 
       {/* Image strip — two side-by-side images with badge centered.

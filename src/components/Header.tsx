@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { Logo, WhatsAppIcon } from "../../public/svg/svg";
+import { Logo } from "../../public/svg/svg";
 import { EASE } from "@/lib/motion";
 import { useCustomerSession } from "@/lib/customerAuth";
 
@@ -90,17 +90,15 @@ export default function Header() {
             </Link>
           </motion.div>
 
-          {/* CTA — hidden on mobile */}
-          <motion.a
-            {...fade(0.25 + navLinks.length * 0.08)}
-            href="https://wa.me/2348025957234"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:shadow-md active:translate-y-0"
-          >
-            <WhatsAppIcon className="h-5 w-5 shrink-0" />
-            Get started
-          </motion.a>
+          {/* CTA — hidden on mobile; opens the web marketplace */}
+          <motion.div {...fade(0.25 + navLinks.length * 0.08)} className="hidden md:block">
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:shadow-md active:translate-y-0"
+            >
+              Get started
+            </Link>
+          </motion.div>
 
           {/* Hamburger — visible on mobile only */}
           <motion.button
@@ -160,15 +158,13 @@ export default function Header() {
           </Link>
 
           {/* CTA inside mobile menu */}
-          <a
-            href="https://wa.me/2348025957234"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/marketplace"
+            onClick={() => setMenuOpen(false)}
             className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] border border-white/40 bg-background px-4 py-2.5 text-sm font-medium text-primary shadow-sm transition-all duration-200 hover:bg-accent"
           >
-            <WhatsAppIcon className="h-5 w-5 shrink-0" />
             Get started
-          </a>
+          </Link>
         </nav>
       </div>
     </header>

@@ -28,7 +28,7 @@ const sections: Section[] = [
     cta: "Get started",
     image: "/assets/StepImg1.png",
     alt: "Woman shopping with a cart at the market",
-    ctaHref: "https://wa.me/2348025957234",
+    ctaHref: "/marketplace",
   },
   {
     id: "agent",
