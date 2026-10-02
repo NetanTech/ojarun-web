@@ -1,15 +1,25 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import BreadCrumb from "../Acomponents/bread-crumb";
 import Filters from "../Acomponents/filters";
 import AllProducts from "./components/all-products";
 import { Home } from "../../../../public/svg/svg";
 import FreshToday from "./components/fresh-today";
-import CookingRecommendations from "./components/cooking-recommendations";
-import AIAgent from "@/components/ui/AIAgent";
 import { fetchProducts } from "@/lib/products";
+
+// Chat widget is heavy and not needed for first paint — load after products UI.
+const AIAgent = dynamic(() => import("@/components/ui/AIAgent"), {
+  ssr: false,
+  loading: () => null,
+});
+
+const CookingRecommendations = dynamic(
+  () => import("./components/cooking-recommendations"),
+  { loading: () => null },
+);
 
 const MarketplaceContent = () => {
   const searchParams = useSearchParams();
@@ -25,7 +35,9 @@ const MarketplaceContent = () => {
     setError(null);
     fetchProducts({ search: query, category: selectedCat })
       .then(setProducts)
-      .catch((err) => setError(err instanceof Error ? err.message : "Could not load products."))
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : "Could not load products."),
+      )
       .finally(() => setLoading(false));
   }, [query, selectedCat]);
 
@@ -38,7 +50,7 @@ const MarketplaceContent = () => {
               title: "Home",
               href: "/marketplace",
               icon: <Home size={18} className="text-grey-300" />,
-             },
+            },
             { title: "Marketplace", href: "/marketplace" },
           ]}
         />
@@ -50,7 +62,9 @@ const MarketplaceContent = () => {
         </p>
       )}
       {error && (
-        <p className="text-red-600 body-medium px-4 md:max-w-300 md:mx-auto">{error}</p>
+        <p className="text-red-600 body-medium px-4 md:max-w-300 md:mx-auto">
+          {error}
+        </p>
       )}
       {!query && <FreshToday products={products.slice(0, 6)} loading={loading} />}
       {!query && <CookingRecommendations />}

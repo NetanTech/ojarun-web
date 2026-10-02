@@ -17,7 +17,7 @@
   --color-grayScale-50: var(--grayScale-50);
   --color-accent: var(--accent);
   --font-sans: var(--font-dm-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme {
@@ -94,11 +94,65 @@
   --color-success-900: #063f1a;
 
   --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-ai-float: ai-float 2.4s ease-in-out infinite;
+  --animate-ai-pulse: ai-pulse 2.2s ease-out infinite;
+  --animate-ai-pop: ai-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes slide-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+@keyframes ai-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes ai-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+@keyframes ai-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ai-fab-float {
+  animation: ai-float 2.4s ease-in-out infinite;
+}
+
+.ai-fab-pulse {
+  animation: ai-pulse 2.2s ease-out infinite;
+}
+
+.ai-nudge-pop {
+  animation: ai-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-fab-float,
+  .ai-fab-pulse,
+  .ai-nudge-pop {
+    animation: none !important;
+  }
 }
 
 @layer base {

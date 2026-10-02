@@ -141,6 +141,7 @@ async function matchDraftItemsToProducts(
 const AIAgent = () => {
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(true);
+  const [showNudge, setShowNudge] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: "welcome", role: "assistant", content: WELCOME_MESSAGE, time: now() },
   ]);
@@ -161,7 +162,38 @@ const AIAgent = () => {
   const openChat = () => {
     setOpen(true);
     setUnread(false);
+    setShowNudge(false);
+    try {
+      sessionStorage.setItem("ojarun_ai_nudge_seen", "1");
+    } catch {
+      /* ignore */
+    }
   };
+
+  const dismissNudge = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowNudge(false);
+    try {
+      sessionStorage.setItem("ojarun_ai_nudge_seen", "1");
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Pop-out tip so the assistant is hard to miss on first visit this session.
+  useEffect(() => {
+    if (open) return;
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("ojarun_ai_nudge_seen") === "1";
+    } catch {
+      seen = false;
+    }
+    if (seen) return;
+
+    const timer = window.setTimeout(() => setShowNudge(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -464,12 +496,57 @@ const AIAgent = () => {
         </div>
       )}
       {!open && (
-        <button
-          className="rounded-full w-12 h-12 flex items-center justify-center bg-primary self-end"
-          onClick={openChat}
-        >
-          {unread ? <MessageIconUnread /> : <MessageIcon />}
-        </button>
+        <div className="relative self-end flex flex-col items-end gap-2">
+          {showNudge && (
+            <div
+              role="status"
+              className="ai-nudge-pop relative max-w-[220px] rounded-2xl rounded-br-md bg-white px-3.5 py-3 text-left shadow-[0_8px_28px_rgba(0,74,25,0.18)] border border-green-50"
+            >
+              <button
+                type="button"
+                aria-label="Dismiss"
+                onClick={dismissNudge}
+                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-grey-50 text-grey-400 hover:bg-grey-100"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={openChat}
+                className="w-full text-left"
+              >
+                <p className="text-xs font-semibold text-primary">Ojarun Agent</p>
+                <p className="mt-0.5 text-sm leading-5 text-grey-500">
+                  Need help shopping? Tap to chat — I can build your list 👋
+                </p>
+              </button>
+              <span
+                aria-hidden
+                className="absolute -bottom-1.5 right-5 h-3 w-3 rotate-45 bg-white border-r border-b border-green-50"
+              />
+            </div>
+          )}
+
+          <div className="ai-fab-float relative">
+            <span
+              aria-hidden
+              className="ai-fab-pulse pointer-events-none absolute inset-0 rounded-full bg-primary"
+            />
+            <span
+              aria-hidden
+              className="ai-fab-pulse pointer-events-none absolute inset-0 rounded-full bg-primary"
+              style={{ animationDelay: "1.1s" }}
+            />
+            <button
+              type="button"
+              aria-label="Open Ojarun shopping assistant"
+              className="relative z-10 rounded-full w-14 h-14 flex items-center justify-center bg-primary shadow-[0_10px_28px_rgba(0,74,25,0.35)] ring-2 ring-white/80 transition-transform active:scale-95"
+              onClick={openChat}
+            >
+              {unread ? <MessageIconUnread /> : <MessageIcon />}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
