@@ -22,7 +22,13 @@ const ReferralCard = ({ summary }: { summary: RewardsSummary }) => {
 
   return (
     <div className="border border-[#E7E7E7] rounded-[20px] p-6 flex flex-col gap-6 bg-white w-full">
-      <div className="bg-green-500 rounded-2xl p-4 flex flex-col gap-6">
+      <div className="bg-green-500 rounded-2xl p-4 flex flex-col gap-6 relative overflow-hidden">
+        <img
+          src="/svg/referral-credits.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 right-0 w-[108px]"
+        />
         <span className="bg-green-400 rounded-2xl px-2 py-1 body-small text-white w-fit">
           Earn 10+ points
         </span>

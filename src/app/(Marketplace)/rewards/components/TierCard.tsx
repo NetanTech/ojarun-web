@@ -4,10 +4,10 @@ import React from "react";
 import { PartyPopper } from "lucide-react";
 import type { RewardsSummary } from "@/lib/rewards";
 
-const TIERS: Array<{ name: string; range: string }> = [
-  { name: "Bronze", range: "0 - 999 pts" },
-  { name: "Silver", range: "1,000 - 4,999 pts" },
-  { name: "Gold", range: "5,000+ pts" },
+const TIERS: Array<{ name: string; range: string; medal: string }> = [
+  { name: "Bronze", range: "0 - 999 pts", medal: "/svg/tier-medal-bronze.svg" },
+  { name: "Silver", range: "1,000 - 4,999 pts", medal: "/svg/tier-medal-silver.svg" },
+  { name: "Gold", range: "5,000+ pts", medal: "/svg/tier-medal-gold.svg" },
 ];
 
 const TIER_COPY: Record<RewardsSummary["tier"], string> = {
@@ -38,7 +38,10 @@ const TierCard = ({ summary }: { summary: RewardsSummary }) => {
       </div>
 
       <div className="flex flex-col gap-1">
-        <h5>Tier {summary.tierIndex}</h5>
+        <div className="flex items-center gap-4">
+          <img src="/svg/tier-badge.svg" alt="" aria-hidden="true" className="h-10 w-auto shrink-0" />
+          <h5>Tier {summary.tierIndex}</h5>
+        </div>
         <p className="text-grey-400 body-medium">{TIER_COPY[summary.tier]}</p>
       </div>
 
@@ -56,6 +59,7 @@ const TierCard = ({ summary }: { summary: RewardsSummary }) => {
               key={tier.name}
               className={`flex-1 flex flex-col items-center gap-1 ${i === summary.tierIndex - 1 ? "text-black" : "text-grey-300"}`}
             >
+              <img src={tier.medal} alt="" aria-hidden="true" className="h-6 w-6" />
               <p className="body-medium font-medium text-center">{tier.name}</p>
               <p className="body-small text-grey-300 text-center">{tier.range}</p>
             </div>
