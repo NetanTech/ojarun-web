@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import BreadCrumb from "../Acomponents/bread-crumb";
@@ -8,9 +8,8 @@ import Filters from "../Acomponents/filters";
 import AllProducts from "./components/all-products";
 import { Home } from "../../../../public/svg/svg";
 import FreshToday from "./components/fresh-today";
-import { fetchProducts } from "@/lib/products";
+import { fetchProducts, filterProductsByCategory } from "@/lib/products";
 
-// Chat widget is heavy and not needed for first paint — load after products UI.
 const AIAgent = dynamic(() => import("@/components/ui/AIAgent"), {
   ssr: false,
   loading: () => null,
@@ -25,21 +24,41 @@ const MarketplaceContent = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 
-  const [products, setProducts] = useState<ProductCardProps[]>([]);
+  const [catalog, setCatalog] = useState<ProductCardProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCat, setSelectedCat] = useState("all");
 
+  // One network fetch per search — category filters are free on the client.
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError(null);
-    fetchProducts({ search: query, category: selectedCat })
-      .then(setProducts)
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : "Could not load products."),
-      )
-      .finally(() => setLoading(false));
-  }, [query, selectedCat]);
+    fetchProducts({ search: query || undefined })
+      .then((list) => {
+        if (!cancelled) setCatalog(list);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "Could not load products.",
+          );
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [query]);
+
+  const products = useMemo(
+    () => filterProductsByCategory(catalog, selectedCat),
+    [catalog, selectedCat],
+  );
+
+  const freshToday = useMemo(() => products.slice(0, 6), [products]);
 
   return (
     <>
@@ -66,7 +85,7 @@ const MarketplaceContent = () => {
           {error}
         </p>
       )}
-      {!query && <FreshToday products={products.slice(0, 6)} loading={loading} />}
+      {!query && <FreshToday products={freshToday} loading={loading} />}
       {!query && <CookingRecommendations />}
       <AllProducts products={products} loading={loading} />
       <AIAgent />

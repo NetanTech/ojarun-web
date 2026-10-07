@@ -17,8 +17,16 @@ const FreshToday = ({ products, loading }: FreshTodayProps) => {
       <h5>Fresh Today</h5>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {loading
-          ? Array.from({ length: 6 }).map((_, i) => <ProductCardSkeleton key={i} />)
-          : products.map((product) => <ProductCard key={product.id} {...product} />)}
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))
+          : products.map((product, i) => (
+              <ProductCard
+                key={product.id}
+                {...product}
+                priority={i < 4}
+              />
+            ))}
       </div>
     </section>
   );

@@ -8,7 +8,12 @@ import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favoritesContext";
 import { useToast } from "@/components/ui/Toast";
 
-const ProductCard = (props: ProductCardProps) => {
+type ProductCardExtras = ProductCardProps & {
+  /** Only the first few above-the-fold cards should opt into this. */
+  priority?: boolean;
+};
+
+const ProductCard = (props: ProductCardExtras) => {
   const cart = useCart();
   const favorites = useFavorites();
   const { showToast } = useToast();
@@ -33,10 +38,11 @@ const ProductCard = (props: ProductCardProps) => {
         <Image
           src={props.imageURL || "/assets/Untitled design.png"}
           className="object-cover h-full w-full"
-          loading="eager"
           alt={props.name}
-          width={500}
-          height={300}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          loading={props.priority ? "eager" : "lazy"}
+          priority={props.priority}
         />
 
         <button

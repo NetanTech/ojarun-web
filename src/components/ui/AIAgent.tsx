@@ -97,23 +97,23 @@ async function matchDraftItemsToProducts(
   const matched: MatchedItem[] = [];
   const unmatched: OrderDraftItem[] = [];
 
-  for (const item of items) {
-    let candidates: ProductCardProps[] = [];
-    try {
-      candidates = await fetchProducts({ search: item.name });
-    } catch {
-      candidates = [];
-    }
+  // One catalog fetch for the whole list — not one API call per item.
+  let catalog: ProductCardProps[] = [];
+  try {
+    catalog = await fetchProducts();
+  } catch {
+    catalog = [];
+  }
 
+  for (const item of items) {
     const lowerName = item.name.toLowerCase();
     const best =
-      candidates.find((p) => p.name.toLowerCase() === lowerName) ??
-      candidates.find(
+      catalog.find((p) => p.name.toLowerCase() === lowerName) ??
+      catalog.find(
         (p) =>
           p.name.toLowerCase().includes(lowerName) ||
           lowerName.includes(p.name.toLowerCase()),
-      ) ??
-      candidates[0];
+      );
 
     if (!best) {
       unmatched.push(item);
