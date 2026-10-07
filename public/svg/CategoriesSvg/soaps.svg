@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="46" height="48" viewBox="0 0 46 48" fill="none">
-<g clipPath="url(#clip0_791_3938)">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="46" height="48" viewBox="0 0 46 48" fill="none">
+<g clip-path="url(#clip0_791_3938)">
         <g style="mix-blend-mode:multiply" opacity="0.75">
           <mask
             id="mask0_791_3938"
@@ -10,7 +10,7 @@
             width="20"
             height="5"
           >
-            <g clipPath="url(#clip1_791_3938)">
+            <g clip-path="url(#clip1_791_3938)">
               <rect
                 width="19.439"
                 height="3.73827"
@@ -73,7 +73,7 @@
             width="31"
             height="5"
           >
-            <g clipPath="url(#clip2_791_3938)">
+            <g clip-path="url(#clip2_791_3938)">
               <rect
                 width="30.246"
                 height="3.73827"
