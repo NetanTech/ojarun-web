@@ -1,14 +1,15 @@
 export const Cats: CategoriesType[] = [
-    { name: 'Meals', icon: '/svg/CategoriesSvg/meals.svg' },
-    { name: 'Fresh Food', icon: '/svg/CategoriesSvg/fresh-food.svg' },
-    { name: 'Grains', icon: '/svg/CategoriesSvg/grains.svg' },
-    { name: 'Oil & Sauces', icon: '/svg/CategoriesSvg/sauce.svg' },
-    { name: 'Snacks', icon: '/svg/CategoriesSvg/snacks.svg' },
-    { name: 'Drinks', icon: '/svg/CategoriesSvg/drinks.svg' },
-    { name: 'Canned', icon: '/svg/CategoriesSvg/canned.svg' },
-    { name: 'Toiletries', icon: '/svg/CategoriesSvg/soaps.svg' },
-    { name: 'Kitchen', icon: '/svg/CategoriesSvg/utensils.svg' },
-    { name: 'Stationery', icon: '/svg/CategoriesSvg/stationery.svg' },
+    // Names must match the product `category` values in the backend exactly (filter is a case-insensitive equals).
+    { name: 'Fruits', icon: '/svg/CategoriesSvg/fresh-food.svg' },
+    { name: 'Vegetables', icon: '/svg/CategoriesSvg/fresh-food.svg' },
+    { name: 'Protein', icon: '/svg/CategoriesSvg/meals.svg' },
+    { name: 'Soup Things', icon: '/svg/CategoriesSvg/meals.svg' },
+    { name: 'Swallows', icon: '/svg/CategoriesSvg/grains.svg' },
+    { name: 'Staples & Grains', icon: '/svg/CategoriesSvg/grains.svg' },
+    { name: 'Spices', icon: '/svg/CategoriesSvg/sauce.svg' },
+    { name: 'Cooking Oil', icon: '/svg/CategoriesSvg/sauce.svg' },
+    { name: 'Snacks/Nuts', icon: '/svg/CategoriesSvg/snacks.svg' },
+    { name: 'Dairy & Beverages', icon: '/svg/CategoriesSvg/drinks.svg' },
 ];
 
 
