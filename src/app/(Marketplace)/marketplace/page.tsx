@@ -87,7 +87,11 @@ const MarketplaceContent = () => {
       )}
       {!query && <FreshToday products={freshToday} loading={loading} />}
       {!query && <CookingRecommendations />}
-      <AllProducts products={products} loading={loading} />
+      <AllProducts
+        key={`${selectedCat}:${query}`}
+        products={products}
+        loading={loading}
+      />
       <AIAgent />
     </>
   );

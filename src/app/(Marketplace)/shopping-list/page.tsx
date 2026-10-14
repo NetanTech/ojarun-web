@@ -314,20 +314,22 @@ const Page = () => {
   }, [ready, customer]);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
+    const q = searchQuery.trim();
+    if (!q) return;
+
     setSearchLoading(true);
-    fetchProducts({ search: searchQuery })
-      .then(setSearchResults)
-      .catch(() => setSearchResults([]))
-      .finally(() => setSearchLoading(false));
+    const timer = window.setTimeout(() => {
+      fetchProducts({ search: q })
+        .then(setSearchResults)
+        .catch(() => setSearchResults([]))
+        .finally(() => setSearchLoading(false));
+    }, 300);
+    return () => window.clearTimeout(timer);
   }, [searchQuery]);
 
-  const filteredProducts = searchResults.filter(
-    (p) => !addedItems.some((item) => item.productId === p.id),
-  );
+  const filteredProducts = (
+    searchQuery.trim() ? searchResults : []
+  ).filter((p) => !addedItems.some((item) => item.productId === p.id));
 
   const handleAddItem = (product: ProductCardProps) => {
     setAddedItems((prev) => {

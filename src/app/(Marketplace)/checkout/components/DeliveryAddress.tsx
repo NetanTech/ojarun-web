@@ -13,7 +13,14 @@ import {
   hasPin,
 } from "@/lib/addresses";
 import { DeliverySelection } from "@/lib/delivery";
-import AddressMapPicker from "./AddressMapPicker";
+import dynamic from "next/dynamic";
+
+const AddressMapPicker = dynamic(() => import("./AddressMapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-64 rounded-2xl bg-grey-50 animate-pulse" />
+  ),
+});
 
 interface DeliveryAddressProps {
   selected: DeliverySelection | null;
