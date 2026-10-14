@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { fetchFavorites, addFavorite, removeFavorite } from "@/lib/favorites";
@@ -33,31 +40,48 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, [ready, customer]);
 
-  const isFavorited = (id: string) => products.some((p) => p.id === id);
+  const isFavorited = useCallback(
+    (id: string) => products.some((p) => p.id === id),
+    [products],
+  );
 
-  const toggle = (product: ProductCardProps) => {
-    if (!customer) {
-      router.push("/login");
-      return;
-    }
+  const toggle = useCallback(
+    (product: ProductCardProps) => {
+      if (!customer) {
+        router.push("/login");
+        return;
+      }
 
-    const wasFavorited = isFavorited(product.id);
-    // Optimistic update so the heart responds instantly.
-    setProducts((prev) =>
-      wasFavorited ? prev.filter((p) => p.id !== product.id) : [...prev, product],
-    );
-
-    const request = wasFavorited ? removeFavorite(product.id) : addFavorite(product.id);
-    request.then(setProducts).catch(() => {
-      // Revert on failure.
+      const wasFavorited = products.some((p) => p.id === product.id);
+      // Optimistic update so the heart responds instantly.
       setProducts((prev) =>
-        wasFavorited ? [...prev, product] : prev.filter((p) => p.id !== product.id),
+        wasFavorited
+          ? prev.filter((p) => p.id !== product.id)
+          : [...prev, product],
       );
-    });
-  };
+
+      const request = wasFavorited
+        ? removeFavorite(product.id)
+        : addFavorite(product.id);
+      request.then(setProducts).catch(() => {
+        // Revert on failure.
+        setProducts((prev) =>
+          wasFavorited
+            ? [...prev, product]
+            : prev.filter((p) => p.id !== product.id),
+        );
+      });
+    },
+    [customer, products, router],
+  );
+
+  const value = useMemo(
+    () => ({ products, loading, isFavorited, toggle }),
+    [products, loading, isFavorited, toggle],
+  );
 
   return (
-    <FavoritesContext.Provider value={{ products, loading, isFavorited, toggle }}>
+    <FavoritesContext.Provider value={value}>
       {children}
     </FavoritesContext.Provider>
   );

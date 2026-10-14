@@ -1,0 +1,33 @@
+import React from "react";
+
+export function ShoppingBag({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      className={className}
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M4.43136 17.3484C4.89854 13.3453 5.58115 10.3438 6.21418 8.21135C6.73326 6.46281 6.99279 5.58855 8.05711 4.79427C9.12143 4 10.2093 4 12.385 4H19.6151C21.7908 4 22.8787 4 23.9429 4.79427C25.0072 5.58855 25.2668 6.46281 25.7859 8.21135C26.4189 10.3438 27.1015 13.3453 27.5687 17.3484C28.1193 22.0663 28.3945 24.4252 26.8036 26.2125C25.2127 28 22.6344 28 17.4779 28H14.5221C9.36563 28 6.78736 28 5.19642 26.2125C3.60548 24.4252 3.88078 22.0663 4.43136 17.3484Z"
+        stroke="#004A19"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M12 9.33325C12 11.5424 13.7908 13.3333 16 13.3333C18.2092 13.3333 20 11.5424 20 9.33325"
+        stroke="#004A19"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

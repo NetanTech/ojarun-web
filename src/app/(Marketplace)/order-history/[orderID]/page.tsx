@@ -6,9 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag } from "../../../../../public/svg/svg";
 import { ChevronDown } from "../../../../../public/svg/svg";
 import { Check, ChevronUp } from "lucide-react";
-import TrackingMap from "./components/TrackingMap";
+import dynamic from "next/dynamic";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { fetchMyOrder } from "@/lib/orders";
+
+const TrackingMap = dynamic(() => import("./components/TrackingMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full rounded-3xl bg-grey-50 animate-pulse" />
+  ),
+});
 
 const container = {
   open: {

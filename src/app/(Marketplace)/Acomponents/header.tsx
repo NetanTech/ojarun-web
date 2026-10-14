@@ -7,7 +7,6 @@ import {
   ChevronDown,
   GiftCard,
   Heart,
-  HeroTop,
   Logo,
   LogOut,
   MapPin,
@@ -97,9 +96,9 @@ const Header = () => {
   return (
     <header className="bg-primary text-white  w-full z-50 sticky top-0 transition-colors duration-300 ">
       <div className="lg:max-w-300 relative w-full py-4 px-6  lg:mx-auto flex items-center justify-between">
-        <HeroTop
+        <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-10 md:-top-2 z-0  w-full"
+          className="pointer-events-none absolute inset-x-0 -top-10 md:-top-2 z-0 h-24 w-full bg-gradient-to-r from-transparent via-[#336E47]/20 to-transparent"
         />
         <div className="flex items-center gap-10 z-20 bg-transparent">
           <Link href={"/"}>

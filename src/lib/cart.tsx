@@ -2,6 +2,7 @@
 
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -19,18 +20,22 @@ export type CartLine = {
   quantity: number;
 };
 
-type CartContextValue = {
-  lines: CartLine[];
-  totalItems: number;
-  subtotal: number;
+type CartActions = {
   addItem: (item: Omit<CartLine, "quantity">, qty?: number) => void;
   setQuantity: (id: string, qty: number) => void;
   removeItem: (id: string) => void;
-  getQuantity: (id: string) => number;
   clear: () => void;
 };
 
-const CartContext = createContext<CartContextValue | null>(null);
+type CartContextValue = CartActions & {
+  lines: CartLine[];
+  totalItems: number;
+  subtotal: number;
+  getQuantity: (id: string) => number;
+};
+
+const CartLinesContext = createContext<CartLine[] | null>(null);
+const CartActionsContext = createContext<CartActions | null>(null);
 
 const STORAGE_KEY = "ojarun_cart";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -45,10 +50,21 @@ type BackendCartLine = {
 };
 
 function toCartLine(b: BackendCartLine): CartLine {
-  return { id: b.id, name: b.name, price: b.price, image: b.imageURL, unit: b.more, quantity: b.quantity };
+  return {
+    id: b.id,
+    name: b.name,
+    price: b.price,
+    image: b.imageURL,
+    unit: b.more,
+    quantity: b.quantity,
+  };
 }
 
-async function authedRequest(path: string, method: string, body?: unknown): Promise<CartLine[]> {
+async function authedRequest(
+  path: string,
+  method: string,
+  body?: unknown,
+): Promise<CartLine[]> {
   const token = getToken();
   if (!token) throw new Error("You need to be logged in to sync your cart.");
 
@@ -87,6 +103,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const syncedForCustomerId = useRef<string | null>(null);
+  const linesRef = useRef(lines);
+
+  useEffect(() => {
+    linesRef.current = lines;
+  }, [lines]);
 
   // Load any saved guest cart once, on mount (browser-only).
   useEffect(() => {
@@ -119,7 +140,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (syncedForCustomerId.current === customer.id) return;
     syncedForCustomerId.current = customer.id;
 
-    const guestItems = lines.map((l) => ({ productId: l.id, quantity: l.quantity }));
+    const guestItems = linesRef.current.map((l) => ({
+      productId: l.id,
+      quantity: l.quantity,
+    }));
     const sync = guestItems.length > 0 ? mergeCart(guestItems) : fetchCart();
 
     sync
@@ -131,55 +155,84 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Couldn't reach the server — keep the local cart, try again next login.
         syncedForCustomerId.current = null;
       });
-    // Only re-run when the logged-in customer changes, not on every cart edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, hydrated, customer]);
 
-  const addItem: CartContextValue["addItem"] = (item, qty = 1) => {
-    const existingQty = lines.find((l) => l.id === item.id)?.quantity ?? 0;
-    const nextQty = existingQty + qty;
+  const addItem = useCallback(
+    (item: Omit<CartLine, "quantity">, qty = 1) => {
+      let nextQty = qty;
 
-    setLines((prev) => {
-      const existing = prev.find((l) => l.id === item.id);
-      if (existing) {
-        return prev.map((l) => (l.id === item.id ? { ...l, quantity: nextQty } : l));
+      setLines((prev) => {
+        const existingQty = prev.find((l) => l.id === item.id)?.quantity ?? 0;
+        nextQty = existingQty + qty;
+        const existing = prev.find((l) => l.id === item.id);
+        if (existing) {
+          return prev.map((l) =>
+            l.id === item.id ? { ...l, quantity: nextQty } : l,
+          );
+        }
+        return [...prev, { ...item, quantity: nextQty }];
+      });
+
+      if (customer) {
+        putCartItemQuantity(item.id, nextQty).then(setLines).catch(() => {});
       }
-      return [...prev, { ...item, quantity: nextQty }];
-    });
+    },
+    [customer],
+  );
 
-    if (customer) {
-      putCartItemQuantity(item.id, nextQty).then(setLines).catch(() => {});
-    }
-  };
+  const setQuantity = useCallback(
+    (id: string, qty: number) => {
+      setLines((prev) => {
+        if (qty <= 0) return prev.filter((l) => l.id !== id);
+        return prev.map((l) => (l.id === id ? { ...l, quantity: qty } : l));
+      });
 
-  const setQuantity: CartContextValue["setQuantity"] = (id, qty) => {
-    setLines((prev) => {
-      if (qty <= 0) return prev.filter((l) => l.id !== id);
-      return prev.map((l) => (l.id === id ? { ...l, quantity: qty } : l));
-    });
+      if (customer) {
+        const request =
+          qty <= 0 ? deleteCartItem(id) : putCartItemQuantity(id, qty);
+        request.then(setLines).catch(() => {});
+      }
+    },
+    [customer],
+  );
 
-    if (customer) {
-      const request = qty <= 0 ? deleteCartItem(id) : putCartItemQuantity(id, qty);
-      request.then(setLines).catch(() => {});
-    }
-  };
+  const removeItem = useCallback(
+    (id: string) => {
+      setLines((prev) => prev.filter((l) => l.id !== id));
+      if (customer) {
+        deleteCartItem(id).then(setLines).catch(() => {});
+      }
+    },
+    [customer],
+  );
 
-  const removeItem: CartContextValue["removeItem"] = (id) => {
-    setLines((prev) => prev.filter((l) => l.id !== id));
-    if (customer) {
-      deleteCartItem(id).then(setLines).catch(() => {});
-    }
-  };
-
-  const getQuantity: CartContextValue["getQuantity"] = (id) =>
-    lines.find((l) => l.id === id)?.quantity ?? 0;
-
-  const clear = () => {
+  const clear = useCallback(() => {
     setLines([]);
     if (customer) {
       deleteCart().catch(() => {});
     }
-  };
+  }, [customer]);
+
+  const actions = useMemo(
+    () => ({ addItem, setQuantity, removeItem, clear }),
+    [addItem, setQuantity, removeItem, clear],
+  );
+
+  return (
+    <CartActionsContext.Provider value={actions}>
+      <CartLinesContext.Provider value={lines}>
+        {children}
+      </CartLinesContext.Provider>
+    </CartActionsContext.Provider>
+  );
+}
+
+export function useCart(): CartContextValue {
+  const lines = useContext(CartLinesContext);
+  const actions = useContext(CartActionsContext);
+  if (!lines || !actions) {
+    throw new Error("useCart must be used inside a CartProvider");
+  }
 
   const totalItems = useMemo(
     () => lines.reduce((sum, l) => sum + l.quantity, 0),
@@ -189,27 +242,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     () => lines.reduce((sum, l) => sum + l.price * l.quantity, 0),
     [lines],
   );
+  const getQuantity = useCallback(
+    (id: string) => lines.find((l) => l.id === id)?.quantity ?? 0,
+    [lines],
+  );
 
-  return (
-    <CartContext.Provider
-      value={{
-        lines,
-        totalItems,
-        subtotal,
-        addItem,
-        setQuantity,
-        removeItem,
-        getQuantity,
-        clear,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+  return useMemo(
+    () => ({
+      lines,
+      totalItems,
+      subtotal,
+      getQuantity,
+      ...actions,
+    }),
+    [lines, totalItems, subtotal, getQuantity, actions],
   );
 }
 
-export function useCart(): CartContextValue {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside a CartProvider");
-  return ctx;
+/** Stable actions only — does not re-render when cart lines change. */
+export function useCartActions(): CartActions {
+  const actions = useContext(CartActionsContext);
+  if (!actions) {
+    throw new Error("useCartActions must be used inside a CartProvider");
+  }
+  return actions;
+}
+
+/** Quantity for one product — still re-renders on any cart change (context). */
+export function useCartQuantity(id: string): number {
+  const lines = useContext(CartLinesContext);
+  if (!lines) {
+    throw new Error("useCartQuantity must be used inside a CartProvider");
+  }
+  return lines.find((l) => l.id === id)?.quantity ?? 0;
 }
