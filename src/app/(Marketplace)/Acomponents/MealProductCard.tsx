@@ -11,6 +11,39 @@ import { useMealFavorites } from "@/lib/mealFavoritesContext";
 import { useToast } from "@/components/ui/Toast";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/imagePlaceholder";
 
+function MealImage({
+  src,
+  alt,
+  sizes,
+  priority,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  sizes: string;
+  priority?: boolean;
+  className?: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={sizes}
+      priority={priority}
+      loading={priority ? "eager" : "lazy"}
+      placeholder="blur"
+      blurDataURL={IMAGE_BLUR_DATA_URL}
+      onLoadingComplete={() => setLoaded(true)}
+      className={`object-cover transition-opacity duration-200 ${
+        loaded ? "opacity-100" : "opacity-0"
+      } ${className}`}
+    />
+  );
+}
+
 interface MealProductCardProps extends Meal {
   onClick?: () => void;
 }
@@ -45,16 +78,11 @@ const MealProductCard = ({
       className="flex flex-col gap-2 sm:gap-3 cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-grey-50">
-        <Image
+      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-[#F3F4F6]">
+        <MealImage
           src={imageURL || "/assets/Untitled design.png"}
           alt={name}
-          fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover"
-          loading="lazy"
-          placeholder="blur"
-          blurDataURL={IMAGE_BLUR_DATA_URL}
         />
 
         <button
@@ -134,15 +162,12 @@ const MealProductCard = ({
         >
           <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-2 sm:p-4 w-full justify-between">
             <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <div className="relative h-48 md:h-72 overflow-hidden rounded-lg bg-grey-50">
-                <Image
+              <div className="relative h-48 md:h-72 overflow-hidden rounded-lg bg-[#F3F4F6]">
+                <MealImage
                   src={imageURL || "/assets/Untitled design.png"}
                   alt={name}
-                  fill
                   sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover"
-                  placeholder="blur"
-                  blurDataURL={IMAGE_BLUR_DATA_URL}
+                  priority
                 />
               </div>
               <div className="flex items-center justify-between gap-2">
