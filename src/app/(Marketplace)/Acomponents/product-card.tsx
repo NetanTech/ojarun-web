@@ -88,7 +88,7 @@ function CartControls({ product }: { product: ProductCardProps }) {
 const ProductCard = memo(function ProductCard(props: ProductCardExtras) {
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
-      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-grey-50">
+      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-[#F3F4F6]">
         <Image
           src={props.imageURL || "/assets/Untitled design.png"}
           className="object-cover h-full w-full"
