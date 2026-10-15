@@ -9,6 +9,7 @@ import { Check, ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { fetchMyOrder } from "@/lib/orders";
+import ErrorState from "@/components/ui/ErrorState";
 
 const TrackingMap = dynamic(() => import("./components/TrackingMap"), {
   ssr: false,
@@ -81,17 +82,28 @@ const Page = () => {
     setIsMobile(window.innerWidth <= 764);
   }, []);
 
+  const loadOrder = () => {
+    if (typeof orderID !== "string") return;
+    setLoading(true);
+    setError(null);
+    fetchMyOrder(orderID)
+      .then(setOrder)
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : "Could not load this order.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     if (!ready) return;
     if (!customer) {
       router.replace("/login");
       return;
     }
-    if (typeof orderID !== "string") return;
-    fetchMyOrder(orderID)
-      .then(setOrder)
-      .catch((err) => setError(err instanceof Error ? err.message : "Could not load this order."))
-      .finally(() => setLoading(false));
+    loadOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, customer, orderID, router]);
 
   const timeline: OrderTimeline = order?.timeline ?? {
@@ -157,7 +169,10 @@ const Page = () => {
   if (error || !order) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
-        <p className="text-red-600 body-medium">{error || "Order not found."}</p>
+        <ErrorState
+          message={error || "Order not found."}
+          onRetry={loadOrder}
+        />
       </div>
     );
   }

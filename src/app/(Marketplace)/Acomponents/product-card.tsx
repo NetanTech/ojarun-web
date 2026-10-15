@@ -7,6 +7,7 @@ import { formatCurrency } from "../../../../lib/utils";
 import { useCartActions, useCartQuantity } from "@/lib/cart";
 import { useFavorites } from "@/lib/favoritesContext";
 import { useToast } from "@/components/ui/Toast";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/imagePlaceholder";
 
 type ProductCardExtras = ProductCardProps & {
   /** Only the first few above-the-fold cards should opt into this. */
@@ -39,8 +40,9 @@ function FavoriteButton({ product }: { product: ProductCardProps }) {
 function CartControls({ product }: { product: ProductCardProps }) {
   const { addItem, setQuantity } = useCartActions();
   const quantity = useCartQuantity(product.id);
+  const { showToast } = useToast();
 
-  const addOne = () =>
+  const addOne = () => {
     addItem(
       {
         id: product.id,
@@ -51,6 +53,8 @@ function CartControls({ product }: { product: ProductCardProps }) {
       },
       1,
     );
+    if (quantity === 0) showToast("Added to cart");
+  };
 
   if (quantity === 0) {
     return (
@@ -84,7 +88,7 @@ function CartControls({ product }: { product: ProductCardProps }) {
 const ProductCard = memo(function ProductCard(props: ProductCardExtras) {
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
-      <div className="relative overflow-hidden rounded-2xl aspect-[5/3]">
+      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-grey-50">
         <Image
           src={props.imageURL || "/assets/Untitled design.png"}
           className="object-cover h-full w-full"
@@ -93,6 +97,8 @@ const ProductCard = memo(function ProductCard(props: ProductCardExtras) {
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           loading={props.priority ? "eager" : "lazy"}
           priority={props.priority}
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR_DATA_URL}
         />
 
         <FavoriteButton product={props} />

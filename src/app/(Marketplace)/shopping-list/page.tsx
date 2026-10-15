@@ -192,7 +192,7 @@ const ShoppingListCard = ({
           <Modal
             isOpen={showDetails}
             onClose={() => setShowDetails(false)}
-            className="w-[600px] overflow-hidden max-h-[85vh] flex flex-col"
+            className="w-full max-w-xl mx-4 overflow-hidden max-h-[85vh] flex flex-col"
             title={list.name}
           >
             <div
@@ -527,7 +527,7 @@ const Page = () => {
       <Modal
         isOpen={modalMode !== null}
         onClose={closeModal}
-        className="w-[600px] max-h-[85vh] flex flex-col"
+        className="w-full max-w-xl mx-4 max-h-[85vh] flex flex-col"
         title={modalMode === "edit" ? "Edit list" : "Add new list"}
       >
         {/* Fixed Top Section */}
@@ -721,7 +721,7 @@ const Page = () => {
           setCreated(false);
           setCreatedListName("");
         }}
-        className="w-[35%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col items-center justify-center gap-4">
           <SuccessIcon />
@@ -737,7 +737,7 @@ const Page = () => {
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        className="w-[35%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col items-center justify-center gap-3 w-full">
           <h6>Are you sure you want to delete this list?</h6>

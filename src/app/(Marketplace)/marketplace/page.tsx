@@ -8,7 +8,12 @@ import Filters from "../Acomponents/filters";
 import AllProducts from "./components/all-products";
 import { Home } from "../../../../public/svg/svg";
 import FreshToday from "./components/fresh-today";
-import { fetchProducts, filterProductsByCategory } from "@/lib/products";
+import {
+  clearProductsCache,
+  fetchProducts,
+  filterProductsByCategory,
+} from "@/lib/products";
+import ErrorState from "@/components/ui/ErrorState";
 
 const AIAgent = dynamic(() => import("@/components/ui/AIAgent"), {
   ssr: false,
@@ -28,12 +33,13 @@ const MarketplaceContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCat, setSelectedCat] = useState("all");
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // One network fetch per search — category filters are free on the client.
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
+
     fetchProducts({ search: query || undefined })
       .then((list) => {
         if (!cancelled) setCatalog(list);
@@ -48,10 +54,11 @@ const MarketplaceContent = () => {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
     return () => {
       cancelled = true;
     };
-  }, [query]);
+  }, [query, reloadKey]);
 
   const products = useMemo(
     () => filterProductsByCategory(catalog, selectedCat),
@@ -80,18 +87,25 @@ const MarketplaceContent = () => {
           Showing results for &quot;{query}&quot;
         </p>
       )}
-      {error && (
-        <p className="text-red-600 body-medium px-4 md:max-w-300 md:mx-auto">
-          {error}
-        </p>
+      {error ? (
+        <ErrorState
+          message={error}
+          onRetry={() => {
+            clearProductsCache();
+            setReloadKey((k) => k + 1);
+          }}
+        />
+      ) : (
+        <>
+          {!query && <FreshToday products={freshToday} loading={loading} />}
+          {!query && <CookingRecommendations />}
+          <AllProducts
+            key={`${selectedCat}:${query}`}
+            products={products}
+            loading={loading}
+          />
+        </>
       )}
-      {!query && <FreshToday products={freshToday} loading={loading} />}
-      {!query && <CookingRecommendations />}
-      <AllProducts
-        key={`${selectedCat}:${query}`}
-        products={products}
-        loading={loading}
-      />
       <AIAgent />
     </>
   );

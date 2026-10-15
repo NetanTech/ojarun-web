@@ -118,7 +118,7 @@ const Header = () => {
             isOpen={showLocModal}
             onClose={() => setShowLocModal(false)}
             title="Location"
-            className="w-[35%] text-black"
+            className="w-full max-w-md mx-4 text-black"
           >
             <div className="flex flex-col gap-2 w-full items-start">
               <div className=" w-full border rounded-lg flex items-center gap-2 px-3 py-4 border-[#e7e7e7] ">
