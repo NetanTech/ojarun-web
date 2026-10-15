@@ -10,6 +10,7 @@ import React, {
   useState,
 } from "react";
 import { getToken, useCustomerSession } from "@/lib/customerAuth";
+import { useToast } from "@/components/ui/Toast";
 
 export type CartLine = {
   id: string;
@@ -100,6 +101,7 @@ const mergeCart = (items: { productId: string; quantity: number }[]) =>
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { ready, customer } = useCustomerSession();
+  const { showToast } = useToast();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const syncedForCustomerId = useRef<string | null>(null);
@@ -108,6 +110,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     linesRef.current = lines;
   }, [lines]);
+
+  const recoverFromSyncFailure = useCallback(() => {
+    showToast("Couldn't sync your cart. Refreshing…");
+    fetchCart()
+      .then(setLines)
+      .catch(() => {
+        showToast("Cart sync failed. Please try again.");
+      });
+  }, [showToast]);
 
   // Load any saved guest cart once, on mount (browser-only).
   useEffect(() => {
@@ -174,10 +185,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (customer) {
-        putCartItemQuantity(item.id, nextQty).then(setLines).catch(() => {});
+        putCartItemQuantity(item.id, nextQty)
+          .then(setLines)
+          .catch(recoverFromSyncFailure);
       }
     },
-    [customer],
+    [customer, recoverFromSyncFailure],
   );
 
   const setQuantity = useCallback(
@@ -190,28 +203,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (customer) {
         const request =
           qty <= 0 ? deleteCartItem(id) : putCartItemQuantity(id, qty);
-        request.then(setLines).catch(() => {});
+        request.then(setLines).catch(recoverFromSyncFailure);
       }
     },
-    [customer],
+    [customer, recoverFromSyncFailure],
   );
 
   const removeItem = useCallback(
     (id: string) => {
       setLines((prev) => prev.filter((l) => l.id !== id));
       if (customer) {
-        deleteCartItem(id).then(setLines).catch(() => {});
+        deleteCartItem(id).then(setLines).catch(recoverFromSyncFailure);
       }
     },
-    [customer],
+    [customer, recoverFromSyncFailure],
   );
 
   const clear = useCallback(() => {
     setLines([]);
     if (customer) {
-      deleteCart().catch(() => {});
+      deleteCart().catch(() => {
+        showToast("Couldn’t clear cart on server. Please try again.");
+      });
     }
-  }, [customer]);
+  }, [customer, showToast]);
 
   const actions = useMemo(
     () => ({ addItem, setQuantity, removeItem, clear }),

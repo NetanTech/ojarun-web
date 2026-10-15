@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import { useCart } from "@/lib/cart";
 import { useMealFavorites } from "@/lib/mealFavoritesContext";
 import { useToast } from "@/components/ui/Toast";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/imagePlaceholder";
 
 interface MealProductCardProps extends Meal {
   onClick?: () => void;
@@ -35,6 +36,7 @@ const MealProductCard = ({
       { id, name, price: totalPrice, image: imageURL, unit: servings },
       1,
     );
+    showToast("Added to cart");
     setShowMealDetail(false);
   };
 
@@ -43,20 +45,21 @@ const MealProductCard = ({
       className="flex flex-col gap-2 sm:gap-3 cursor-pointer"
       onClick={onClick}
     >
-      <div className="relative overflow-hidden rounded-2xl aspect-5/3">
+      <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-grey-50">
         <Image
           src={imageURL || "/assets/Untitled design.png"}
           alt={name}
-          width={500}
-          height={300}
-          className="object-cover w-full h-full"
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover"
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR_DATA_URL}
         />
 
         <button
           className={`absolute top-2 right-2 ${
-            favorited
-              ? "bg-green-50 text-[#004A19]"
-              : "bg-white/70"
+            favorited ? "bg-green-50 text-[#004A19]" : "bg-white/70"
           } p-1.5 sm:p-2 rounded-full`}
           onClick={(e) => {
             e.stopPropagation();
@@ -126,18 +129,20 @@ const MealProductCard = ({
         <Modal
           isOpen={showMealDetail}
           onClose={() => setShowMealDetail(false)}
-          className="w-225 h-150"
+          className="w-full max-w-3xl max-h-[85vh] overflow-y-auto mx-4"
           title="Meal based order"
         >
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 w-full h-full justify-between">
-            <div className="flex flex-col h-full gap-2 flex-1">
-              <div className="h-48 md:h-[80%] overflow-hidden rounded-lg">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-2 sm:p-4 w-full justify-between">
+            <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <div className="relative h-48 md:h-72 overflow-hidden rounded-lg bg-grey-50">
                 <Image
                   src={imageURL || "/assets/Untitled design.png"}
                   alt={name}
-                  width={500}
-                  height={300}
-                  className="object-cover w-full h-full"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  className="object-cover"
+                  placeholder="blur"
+                  blurDataURL={IMAGE_BLUR_DATA_URL}
                 />
               </div>
               <div className="flex items-center justify-between gap-2">
@@ -150,9 +155,9 @@ const MealProductCard = ({
                 {ingredients.length} ingredients • {servings}
               </p>
             </div>
-            <div className="flex flex-col flex-1 h-full gap-7">
+            <div className="flex flex-col flex-1 gap-7 min-w-0">
               <div
-                className="flex flex-col gap-2 overflow-y-auto  md:max-h-none md:h-[80%]"
+                className="flex flex-col gap-2 overflow-y-auto max-h-64 md:max-h-72"
                 style={{ scrollbarWidth: "none" }}
               >
                 {ingredients.map((ingredient, i) => (

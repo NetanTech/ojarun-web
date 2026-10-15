@@ -1,0 +1,58 @@
+{
+  "base": "https://ojarun-backend-whatsapp.onrender.com",
+  "at": "2026-10-14T22:18:53.323Z",
+  "method": "curl wall-clock (12 samples each)",
+  "notes": [
+    "First catalog sample was a cold start (~33.4s) while Render spun up; excluded from p50/p95 by sorting but remains max.",
+    "Local http://localhost:4000 was not reachable during this run (backend not up).",
+    "Authed endpoints (cart, orders, delivery quote, order detail) require API_TOKEN — not measured here."
+  ],
+  "rows": [
+    {
+      "name": "products (catalog)",
+      "path": "/storefront-products",
+      "status": 200,
+      "p50_ms": 342,
+      "p95_ms": 357,
+      "min_ms": 324,
+      "max_ms": 33378,
+      "target_p95_ms": 800,
+      "meets_target_warm": true
+    },
+    {
+      "name": "products (search)",
+      "path": "/storefront-products?search=rice",
+      "status": 200,
+      "p50_ms": 334,
+      "p95_ms": 363,
+      "min_ms": 322,
+      "max_ms": 691,
+      "target_p95_ms": 800,
+      "meets_target_warm": true
+    },
+    {
+      "name": "cart",
+      "path": "/customer-cart",
+      "skipped": true,
+      "reason": "API_TOKEN not set"
+    },
+    {
+      "name": "orders list",
+      "path": "/customer-orders",
+      "skipped": true,
+      "reason": "API_TOKEN not set"
+    },
+    {
+      "name": "order detail / tracking",
+      "path": "/customer-orders/:id",
+      "skipped": true,
+      "reason": "API_TOKEN not set"
+    },
+    {
+      "name": "delivery quote",
+      "path": "/delivery/quote",
+      "skipped": true,
+      "reason": "API_TOKEN not set (POST)"
+    }
+  ]
+}
