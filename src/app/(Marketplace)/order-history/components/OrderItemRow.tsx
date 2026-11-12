@@ -477,7 +477,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
         isOpen={showCOmodal}
         onClose={() => setShowCOModal(false)}
         title="Confirm delivery"
-        className="w-[35%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col items-center justify-center gap-4 w-full">
           <p className="text-grey-300 text-center  max-w-100">
@@ -515,7 +515,7 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
       <Modal
         isOpen={cancelOrderModal}
         onClose={() => setCancelOrderModal(false)}
-        className="w-[35%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col items-center justify-center gap-3 w-full">
           <h6>Are you sure you want to cancel this order?</h6>

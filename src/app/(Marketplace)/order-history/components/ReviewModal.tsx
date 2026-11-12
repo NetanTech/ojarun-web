@@ -44,7 +44,7 @@ const ReviewModal = ({ orderId, isOpen, onClose, onSubmitted }: ReviewModalProps
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Rate your order" className="w-[35%]">
+    <Modal isOpen={isOpen} onClose={onClose} title="Rate your order" className="w-full max-w-md mx-4">
       <div className="flex flex-col gap-5 w-full">
         <div className="flex items-center justify-between w-full">
           <p className="body-medium">Overall experience</p>

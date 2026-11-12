@@ -77,7 +77,7 @@ const PromoCode = ({ applied, onApply }: PromoCodeProps) => {
         isOpen={openPCModal}
         onClose={() => setOpenPCModal(false)}
         title="Promo code"
-        className="w-[35%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col gap-4 w-full">
           <div className="flex items-center gap-2 w-full border border-[#E7E7E7] rounded-xl p-3">

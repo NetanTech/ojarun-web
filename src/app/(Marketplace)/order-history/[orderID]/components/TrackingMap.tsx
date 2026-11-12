@@ -9,15 +9,29 @@ import Map, {
   MapRef,
 } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
-import * as turf from "@turf/turf";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Feature, LineString } from 'geojson';
+import type { Feature, LineString } from "geojson";
 import { PickupMarker } from "./PickupMarker";
 import { DestinationMarker } from "./DestinationMarker";
 import { DriverMarker } from "./DriverMarker";
 
 type Coordinate = [number, number];
+
+/** Degrees from north; replaces @turf/turf for this single use. */
+function bearingDegrees(start: Coordinate, end: Coordinate): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const toDeg = (r: number) => (r * 180) / Math.PI;
+  const [lng1, lat1] = start;
+  const [lng2, lat2] = end;
+  const φ1 = toRad(lat1);
+  const φ2 = toRad(lat2);
+  const Δλ = toRad(lng2 - lng1);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x =
+    Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
 
 interface TrackingMapProps {
   routeCoordinates: Coordinate[];
@@ -32,20 +46,23 @@ export default function TrackingMap({
 }: TrackingMapProps) {
   const mapRef = useRef<MapRef>(null);
 
-  const [driverPosition, setDriverPosition] =
-    useState<Coordinate>(routeCoordinates[0]);
+  const [driverPosition, setDriverPosition] = useState<Coordinate>(
+    routeCoordinates[0],
+  );
 
   const [bearing, setBearing] = useState(0);
 
- const routeGeoJSON: Feature<LineString> = {
-  type: "Feature",
-  geometry: {
-    type: "LineString",
-    coordinates: routeCoordinates,
-  },
-  properties: {},
-};
-
+  const routeGeoJSON: Feature<LineString> = useMemo(
+    () => ({
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: routeCoordinates,
+      },
+      properties: {},
+    }),
+    [routeCoordinates],
+  );
 
   useEffect(() => {
     if (!routeCoordinates.length) return;
@@ -61,12 +78,7 @@ export default function TrackingMap({
       const start = routeCoordinates[current];
       const end = routeCoordinates[current + 1];
 
-      const angle = turf.bearing(
-        turf.point(start),
-        turf.point(end)
-      );
-
-      setBearing(angle);
+      setBearing(bearingDegrees(start, end));
       setDriverPosition(end);
 
       mapRef.current?.easeTo({

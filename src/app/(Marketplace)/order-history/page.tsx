@@ -11,6 +11,7 @@ import { useCustomerSession } from "@/lib/customerAuth";
 import { fetchMyOrders } from "@/lib/orders";
 import OrderItemRow from "./components/OrderItemRow";
 import Empty from "./components/Empty";
+import ErrorState from "@/components/ui/ErrorState";
 
 
 interface Filtertype {
@@ -34,16 +35,28 @@ const Page = () => {
     "all",
   );
 
+  const loadOrders = () => {
+    if (!customer) return;
+    setLoading(true);
+    setError(null);
+    fetchMyOrders()
+      .then(setOrders)
+      .catch((err) =>
+        setError(
+          err instanceof Error ? err.message : "Could not load your orders.",
+        ),
+      )
+      .finally(() => setLoading(false));
+  };
+
   useEffect(() => {
     if (!ready) return;
     if (!customer) {
       router.replace("/login");
       return;
     }
-    fetchMyOrders()
-      .then(setOrders)
-      .catch((err) => setError(err instanceof Error ? err.message : "Could not load your orders."))
-      .finally(() => setLoading(false));
+    loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, customer, router]);
 
   const filterRef = useRef<HTMLDivElement>(null);
@@ -79,7 +92,7 @@ const Page = () => {
     },
   ];
   return (
-    <div className="md:max-w-300 lg:mx-auto mx-5 md:w-full flex flex-col items-start gap-2 my-5">
+    <div className="md:max-w-300 lg:mx-auto w-full px-4 md:px-5 flex flex-col items-start gap-2 my-5 overflow-x-hidden">
       <BreadCrumb
         item={[
           {
@@ -147,7 +160,7 @@ const Page = () => {
             return <p className="text-grey-300 body-medium">Loading your orders...</p>;
           }
           if (error) {
-            return <p className="text-red-600 body-medium">{error}</p>;
+            return <ErrorState message={error} onRetry={loadOrders} />;
           }
           const matchesFilter = (status: OrderProperties["status"]) => {
             if (filter === "all") return true;

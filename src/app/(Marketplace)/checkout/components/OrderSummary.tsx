@@ -54,6 +54,7 @@ const OrderSummary = ({
     !!quote?.serviceable;
 
   const handlePlaceOrder = async () => {
+    if (loading) return;
     if (!hasItems || !customer || !delivery || !quote?.serviceable) return;
     setError(null);
     setLoading(true);
@@ -191,6 +192,7 @@ const OrderSummary = ({
           size="sm"
           variant="primary"
           isDisabled={!canPlace}
+          isLoading={loading || quoteLoading}
           onClick={handlePlaceOrder}
         >
           {loading
@@ -207,7 +209,7 @@ const OrderSummary = ({
           setPlaceOrder(false);
           router.push("/marketplace");
         }}
-        className="w-[30%]"
+        className="w-full max-w-md mx-4"
       >
         <div className="flex flex-col gap-2 w-full items-center justify-center">
           <SuccessIcon />

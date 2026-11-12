@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { getToken } from "@/lib/customerAuth";
@@ -33,7 +40,7 @@ async function authedRequest(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  const data = await res.json().catch(() => ([]));
+  const data = await res.json().catch(() => []);
 
   if (!res.ok) {
     const message = Array.isArray(data.message)
@@ -64,9 +71,15 @@ type MealFavoritesContextValue = {
   toggle: (meal: MealFavoriteSummary) => void;
 };
 
-const MealFavoritesContext = createContext<MealFavoritesContextValue | null>(null);
+const MealFavoritesContext = createContext<MealFavoritesContextValue | null>(
+  null,
+);
 
-export function MealFavoritesProvider({ children }: { children: React.ReactNode }) {
+export function MealFavoritesProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const { customer, ready } = useCustomerSession();
   const [meals, setMeals] = useState<MealFavoriteSummary[]>([]);
@@ -85,29 +98,46 @@ export function MealFavoritesProvider({ children }: { children: React.ReactNode 
       .finally(() => setLoading(false));
   }, [ready, customer]);
 
-  const isFavorited = (id: string) => meals.some((m) => m.id === id);
+  const isFavorited = useCallback(
+    (id: string) => meals.some((m) => m.id === id),
+    [meals],
+  );
 
-  const toggle = (meal: MealFavoriteSummary) => {
-    if (!customer) {
-      router.push("/login");
-      return;
-    }
+  const toggle = useCallback(
+    (meal: MealFavoriteSummary) => {
+      if (!customer) {
+        router.push("/login");
+        return;
+      }
 
-    const wasFavorited = isFavorited(meal.id);
-    setMeals((prev) =>
-      wasFavorited ? prev.filter((m) => m.id !== meal.id) : [...prev, meal],
-    );
-
-    const request = wasFavorited ? removeMealFavorite(meal.id) : addMealFavorite(meal);
-    request.then(setMeals).catch(() => {
+      const wasFavorited = meals.some((m) => m.id === meal.id);
       setMeals((prev) =>
-        wasFavorited ? [...prev, meal] : prev.filter((m) => m.id !== meal.id),
+        wasFavorited
+          ? prev.filter((m) => m.id !== meal.id)
+          : [...prev, meal],
       );
-    });
-  };
+
+      const request = wasFavorited
+        ? removeMealFavorite(meal.id)
+        : addMealFavorite(meal);
+      request.then(setMeals).catch(() => {
+        setMeals((prev) =>
+          wasFavorited
+            ? [...prev, meal]
+            : prev.filter((m) => m.id !== meal.id),
+        );
+      });
+    },
+    [customer, meals, router],
+  );
+
+  const value = useMemo(
+    () => ({ meals, loading, isFavorited, toggle }),
+    [meals, loading, isFavorited, toggle],
+  );
 
   return (
-    <MealFavoritesContext.Provider value={{ meals, loading, isFavorited, toggle }}>
+    <MealFavoritesContext.Provider value={value}>
       {children}
     </MealFavoritesContext.Provider>
   );
@@ -115,6 +145,10 @@ export function MealFavoritesProvider({ children }: { children: React.ReactNode 
 
 export function useMealFavorites(): MealFavoritesContextValue {
   const ctx = useContext(MealFavoritesContext);
-  if (!ctx) throw new Error("useMealFavorites must be used inside a MealFavoritesProvider");
+  if (!ctx) {
+    throw new Error(
+      "useMealFavorites must be used inside a MealFavoritesProvider",
+    );
+  }
   return ctx;
 }
