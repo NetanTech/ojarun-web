@@ -145,6 +145,43 @@ function forgetSession() {
   localStorage.removeItem(CUSTOMER_KEY);
 }
 
+// Reads the `exp` claim (seconds since epoch) from the JWT payload. Returns
+// null when the token is malformed. This only reads the token; the backend
+// still verifies the signature on every request.
+function getTokenExpiryMs(token: string): number | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+    const { exp } = JSON.parse(atob(padded)) as { exp?: number };
+    return typeof exp === "number" ? exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+// A session is only valid when both the profile and an unexpired token exist.
+function hasValidSession(): boolean {
+  const token = getToken();
+  if (!token || !getStoredCustomer()) return false;
+  const expiresAt = getTokenExpiryMs(token);
+  return expiresAt !== null && expiresAt > Date.now();
+}
+
+function isAuthorizedApiCall(input: RequestInfo | URL, init?: RequestInit): boolean {
+  const url =
+    typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+  if (!url.startsWith(API_URL)) return false;
+  // change-password returns 401 for a wrong *current* password, which is a
+  // form error, not a dead session.
+  if (url.includes("/customer-auth/change-password")) return false;
+  const headers = new Headers(
+    init?.headers ?? (input instanceof Request ? input.headers : undefined),
+  );
+  return (headers.get("Authorization") || "").startsWith("Bearer ");
+}
+
 // Carries the email from register into the verify-email screen without
 // putting it in the URL.
 export function setPendingEmail(email: string) {
@@ -182,10 +219,66 @@ export function CustomerSessionProvider({ children }: { children: React.ReactNod
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [ready, setReady] = useState(false);
 
+  // On load: drop a stored session whose token has expired (or is missing),
+  // instead of showing the user as logged in with a dead token.
   useEffect(() => {
-    setCustomer(getStoredCustomer());
+    if (hasValidSession()) {
+      setCustomer(getStoredCustomer());
+    } else {
+      forgetSession();
+      setCustomer(null);
+    }
     setReady(true);
   }, []);
+
+  // While logged in: log out when the token expires (timer, plus a re-check
+  // when the tab regains focus, since timers pause in background tabs).
+  useEffect(() => {
+    if (!customer) return;
+    const token = getToken();
+    const expiresAt = token ? getTokenExpiryMs(token) : null;
+
+    const expire = () => {
+      if (!hasValidSession()) {
+        forgetSession();
+        setCustomer(null);
+      }
+    };
+
+    // setTimeout overflows above ~24.8 days, so cap the delay and re-check.
+    const delay = expiresAt ? Math.min(Math.max(expiresAt - Date.now(), 0), 2 ** 31 - 1) : 0;
+    const timer = window.setTimeout(expire, delay);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") expire();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [customer]);
+
+  // While logged in: if the backend rejects our token (401) on any API call,
+  // the session is dead (expired, secret rotated, account deactivated), so
+  // log out and send the user to the login page.
+  useEffect(() => {
+    if (!customer) return;
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init) => {
+      const res = await originalFetch(input, init);
+      if (res.status === 401 && isAuthorizedApiCall(input, init)) {
+        forgetSession();
+        setCustomer(null);
+        if (!window.location.pathname.startsWith("/login")) {
+          window.location.assign("/login");
+        }
+      }
+      return res;
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [customer]);
 
   const login = (token: string, nextCustomer: Customer) => {
     persistSession(token, nextCustomer);
