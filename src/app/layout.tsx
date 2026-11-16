@@ -55,7 +55,7 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} h-full antialiased overflow-x-hidden`}
     >
-      <body className="min-h-full flex flex-col overflow-x-hidden font-sans">
+      <body className="min-h-full flex flex-col overflow-x-clip font-sans">
         <CustomerSessionProvider>
           <ToastProvider>{children}</ToastProvider>
         </CustomerSessionProvider>

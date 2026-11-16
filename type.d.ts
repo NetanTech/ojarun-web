@@ -20,6 +20,7 @@ interface ProductCardProps {
   price: number;
   imageURL: string;
   more: string;
+  description?: string | null;
   wishlisted?: boolean;
 }
 

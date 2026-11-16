@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { registerCustomer, setPendingEmail } from "@/lib/customerAuth";
+import {
+  registerCustomer,
+  setPendingEmail,
+  warmUpBackend,
+} from "@/lib/customerAuth";
 
 export default function SignupForm() {
+  useEffect(() => {
+    warmUpBackend();
+  }, []);
   const router = useRouter();
   const searchParams = useSearchParams();
   const referralCode = searchParams.get("ref") || undefined;

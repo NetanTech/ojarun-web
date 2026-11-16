@@ -35,6 +35,14 @@ const MarketplaceContent = () => {
   const [selectedCat, setSelectedCat] = useState("all");
   const [reloadKey, setReloadKey] = useState(0);
 
+  // A new search covers the whole catalogue, not just the category the
+  // shopper happened to be browsing (e.g. searching "Efo" from Cooking Oil).
+  const [lastQuery, setLastQuery] = useState(query);
+  if (query !== lastQuery) {
+    setLastQuery(query);
+    if (query) setSelectedCat("all");
+  }
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);

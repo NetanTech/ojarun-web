@@ -4,6 +4,19 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+let warmedUp = false;
+/**
+ * The API host sleeps when idle and takes a while to wake. Ping it as soon as
+ * an auth screen opens so it's awake by the time the user submits the form.
+ */
+export function warmUpBackend() {
+  if (warmedUp || typeof window === "undefined") return;
+  warmedUp = true;
+  fetch(`${API_URL}/health`, { cache: "no-store" }).catch(() => {
+    warmedUp = false;
+  });
+}
+
 export type Customer = {
   id: string;
   name: string | null;
