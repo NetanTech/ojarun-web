@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { loginCustomer, useCustomerSession } from "@/lib/customerAuth";
+import {
+  loginCustomer,
+  useCustomerSession,
+  warmUpBackend,
+} from "@/lib/customerAuth";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -14,10 +18,22 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [slow, setSlow] = useState(false);
+
+  useEffect(() => {
+    warmUpBackend();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setSlow(true), 5000);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSlow(false);
     setLoading(true);
     try {
       const { accessToken, customer } = await loginCustomer({ phone, password });
@@ -115,6 +131,13 @@ export default function LoginForm() {
 
       {error && (
         <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+      )}
+
+      {loading && slow && (
+        <p className="mt-4 text-center text-sm text-neutral-500">
+          Connecting to Ojarun, this can take up to a minute the first time.
+          Please keep this page open.
+        </p>
       )}
 
       {/* Submit */}

@@ -19,6 +19,8 @@ export function toProductCard(p: BackendProduct): ProductCardProps {
     price: p.currentPrice,
     imageURL: p.imageUrl || "/assets/Untitled design.png",
     more: p.unit,
+    // The list endpoint always sends null here; undefined means "not loaded yet".
+    description: p.description ?? undefined,
   };
 }
 
@@ -91,7 +93,25 @@ export async function fetchProducts(params?: {
   }
 }
 
+const detailCache = new Map<string, Promise<ProductCardProps>>();
+
+/** Single product incl. description (the list endpoint omits it to stay small). */
+export function fetchProductDetail(id: string): Promise<ProductCardProps> {
+  const hit = detailCache.get(id);
+  if (hit) return hit;
+  const request = fetch(
+    `${API_URL}/storefront-products/${encodeURIComponent(id)}`,
+  ).then(async (res) => {
+    if (!res.ok) throw new Error("Could not load product details.");
+    return toProductCard((await res.json()) as BackendProduct);
+  });
+  detailCache.set(id, request);
+  request.catch(() => detailCache.delete(id));
+  return request;
+}
+
 /** Drop client cache after cart-side mutations that shouldn't apply to products, or when forcing refresh. */
 export function clearProductsCache() {
   memoryCache.clear();
+  detailCache.clear();
 }

@@ -2,12 +2,14 @@
 
 import { Heart, Minus, Plus } from "../../../../public/svg/svg";
 import Image from "next/image";
-import React, { memo } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { formatCurrency } from "../../../../lib/utils";
 import { useCartActions, useCartQuantity } from "@/lib/cart";
 import { useFavorites } from "@/lib/favoritesContext";
 import { useToast } from "@/components/ui/Toast";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/imagePlaceholder";
+import Modal from "@/components/ui/Modal";
+import { fetchProductDetail } from "@/lib/products";
 
 type ProductCardExtras = ProductCardProps & {
   /** Only the first few above-the-fold cards should opt into this. */
@@ -85,36 +87,143 @@ function CartControls({ product }: { product: ProductCardProps }) {
   );
 }
 
+function ProductDetails({
+  product,
+  onClose,
+}: {
+  product: ProductCardProps;
+  onClose: () => void;
+}) {
+  const [description, setDescription] = useState<string | null | undefined>(
+    product.description,
+  );
+  const [loading, setLoading] = useState(product.description === undefined);
+
+  useEffect(() => {
+    if (product.description !== undefined) return;
+    let cancelled = false;
+    fetchProductDetail(product.id)
+      .then((d) => {
+        if (!cancelled) setDescription(d.description ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setDescription(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [product.id, product.description]);
+
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={product.name}
+      className="w-full max-w-lg mx-4"
+    >
+      <div className="flex flex-col gap-4">
+        <div className="relative overflow-hidden rounded-2xl aspect-[4/3] bg-[#F3F4F6]">
+          <Image
+            src={product.imageURL || "/assets/Untitled design.png"}
+            className="object-cover"
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 512px"
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
+          />
+          <FavoriteButton product={product} />
+        </div>
+
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col min-w-0">
+            <p className="text-lg font-semibold">
+              {formatCurrency(product.price)}
+            </p>
+            <p className="text-grey-300 text-sm capitalize">
+              Per {product.more.replace(/^per\s+/i, "")}
+              {product.category && product.category !== "Uncategorized"
+                ? ` · ${product.category}`
+                : ""}
+            </p>
+          </div>
+          <CartControls product={product} />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-semibold">About this item</p>
+          {loading ? (
+            <div className="flex flex-col gap-2" aria-label="Loading description">
+              <span className="h-3 w-full rounded bg-grey-50 animate-pulse" />
+              <span className="h-3 w-2/3 rounded bg-grey-50 animate-pulse" />
+            </div>
+          ) : (
+            <p className="text-sm text-grey-400 leading-relaxed">
+              {description?.trim() ||
+                "No description yet. Our market agent will pick the freshest available and contact you if anything differs."}
+            </p>
+          )}
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 const ProductCard = memo(function ProductCard(props: ProductCardExtras) {
+  const [showDetails, setShowDetails] = useState(false);
+  const { priority, ...product } = props;
+  const closeDetails = useCallback(() => setShowDetails(false), []);
+
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
       <div className="relative overflow-hidden rounded-2xl aspect-[5/3] bg-[#F3F4F6]">
-        <Image
-          src={props.imageURL || "/assets/Untitled design.png"}
-          className="object-cover h-full w-full"
-          alt={props.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          loading={props.priority ? "eager" : "lazy"}
-          priority={props.priority}
-          placeholder="blur"
-          blurDataURL={IMAGE_BLUR_DATA_URL}
-        />
+        <button
+          type="button"
+          className="absolute inset-0 cursor-pointer"
+          onClick={() => setShowDetails(true)}
+          aria-label={`View details for ${product.name}`}
+        >
+          <Image
+            src={product.imageURL || "/assets/Untitled design.png"}
+            className="object-cover h-full w-full"
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading={priority ? "eager" : "lazy"}
+            priority={priority}
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
+          />
+        </button>
 
-        <FavoriteButton product={props} />
+        <FavoriteButton product={product} />
       </div>
 
       <div className="flex items-start justify-between gap-3 w-full">
-        <div className="flex flex-col min-w-0">
-          <h6 className="font-medium truncate w-full">{props.name}</h6>
+        <button
+          type="button"
+          className="flex flex-col min-w-0 text-left cursor-pointer"
+          onClick={() => setShowDetails(true)}
+        >
+          <h6 className="font-medium truncate w-full">{product.name}</h6>
           <p className="text-grey-300 capitalize text-sm sm:text-base">
-            {props.more}
+            {product.more}
           </p>
-          <p className="text-sm sm:text-base">{formatCurrency(props.price)}</p>
-        </div>
+          <p className="text-sm sm:text-base">{formatCurrency(product.price)}</p>
+        </button>
 
-        <CartControls product={props} />
+        <CartControls product={product} />
       </div>
+
+      {showDetails && (
+        <ProductDetails
+          product={product}
+          onClose={closeDetails}
+        />
+      )}
     </div>
   );
 });
