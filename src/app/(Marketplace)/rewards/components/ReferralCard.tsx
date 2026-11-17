@@ -27,12 +27,13 @@ const ReferralCard = ({ summary }: { summary: RewardsSummary }) => {
           src="/svg/referral-credits.svg"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 right-0 w-[108px]"
+          className="pointer-events-none absolute bottom-0 right-0 w-[84px] sm:w-[108px]"
         />
         <span className="bg-green-400 rounded-2xl px-2 py-1 body-small text-white w-fit">
           Earn 10+ points
         </span>
-        <div className="flex flex-col gap-0.5">
+        {/* Right padding keeps the text clear of the coin image. */}
+        <div className="flex flex-col gap-0.5 pr-20 sm:pr-28">
           <h5 className="text-white">Refer & Earn</h5>
           <p className="text-grey-50 body-small">
             For each friend that you invite, you both earn points.

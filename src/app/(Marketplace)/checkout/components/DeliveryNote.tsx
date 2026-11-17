@@ -31,7 +31,7 @@ const DeliveryNote = ({ note, onSave }: DeliveryNoteProps) => {
         <div className="flex items-center gap-2 md:gap-5 min-w-0 flex-1">
           <DeliveryBox className="shrink-0" />
           <div className="flex flex-col gap-2 min-w-0">
-            <p className="body-medium font-medium break-words">
+            <p className="body-medium font-medium truncate">
               {note ? note : "Leave a note for the agent"}
             </p>
             {!note && (
@@ -57,6 +57,7 @@ const DeliveryNote = ({ note, onSave }: DeliveryNoteProps) => {
               <div className="flex items-center gap-2 w-full border border-[#E7E7E7] rounded-xl p-3">
                 <textarea
                   rows={3}
+                  maxLength={300}
                   className="focus-within:outline-0 flex-1"
                   placeholder="Enter a delivery note"
                   value={draft}

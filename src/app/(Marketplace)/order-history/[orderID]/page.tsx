@@ -40,13 +40,36 @@ const item = {
   },
 };
 
-const route: [number, number][] = [
-  [-97.744, 30.267],
-  [-97.741, 30.27],
-  [-97.736, 30.274],
-  [-97.73, 30.278],
-  [-97.724, 30.281],
-];
+// Bodija Market, Ibadan. Used until the API sends the order's own pickup point.
+const DEFAULT_PICKUP = { name: "Bodija Market, Ibadan", lat: 7.4359015, lng: 3.9157404 };
+
+function stageFromTimeline(
+  status: OrderProperties["status"],
+  t: OrderTimeline,
+): TrackingStage {
+  if (status === "failed") return "cancelled";
+  if (t.delivered) return "delivered";
+  if (t.readyForPickup) return "ready";
+  if (t.shoppingInProgress) return "shopping";
+  return "received";
+}
+
+function stageMessage(stage: TrackingStage, market: string): string {
+  switch (stage) {
+    case "shopping":
+      return `Your agent is shopping at ${market}`;
+    case "ready":
+      return "Your items are bought and packed for delivery";
+    case "on_the_way":
+      return "Your order is on the way";
+    case "delivered":
+      return "Delivered. Enjoy your meal!";
+    case "cancelled":
+      return "This order was cancelled";
+    default:
+      return "Order received. An agent will start shopping soon";
+  }
+}
 
 const orderTimelines = [
   {
@@ -177,6 +200,12 @@ const Page = () => {
     );
   }
 
+  const pickup = order.tracking?.pickup ?? DEFAULT_PICKUP;
+  const destination: [number, number] | null = order.tracking?.destination
+    ? [order.tracking.destination.lng, order.tracking.destination.lat]
+    : null;
+  const stage = order.tracking?.stage ?? stageFromTimeline(order.status, timeline);
+
   return (
     <div className="relative w-full h-screen">
       <motion.div
@@ -228,10 +257,16 @@ const Page = () => {
             <div className="bg-green-50 p-2 flex items-center justify-center rounded-md shrink-0">
               <ShoppingBag />
             </div>
-            <p className="text-lg font-medium truncate">{order?.orderId}</p>
+            <div className="flex flex-col min-w-0">
+              <p className="text-lg font-medium truncate">{order?.orderId}</p>
+              <p className="text-sm text-grey-400">
+                {stageMessage(stage, pickup.name)}
+              </p>
+            </div>
           </div>
 
           <button
+            aria-label={showSub ? "Hide order progress" : "Show order progress"}
             className={`shrink-0 transition duration-150 ${showSub ? "rotate-180" : ""}`}
           >
             {isMobile ? <ChevronUp /> : <ChevronDown />}
@@ -264,11 +299,7 @@ const Page = () => {
         </AnimatePresence>
       </motion.div>
 
-      <TrackingMap
-        routeCoordinates={route}
-        pickup={route[0]}
-        destination={route[route.length - 1]}
-      />
+      <TrackingMap pickup={[pickup.lng, pickup.lat]} destination={destination} />
     </div>
   );
 };
