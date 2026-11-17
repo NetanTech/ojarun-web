@@ -125,6 +125,20 @@ interface OrderTimeline {
   delivered: boolean;
 }
 
+type TrackingStage =
+  | "received"
+  | "shopping"
+  | "ready"
+  | "on_the_way"
+  | "delivered"
+  | "cancelled";
+
+interface OrderTracking {
+  stage: TrackingStage;
+  pickup: { name: string; lat: number; lng: number };
+  destination: { lat: number; lng: number } | null;
+}
+
 interface OrderProperties {
   orderId: string;
   date: string;
@@ -146,6 +160,9 @@ interface OrderProperties {
   timeline: OrderTimeline;
 
   market: string;
+
+  /** Sent by newer API versions; older ones omit it. */
+  tracking?: OrderTracking;
 }
 
 

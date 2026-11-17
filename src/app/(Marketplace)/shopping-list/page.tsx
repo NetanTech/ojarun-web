@@ -25,6 +25,7 @@ import {
 } from "@/lib/shoppingLists";
 import { SuccessIcon } from "../../../../public/svg/AnimatedSvgs/fun-svg";
 import { useRequireAuth } from "@/lib/useRequireAuth";
+import { useToast } from "@/components/ui/Toast";
 
 const Empty = ({ onCreate }: { onCreate: () => void }) => {
   return (
@@ -64,6 +65,41 @@ const ShoppingListCard = ({
   const [justAdded, setJustAdded] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const cart = useCart();
+  const { showToast } = useToast();
+
+  const handleShare = async () => {
+    setShowMenu(false);
+    const lines = list.items.map(
+      (item) =>
+        `- ${item.name} x${item.quantity} (${formatCurrency(item.price * item.quantity)})`,
+    );
+    const total = list.items.reduce((a, b) => a + b.price * b.quantity, 0);
+    const shopUrl = `${window.location.origin}/marketplace`;
+    const text = [
+      `My Ojarun shopping list: ${list.name}`,
+      "",
+      ...lines,
+      "",
+      `Total: ${formatCurrency(total)}`,
+      `Shop it on Ojarun: ${shopUrl}`,
+    ].join("\n");
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${list.name} - Ojarun`, text });
+        return;
+      } catch (err) {
+        // The user closed the share sheet: nothing else to do.
+        if (err instanceof DOMException && err.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("List copied. Paste it to share");
+    } catch {
+      showToast("Could not share this list");
+    }
+  };
 
   useEffect(() => {
     setItems(list.items);
@@ -177,7 +213,10 @@ const ShoppingListCard = ({
               className="absolute shadow flex flex-col gap-2 p-2 rounded-[8px] border border-[#E3E3E3] -bottom-3 right-0 w-[117px] bg-white"
               ref={menuRef}
             >
-              <button className="hover:bg-[#F4F4F4] rounded-[4px] p-2 w-full text-start hover:text-black text-grey-400">
+              <button
+                className="hover:bg-[#F4F4F4] rounded-[4px] p-2 w-full text-start hover:text-black text-grey-400"
+                onClick={handleShare}
+              >
                 Share
               </button>
               <button

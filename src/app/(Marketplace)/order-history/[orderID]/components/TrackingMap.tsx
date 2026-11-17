@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Map, {
   Layer,
   Marker,
@@ -14,85 +14,52 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { Feature, LineString } from "geojson";
 import { PickupMarker } from "./PickupMarker";
 import { DestinationMarker } from "./DestinationMarker";
-import { DriverMarker } from "./DriverMarker";
 
-type Coordinate = [number, number];
-
-/** Degrees from north; replaces @turf/turf for this single use. */
-function bearingDegrees(start: Coordinate, end: Coordinate): number {
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const toDeg = (r: number) => (r * 180) / Math.PI;
-  const [lng1, lat1] = start;
-  const [lng2, lat2] = end;
-  const φ1 = toRad(lat1);
-  const φ2 = toRad(lat2);
-  const Δλ = toRad(lng2 - lng1);
-  const y = Math.sin(Δλ) * Math.cos(φ2);
-  const x =
-    Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-  return (toDeg(Math.atan2(y, x)) + 360) % 360;
-}
+type Coordinate = [number, number]; // [lng, lat]
 
 interface TrackingMapProps {
-  routeCoordinates: Coordinate[];
   pickup: Coordinate;
-  destination: Coordinate;
+  /** Null for orders placed without a map pin. */
+  destination: Coordinate | null;
 }
 
-export default function TrackingMap({
-  routeCoordinates,
-  pickup,
-  destination,
-}: TrackingMapProps) {
+/**
+ * Shows the market the order is bought from and the customer's delivery pin.
+ * Riders don't share live GPS yet, so there is deliberately no moving rider:
+ * order progress is shown in the status panel instead.
+ */
+export default function TrackingMap({ pickup, destination }: TrackingMapProps) {
   const mapRef = useRef<MapRef>(null);
 
-  const [driverPosition, setDriverPosition] = useState<Coordinate>(
-    routeCoordinates[0],
+  const lineGeoJSON: Feature<LineString> | null = useMemo(
+    () =>
+      destination
+        ? {
+            type: "Feature",
+            geometry: { type: "LineString", coordinates: [pickup, destination] },
+            properties: {},
+          }
+        : null,
+    [pickup, destination],
   );
 
-  const [bearing, setBearing] = useState(0);
+  const fitBoth = () => {
+    if (!destination) return;
+    mapRef.current?.fitBounds(
+      [
+        [Math.min(pickup[0], destination[0]), Math.min(pickup[1], destination[1])],
+        [Math.max(pickup[0], destination[0]), Math.max(pickup[1], destination[1])],
+      ],
+      // Extra bottom/top room so the markers clear the order panel.
+      { padding: { top: 140, bottom: 200, left: 60, right: 60 }, maxZoom: 15, duration: 0 },
+    );
+  };
 
-  const routeGeoJSON: Feature<LineString> = useMemo(
-    () => ({
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: routeCoordinates,
-      },
-      properties: {},
-    }),
-    [routeCoordinates],
-  );
-
+  // Re-fit if the coordinates change after the map has loaded.
   useEffect(() => {
-    if (!routeCoordinates.length) return;
-
-    let current = 0;
-
-    const interval = setInterval(() => {
-      if (current >= routeCoordinates.length - 1) {
-        clearInterval(interval);
-        return;
-      }
-
-      const start = routeCoordinates[current];
-      const end = routeCoordinates[current + 1];
-
-      setBearing(bearingDegrees(start, end));
-      setDriverPosition(end);
-
-      mapRef.current?.easeTo({
-        center: end,
-        duration: 1000,
-        zoom: 14.5,
-        pitch: 0,
-      });
-
-      current++;
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [routeCoordinates]);
+    fitBoth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pickup[0], pickup[1], destination?.[0], destination?.[1]]);
 
   return (
     <div className="w-full h-full rounded-3xl overflow-hidden">
@@ -104,72 +71,39 @@ export default function TrackingMap({
           latitude: pickup[1],
           zoom: 13,
         }}
+        onLoad={fitBoth}
         mapStyle={`https://api.maptiler.com/maps/dataviz/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`}
       >
         <NavigationControl position="top-right" />
 
-        {/* Route */}
-        <Source
-          id="route"
-          type="geojson"
-          data={routeGeoJSON}
-        >
-          {/* Shadow */}
-          <Layer
-            id="route-shadow"
-            type="line"
-            paint={{
-              "line-color": "#D9A700",
-              "line-width": 10,
-              "line-opacity": 0.9,
-            }}
-            layout={{
-              "line-cap": "round",
-              "line-join": "round",
-            }}
-          />
+        {lineGeoJSON && (
+          <Source id="route" type="geojson" data={lineGeoJSON}>
+            <Layer
+              id="route-line"
+              type="line"
+              paint={{
+                "line-color": "#D9A700",
+                "line-width": 4,
+                "line-dasharray": [2, 1.5],
+              }}
+              layout={{ "line-cap": "round", "line-join": "round" }}
+            />
+          </Source>
+        )}
 
-          {/* Main Line */}
-          <Layer
-            id="route-main"
-            type="line"
-            paint={{
-              "line-color": "#FFD539",
-              "line-width": 6,
-            }}
-            layout={{
-              "line-cap": "round",
-              "line-join": "round",
-            }}
-          />
-        </Source>
-
-        {/* Pickup */}
-        <Marker
-          longitude={pickup[0]}
-          latitude={pickup[1]}
-          anchor="center"
-        >
+        <Marker longitude={pickup[0]} latitude={pickup[1]} anchor="center">
           <PickupMarker />
         </Marker>
 
-        {/* Destination */}
-        <Marker
-          longitude={destination[0]}
-          latitude={destination[1]}
-          anchor="center"
-        >
-          <DestinationMarker />
-        </Marker>
-
-        {/* Driver */}
-        <Marker
-          longitude={driverPosition[0]}
-          latitude={driverPosition[1]}
-          anchor="center"
-        >
-          <DriverMarker bearing={bearing} />
-        </Marker>
+        {destination && (
+          <Marker
+            longitude={destination[0]}
+            latitude={destination[1]}
+            anchor="center"
+          >
+            <DestinationMarker />
+          </Marker>
+        )}
       </Map>
     </div>
   );
