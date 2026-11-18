@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { CustomerSessionProvider } from "@/lib/customerAuth";
 import { ToastProvider } from "@/components/ui/Toast";
+import TermsGate from "@/components/TermsGate";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -57,7 +58,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col overflow-x-clip font-sans">
         <CustomerSessionProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <TermsGate />
+          </ToastProvider>
         </CustomerSessionProvider>
       </body>
     </html>

@@ -24,12 +24,17 @@ export default function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [deliveryArea, setDeliveryArea] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!agreed) {
+      setError("Please accept the Terms & Conditions to continue.");
+      return;
+    }
     setLoading(true);
     try {
       const { email: normalizedEmail } = await registerCustomer({
@@ -39,6 +44,7 @@ export default function SignupForm() {
         password,
         deliveryArea,
         referralCode,
+        acceptTerms: true,
       });
       setPendingEmail(normalizedEmail);
       router.push("/verify-email");
@@ -210,23 +216,38 @@ export default function SignupForm() {
       )}
 
       {/* Terms */}
-      <p className="mt-6 text-center text-sm text-neutral-500">
-        By clicking continue, you acknowledge that you have read and agreed to
-        our{" "}
-        <Link href="/terms" className="font-semibold text-primary underline">
-          Terms of Use
-        </Link>{" "}
-        and{" "}
-        <Link href="/privacy" className="font-semibold text-primary underline">
-          Privacy Policy
-        </Link>
-        .
-      </p>
+      <label className="mt-6 flex items-start gap-3 text-sm text-neutral-600 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[#004A19]"
+        />
+        <span>
+          I have read and agree to Ojarun&apos;s{" "}
+          <Link
+            href="/terms-and-conditions"
+            target="_blank"
+            className="font-semibold text-primary underline"
+          >
+            Terms &amp; Conditions
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/privacy-policy"
+            target="_blank"
+            className="font-semibold text-primary underline"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </span>
+      </label>
 
       {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !agreed}
         className="mt-6 w-full rounded-lg bg-primary py-3.5 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Creating account..." : "Continue"}

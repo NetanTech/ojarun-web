@@ -14,6 +14,7 @@ import {
 } from "@/lib/addresses";
 import { DeliverySelection } from "@/lib/delivery";
 import dynamic from "next/dynamic";
+import QuickAddressForm from "./QuickAddressForm";
 
 const AddressMapPicker = dynamic(() => import("./AddressMapPicker"), {
   ssr: false,
@@ -34,6 +35,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
   const [listError, setListError] = useState<string | null>(null);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [useMap, setUseMap] = useState(false);
   const [newLandmark, setNewLandmark] = useState("");
   const [newLabel, setNewLabel] = useState("");
   const [pendingPin, setPendingPin] = useState<{
@@ -76,7 +78,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
   const handleSelect = (address: SavedAddress) => {
     if (!hasPin(address) || address.lat == null || address.lng == null) {
       setListError(
-        "This saved address has no map pin. Add it again with the map.",
+        "This saved address has no location. Please add it again.",
       );
       return;
     }
@@ -150,7 +152,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
 
   const display =
     selected?.address ||
-    (loading ? "Loading your addresses..." : "Drop a pin for delivery");
+    (loading ? "Loading your addresses..." : "Add a delivery address");
 
   return (
     <div className="flex flex-col gap-2 items-start w-full">
@@ -180,6 +182,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
         onClose={() => {
           setOpenDAModal(false);
           setShowAddForm(false);
+          setUseMap(false);
           setPendingPin(null);
         }}
         title="Delivery address"
@@ -207,7 +210,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
                       <p className="body-small break-words">{formatAddress(a)}</p>
                       {!hasPin(a) && (
                         <p className="text-amber-600 body-xsmall">
-                          Needs a map pin — add again
+                          Needs a location. Add it again
                         </p>
                       )}
                       {a.isDefault && hasPin(a) && (
@@ -233,21 +236,37 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
           {showAddForm ? (
             <div className="flex flex-col gap-3 w-full">
               {!pendingPin ? (
-                <AddressMapPicker
-                  onConfirm={handlePinConfirmed}
-                  confirming={saving}
-                />
+                useMap ? (
+                  <>
+                    <AddressMapPicker
+                      onConfirm={handlePinConfirmed}
+                      confirming={saving}
+                    />
+                    <button
+                      type="button"
+                      className="text-sm text-primary underline w-fit self-center"
+                      onClick={() => setUseMap(false)}
+                    >
+                      Back to area search
+                    </button>
+                  </>
+                ) : (
+                  <QuickAddressForm
+                    onPicked={handlePinConfirmed}
+                    onUseMap={() => setUseMap(true)}
+                  />
+                )
               ) : (
                 <>
                   <div className="rounded-xl bg-[#F5F7F5] p-3">
-                    <p className="body-small text-grey-300">Pinned location</p>
+                    <p className="body-small text-grey-300">Delivery location</p>
                     <p className="font-medium break-words">{pendingPin.address}</p>
                     <button
                       type="button"
                       className="text-sm text-primary mt-1 underline"
                       onClick={() => setPendingPin(null)}
                     >
-                      Move pin
+                      Change
                     </button>
                   </div>
                   <input
@@ -255,7 +274,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
                     value={newLandmark}
                     onChange={(e) => setNewLandmark(e.target.value)}
                     className="w-full border border-[#E7E7E7] rounded-xl p-3 focus-within:outline-0"
-                    placeholder="Landmark for the rider (optional)"
+                    placeholder="Landmark for the rider, e.g. opposite Total filling station"
                   />
                   <input
                     type="text"
@@ -275,7 +294,7 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
                     isLoading={saving}
                     onClick={handleSavePinnedAddress}
                   >
-                    Save &amp; use this pin
+                    Save &amp; use this address
                   </Button>
                   <button
                     type="button"
@@ -312,13 +331,14 @@ const DeliveryAddress = ({ selected, onSelect }: DeliveryAddressProps) => {
               isDisabled={addresses.length >= 5}
               onClick={() => {
                 setShowAddForm(true);
+                setUseMap(false);
                 setPendingPin(null);
                 setListError(null);
               }}
             >
               {addresses.length >= 5
                 ? "Address limit reached (5)"
-                : "+ Drop a new pin"}
+                : "+ Add a new address"}
             </Button>
           )}
         </div>

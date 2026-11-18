@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Marker, NavigationControl, MapRef } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { reverseGeocode } from "@/lib/geo";
 
 /** Rough city centre — map opens here before GPS / a saved pin. */
 const IBADAN_CENTER = { lat: 7.401, lng: 3.917 };
@@ -20,26 +21,6 @@ interface AddressMapPickerProps {
     address: string;
   }) => void;
   confirming?: boolean;
-}
-
-async function reverseGeocode(lat: number, lng: number): Promise<string> {
-  const key = process.env.NEXT_PUBLIC_MAPTILER_KEY;
-  if (!key) {
-    return `Pin ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  }
-  try {
-    const res = await fetch(
-      `https://api.maptiler.com/geocoding/${lng},${lat}.json?key=${key}`,
-    );
-    if (!res.ok) {
-      return `Pin ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-    }
-    const data = await res.json();
-    const label = data?.features?.[0]?.place_name as string | undefined;
-    return label || `Pin ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  } catch {
-    return `Pin ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  }
 }
 
 export default function AddressMapPicker({

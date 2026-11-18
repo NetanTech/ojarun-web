@@ -25,6 +25,8 @@ export type Customer = {
   deliveryArea: string | null;
   /** Profile photo URL; missing on sessions saved before photos existed. */
   avatarUrl?: string | null;
+  /** ISO date; null = not accepted yet; missing = older API that doesn't track it. */
+  termsAcceptedAt?: string | null;
   emailVerified: boolean;
 };
 
@@ -55,6 +57,7 @@ export function registerCustomer(input: {
   password: string;
   deliveryArea: string;
   referralCode?: string;
+  acceptTerms?: boolean;
 }) {
   return request<{ message: string; email: string }>("/customer-auth/register", {
     method: "POST",
@@ -134,6 +137,20 @@ export async function uploadAvatar(token: string, file: File): Promise<Customer>
     throw new ApiError(data.message || "Could not upload your photo. Please try again.");
   }
   return data as Customer;
+}
+
+/** Fresh copy of the signed-in customer (picks up fields added since login). */
+export function fetchMe(token: string) {
+  return request<Customer>("/customer-auth/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function acceptTerms(token: string) {
+  return request<Customer>("/customer-auth/me/accept-terms", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export function removeAvatar(token: string) {
