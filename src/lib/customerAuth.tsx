@@ -23,6 +23,8 @@ export type Customer = {
   phone: string;
   email: string | null;
   deliveryArea: string | null;
+  /** Profile photo URL; missing on sessions saved before photos existed. */
+  avatarUrl?: string | null;
   emailVerified: boolean;
 };
 
@@ -110,6 +112,34 @@ export function updateProfile(
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
     body: JSON.stringify(input),
+  });
+}
+
+/** Uploads a profile photo (multipart, so it can't use the JSON `request` helper). */
+export async function uploadAvatar(token: string, file: File): Promise<Customer> {
+  const form = new FormData();
+  form.append("file", file);
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/customer-auth/me/avatar`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch {
+    throw new ApiError("Could not reach Ojarun. Check your connection and try again.");
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new ApiError(data.message || "Could not upload your photo. Please try again.");
+  }
+  return data as Customer;
+}
+
+export function removeAvatar(token: string) {
+  return request<Customer>("/customer-auth/me/avatar", {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
   });
 }
 

@@ -1,9 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 import Button from "@/components/ui/Button";
-import { getToken, updateProfile, useCustomerSession } from "@/lib/customerAuth";
+import {
+  getToken,
+  removeAvatar,
+  updateProfile,
+  uploadAvatar,
+  useCustomerSession,
+} from "@/lib/customerAuth";
 import DeleteAccountModal from "./DeleteAccountModal";
 
 function getInitials(name: string | null, phone: string): string {
@@ -25,8 +31,54 @@ const ProfileForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!customer) return null;
+
+  const handlePhotoChosen = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow choosing the same file again later
+    if (!file) return;
+
+    setPhotoError(null);
+    if (!["image/jpeg", "image/png", "image/gif", "image/webp"].includes(file.type)) {
+      setPhotoError("Use a JPG, PNG, GIF or WebP image.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setPhotoError("Image is too large. Max size is 2MB.");
+      return;
+    }
+    const token = getToken();
+    if (!token) return;
+
+    setPhotoBusy(true);
+    try {
+      const updated = await uploadAvatar(token, file);
+      login(token, updated);
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Could not upload your photo.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    const token = getToken();
+    if (!token) return;
+    setPhotoError(null);
+    setPhotoBusy(true);
+    try {
+      const updated = await removeAvatar(token);
+      login(token, updated);
+    } catch (err) {
+      setPhotoError(err instanceof Error ? err.message : "Could not remove your photo.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,17 +111,67 @@ const ProfileForm = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative w-25 h-25 shrink-0">
-            <div className="w-25 h-25 rounded-full bg-[#FFE7CC] flex items-center justify-center text-2xl font-medium text-black">
-              {getInitials(customer.name, customer.phone)}
-            </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={photoBusy}
+            aria-label="Change profile photo"
+            className="relative w-25 h-25 shrink-0 rounded-full disabled:opacity-60"
+          >
+            {customer.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={customer.avatarUrl}
+                alt="Profile photo"
+                className="w-25 h-25 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-25 h-25 rounded-full bg-[#FFE7CC] flex items-center justify-center text-2xl font-medium text-black">
+                {getInitials(customer.name, customer.phone)}
+              </div>
+            )}
+            {photoBusy && (
+              <span className="absolute inset-0 rounded-full bg-white/60 flex items-center justify-center body-small font-medium">
+                Saving...
+              </span>
+            )}
             <span className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-grey-50 border-[1.5px] border-white flex items-center justify-center">
               <Pencil size={12} />
             </span>
-          </div>
-          <div className="flex flex-col gap-1">
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            className="hidden"
+            onChange={handlePhotoChosen}
+          />
+          <div className="flex flex-col gap-1 items-start">
             <p className="body-medium font-medium">Profile Photo</p>
-            <p className="body-small text-grey-400">JPG, PNG or GIF. Max size 2MB.</p>
+            <p className="body-small text-grey-400">
+              JPG, PNG, GIF or WebP. Max size 2MB.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={photoBusy}
+                className="body-small font-semibold text-primary disabled:opacity-60"
+              >
+                {customer.avatarUrl ? "Change photo" : "Upload photo"}
+              </button>
+              {customer.avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  disabled={photoBusy}
+                  className="body-small font-semibold text-red-500 disabled:opacity-60"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            {photoError && <p className="body-small text-red-500">{photoError}</p>}
           </div>
         </div>
 
