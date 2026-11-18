@@ -53,3 +53,24 @@ export async function quoteDelivery(input: {
 
   return data as DeliveryQuote;
 }
+
+export type DeliveryArea = { name: string; lat: number; lng: number };
+
+let areasCache: Promise<DeliveryArea[]> | null = null;
+
+/** Ibadan areas the backend can price (same list it uses for typed addresses). */
+export function fetchDeliveryAreas(): Promise<DeliveryArea[]> {
+  if (areasCache) return areasCache;
+  const token = getToken();
+  if (!token) return Promise.reject(new Error("You need to be logged in."));
+  areasCache = fetch(`${API_URL}/delivery/areas`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then(async (res) => {
+    if (!res.ok) throw new Error("Could not load delivery areas.");
+    return (await res.json()) as DeliveryArea[];
+  });
+  areasCache.catch(() => {
+    areasCache = null;
+  });
+  return areasCache;
+}
