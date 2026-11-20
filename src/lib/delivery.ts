@@ -20,6 +20,13 @@ export type DeliveryQuote = {
   serviceFee: number;
   /** Sent by newer API versions; older ones only send a flat serviceFee. */
   serviceFeeRule?: ServiceFeeRule;
+  /** Launch offer applied to deliveryFee (already discounted), or null. */
+  launchDiscount?: {
+    percent: number;
+    originalFee: number;
+    orderNumber: number;
+    maxOrders: number;
+  } | null;
   distanceKm: number | null;
   lat: number;
   lng: number;

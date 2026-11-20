@@ -52,6 +52,9 @@ const OrderSummary = ({
         : quote.serviceFee
       : 0;
   const deliveryFee = hasItems && quote?.serviceable ? quote.deliveryFee : 0;
+  // deliveryFee above is already discounted by the API; this only explains it.
+  const launchDiscount =
+    hasItems && quote?.serviceable ? (quote.launchDiscount ?? null) : null;
   const total = Math.max(cart.subtotal + serviceFee + deliveryFee - discount, 0);
   const loggedOut = ready && !customer;
   const canPlace =
@@ -164,14 +167,25 @@ const OrderSummary = ({
           </p>
         </div>
         <div className="flex items-center justify-between text-grey-300">
-          <p>
-            Delivery
-            {quote?.distanceKm != null ? ` (~${quote.distanceKm} km)` : ""}
-          </p>
-          <p>
-            {quoteLoading
-              ? "…"
-              : formatCurrency(deliveryFee)}
+          <div className="flex flex-col">
+            <p>
+              Delivery
+              {quote?.distanceKm != null ? ` (~${quote.distanceKm} km)` : ""}
+            </p>
+            {launchDiscount && (
+              <p className="body-xsmall text-green-600">
+                {launchDiscount.percent}% launch discount (order{" "}
+                {launchDiscount.orderNumber} of {launchDiscount.maxOrders})
+              </p>
+            )}
+          </div>
+          <p className="flex items-center gap-2">
+            {!quoteLoading && launchDiscount && (
+              <span className="line-through text-grey-200">
+                {formatCurrency(launchDiscount.originalFee)}
+              </span>
+            )}
+            {quoteLoading ? "…" : formatCurrency(deliveryFee)}
           </p>
         </div>
         {discount > 0 && (
