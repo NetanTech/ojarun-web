@@ -2,9 +2,24 @@ import { getToken } from "@/lib/customerAuth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+/** Tiered service fee rule from the API: perBand naira per bandSize of items. */
+export type ServiceFeeRule = { perBand: number; bandSize: number; edge: number };
+
+/**
+ * Same formula as the backend (src/common/service-fee.util.ts), so checkout
+ * shows exactly what will be charged as the cart changes.
+ */
+export function computeServiceFee(subtotal: number, rule: ServiceFeeRule): number {
+  if (!Number.isFinite(subtotal) || subtotal <= 0) return rule.perBand;
+  const bands = Math.max(1, Math.floor((subtotal - rule.edge) / rule.bandSize) + 1);
+  return bands * rule.perBand;
+}
+
 export type DeliveryQuote = {
   deliveryFee: number;
   serviceFee: number;
+  /** Sent by newer API versions; older ones only send a flat serviceFee. */
+  serviceFeeRule?: ServiceFeeRule;
   distanceKm: number | null;
   lat: number;
   lng: number;

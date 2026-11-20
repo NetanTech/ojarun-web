@@ -9,7 +9,11 @@ import Modal from "@/components/ui/Modal";
 import { useCart } from "@/lib/cart";
 import { useCustomerSession } from "@/lib/customerAuth";
 import { createOrder, PromoValidation } from "@/lib/orders";
-import { DeliveryQuote, DeliverySelection } from "@/lib/delivery";
+import {
+  DeliveryQuote,
+  DeliverySelection,
+  computeServiceFee,
+} from "@/lib/delivery";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -41,7 +45,12 @@ const OrderSummary = ({
 
   const hasItems = cart.lines.length > 0;
   const discount = hasItems ? promo?.discountAmount || 0 : 0;
-  const serviceFee = hasItems && quote?.serviceable ? quote.serviceFee : 0;
+  const serviceFee =
+    hasItems && quote?.serviceable
+      ? quote.serviceFeeRule
+        ? computeServiceFee(cart.subtotal, quote.serviceFeeRule)
+        : quote.serviceFee
+      : 0;
   const deliveryFee = hasItems && quote?.serviceable ? quote.deliveryFee : 0;
   const total = Math.max(cart.subtotal + serviceFee + deliveryFee - discount, 0);
   const loggedOut = ready && !customer;
@@ -139,7 +148,15 @@ const OrderSummary = ({
           <p> {formatCurrency(cart.subtotal)} </p>
         </div>
         <div className="flex items-center justify-between text-grey-300">
-          <p>Shopper fee</p>
+          <div className="flex flex-col">
+            <p>Shopper fee</p>
+            {quote?.serviceFeeRule && (
+              <p className="body-xsmall">
+                {formatCurrency(quote.serviceFeeRule.perBand)} per{" "}
+                {formatCurrency(quote.serviceFeeRule.bandSize)} of items
+              </p>
+            )}
+          </div>
           <p>
             {quoteLoading
               ? "…"

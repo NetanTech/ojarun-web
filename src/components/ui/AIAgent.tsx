@@ -20,11 +20,15 @@ import {
 import { fetchProducts } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 
+type ChatAction = { label: string; href: string };
+
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
   time: string;
+  /** Optional button shown under an assistant message, e.g. "Go to checkout". */
+  action?: ChatAction;
 };
 
 const WELCOME_MESSAGE =
@@ -91,11 +95,54 @@ function parseNairaWorth(unit: string): number | null {
   return Number.isFinite(amount) && amount > 0 ? amount : null;
 }
 
-async function matchDraftItemsToProducts(
-  items: OrderDraftItem[],
-): Promise<{ matched: MatchedItem[]; unmatched: OrderDraftItem[] }> {
+/** Lowercase, drop bracketed notes and punctuation: "Fresh Pepper (Ata Rodo)" -> "fresh pepper". */
+function normalizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+type AmbiguousItem = { item: OrderDraftItem; options: string[] };
+
+/**
+ * Finds the one product an item refers to. Exact name first, then the same
+ * name ignoring brackets/punctuation, then a partial match, but only when
+ * exactly one product fits. Several partial matches ("pepper") are returned
+ * as options so the customer can choose, instead of us guessing.
+ */
+function findProduct(
+  catalog: ProductCardProps[],
+  itemName: string,
+): { product: ProductCardProps } | { options: ProductCardProps[] } | null {
+  const lower = itemName.trim().toLowerCase();
+  const exact = catalog.find((p) => p.name.toLowerCase() === lower);
+  if (exact) return { product: exact };
+
+  const norm = normalizeName(itemName);
+  if (!norm) return null;
+  const sameName = catalog.filter((p) => normalizeName(p.name) === norm);
+  if (sameName.length === 1) return { product: sameName[0] };
+  if (sameName.length > 1) return { options: sameName };
+
+  const partial = catalog.filter((p) => {
+    const pn = normalizeName(p.name);
+    return pn.includes(norm) || (pn.length >= 3 && norm.includes(pn));
+  });
+  if (partial.length === 1) return { product: partial[0] };
+  if (partial.length > 1) return { options: partial };
+  return null;
+}
+
+async function matchDraftItemsToProducts(items: OrderDraftItem[]): Promise<{
+  matched: MatchedItem[];
+  unmatched: OrderDraftItem[];
+  ambiguous: AmbiguousItem[];
+}> {
   const matched: MatchedItem[] = [];
   const unmatched: OrderDraftItem[] = [];
+  const ambiguous: AmbiguousItem[] = [];
 
   // One catalog fetch for the whole list — not one API call per item.
   let catalog: ProductCardProps[] = [];
@@ -106,19 +153,17 @@ async function matchDraftItemsToProducts(
   }
 
   for (const item of items) {
-    const lowerName = item.name.toLowerCase();
-    const best =
-      catalog.find((p) => p.name.toLowerCase() === lowerName) ??
-      catalog.find(
-        (p) =>
-          p.name.toLowerCase().includes(lowerName) ||
-          lowerName.includes(p.name.toLowerCase()),
-      );
+    const found = findProduct(catalog, item.name);
 
-    if (!best) {
+    if (!found) {
       unmatched.push(item);
       continue;
     }
+    if ("options" in found) {
+      ambiguous.push({ item, options: found.options.slice(0, 5).map((p) => p.name) });
+      continue;
+    }
+    const best = found.product;
 
     const nairaWorth = parseNairaWorth(item.unit);
     const quantity = nairaWorth
@@ -135,7 +180,7 @@ async function matchDraftItemsToProducts(
     });
   }
 
-  return { matched, unmatched };
+  return { matched, unmatched, ambiguous };
 }
 
 const AIAgent = () => {
@@ -235,10 +280,14 @@ const AIAgent = () => {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, sending]);
 
-  const appendMessage = (role: ChatMessage["role"], content: string) => {
+  const appendMessage = (
+    role: ChatMessage["role"],
+    content: string,
+    action?: ChatAction,
+  ) => {
     setMessages((prev) => [
       ...prev,
-      { id: makeId(), role, content, time: now() },
+      { id: makeId(), role, content, time: now(), action },
     ]);
   };
 
@@ -278,7 +327,7 @@ const AIAgent = () => {
           `Let's get your list started first — tell me what you'd like to buy.`,
         );
       } else {
-        const { matched, unmatched } = await matchDraftItemsToProducts(
+        const { matched, unmatched, ambiguous } = await matchDraftItemsToProducts(
           draftItemsRef.current,
         );
         draftItemsRef.current = [];
@@ -306,21 +355,35 @@ const AIAgent = () => {
             .join("\n");
           parts.push(`Added to your cart:\n${addedLines}`);
         }
+        if (ambiguous.length > 0) {
+          const questions = ambiguous
+            .map((a) => `• "${a.item.name}": ${a.options.join(", ")}`)
+            .join("\n");
+          parts.push(
+            `I wasn't sure which one you meant, so I didn't add these yet:\n${questions}\n\nTell me which one (and how much), then say "that's all" again.`,
+          );
+        }
         if (unmatched.length > 0) {
           const missingLines = unmatched
             .map((i) => `• ${i.name}`)
             .join("\n");
           parts.push(
-            `I couldn't find these in our catalog, so please add them yourself from the marketplace:\n${missingLines}`,
+            `We don't sell these yet, or I couldn't find them:\n${missingLines}`,
           );
         }
-        parts.push(
-          matched.length > 0
-            ? `Head to checkout when you're ready.`
-            : `Nothing on your list matched a product we sell — try searching the marketplace directly.`,
-        );
+        if (matched.length === 0 && ambiguous.length === 0) {
+          parts.push(
+            `Nothing on your list matched a product we sell. Try searching the marketplace directly.`,
+          );
+        }
 
-        appendMessage("assistant", parts.join("\n\n"));
+        appendMessage(
+          "assistant",
+          parts.join("\n\n"),
+          matched.length > 0
+            ? { label: "Go to checkout", href: "/checkout" }
+            : undefined,
+        );
       }
     } catch (err) {
       appendMessage(
@@ -394,6 +457,15 @@ const AIAgent = () => {
                       </button>
                     </div>
                   </div>
+                  {message.action && (
+                    <Link
+                      href={message.action.href}
+                      onClick={closeChat}
+                      className="ml-4 mt-1 inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
+                    >
+                      {message.action.label}
+                    </Link>
+                  )}
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-start gap-3">
                       <div className="w-12.5 flex items-center justify-center h-12.5 bg-green-500 rounded-full overflow-hidden">
@@ -443,16 +515,6 @@ const AIAgent = () => {
               </div>
             )}
 
-            {messages[messages.length - 1]?.content.includes(
-              "Head to checkout",
-            ) && (
-              <Link
-                href="/checkout"
-                className="ml-6 self-start text-sm font-medium text-primary underline"
-              >
-                Go to checkout
-              </Link>
-            )}
           </div>
 
           <div className="p-3 py-5 bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.04)] flex flex-col gap-2">
