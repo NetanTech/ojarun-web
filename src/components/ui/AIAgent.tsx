@@ -41,7 +41,7 @@ const WELCOME_MESSAGE =
   "Hello! Type what you want to buy, or paste your shopping list, and an Ojarun admin will take up your order.";
 
 const INSTRUCTION =
-  "Start typing a product, e.g. “rice”. Pick it from the list, set the quantity and tap ✓ to add it to your cart. Can't find it? Just send it and an admin will get it for you.";
+  "Start typing a product, e.g. “rice”, set the quantity and tap ✓. Pick as many as you like, then press send once to add them all to your cart. Can't find something? Type it and send, and an admin will get it for you.";
 
 const NOT_A_LIST =
   "I can only take shopping lists here. Type what you want to buy, e.g. “3 tubers of yam, 1 crate of eggs”.";
@@ -179,6 +179,10 @@ const AIAgent = () => {
   const [catalog, setCatalog] = useState<ProductCardProps[]>([]);
   // Quantity chosen in each suggestion row, by product id.
   const [pickQty, setPickQty] = useState<Record<string, number>>({});
+  // Ticked products waiting for Send.
+  const [pending, setPending] = useState<
+    { product: ProductCardProps; qty: number }[]
+  >([]);
   const { addItem } = useCartActions();
   const listRef = useRef<ListItem[] | null>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
@@ -219,37 +223,57 @@ const AIAgent = () => {
     }));
   };
 
-  /** Puts a suggested product in the cart and on the list, then clears the line. */
+  /**
+   * Ticks a suggested product into the tray above the text box (owner's
+   * request: no chat message per item). Nothing is added to the cart until
+   * the customer presses Send, which then gets one reply for everything.
+   */
   const pickProduct = (product: ProductCardProps) => {
     const qty = qtyFor(product.id);
-    addItem(
-      {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.imageURL,
-        unit: product.more,
-      },
-      qty,
-    );
-
-    const label = `${product.name} × ${qty}${product.more ? ` (${product.more})` : ""} – ${naira(product.price * qty)}`;
-    const list = [...getList(), { text: label, inCart: true }];
-    setList(list);
+    setPending((prev) => {
+      const existing = prev.find((p) => p.product.id === product.id);
+      return existing
+        ? prev.map((p) =>
+            p.product.id === product.id
+              ? { ...p, qty: Math.min(99, p.qty + qty) }
+              : p,
+          )
+        : [...prev, { product, qty }];
+    });
 
     // Keep any earlier lines the customer typed; drop the one just matched.
     const lines = input.split(/\r?\n/);
     lines.pop();
     setInput(lines.join("\n"));
     setPickQty({});
-
-    appendMessage("user", `${product.name} × ${qty}`);
-    appendMessage(
-      "assistant",
-      `Added to your cart ✓\n\nYour list so far:\n${listText(list)}\n\nAnything else? Keep typing, or tap "That's all".`,
-      ["add_more", "checkout", "send"],
-    );
     inputRef.current?.focus();
+  };
+
+  const unpick = (id: string) =>
+    setPending((prev) => prev.filter((p) => p.product.id !== id));
+
+  /** Moves the tray into the cart and onto the list; returns the new list. */
+  const commitPending = (): ListItem[] => {
+    const added: ListItem[] = pending.map(({ product, qty }) => {
+      addItem(
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.imageURL,
+          unit: product.more,
+        },
+        qty,
+      );
+      return {
+        text: `${product.name} × ${qty}${product.more ? ` (${product.more})` : ""} – ${naira(product.price * qty)}`,
+        inCart: true,
+      };
+    });
+    setPending([]);
+    const list = [...getList(), ...added];
+    setList(list);
+    return list;
   };
 
   const closeChat = () => {
@@ -357,31 +381,37 @@ const AIAgent = () => {
 
   const handleSend = (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || sending) return;
+    if ((!trimmed && pending.length === 0) || sending) return;
 
     setInput("");
 
-    // "No" to "anything else?" means they're done.
-    if (getList().length > 0 && DONE.test(trimmed)) {
+    // "No"/"that's all" means they're done (anything ticked goes in first).
+    if (trimmed && DONE.test(trimmed) && (getList().length > 0 || pending.length > 0)) {
+      if (pending.length) commitPending();
       void sendOrder(trimmed);
       return;
     }
 
-    appendMessage("user", trimmed);
-
-    if (isSmallTalk(trimmed)) {
+    if (pending.length === 0 && isSmallTalk(trimmed)) {
+      appendMessage("user", trimmed);
       appendMessage("assistant", NOT_A_LIST);
       return;
     }
 
+    // One message for everything ticked and typed since the last send.
+    const picked = pending.map(({ product, qty }) => `${product.name} × ${qty}`);
+    const typedLines = trimmed ? toLines(trimmed) : [];
+    appendMessage("user", [...picked, ...typedLines].join("\n"));
+
+    const hadPicks = pending.length > 0;
     const list: ListItem[] = [
-      ...getList(),
-      ...toLines(trimmed).map((text) => ({ text })),
+      ...commitPending(),
+      ...typedLines.map((line) => ({ text: line })),
     ];
     setList(list);
     appendMessage(
       "assistant",
-      `Got it! Your list so far:\n${listText(list)}\n\nAnything else to add? You can type more, browse the market, or send your order.`,
+      `${hadPicks ? "Added to your cart ✓\n\n" : "Got it! "}Your list so far:\n${listText(list)}\n\nAnything else? Keep typing, or tap "That's all".`,
       list.some((l) => l.inCart)
         ? ["add_more", "checkout", "send"]
         : ["add_more", "browse", "send"],
@@ -456,6 +486,7 @@ const AIAgent = () => {
     } else if (action === "browse") {
       closeChat();
     } else if (action === "send") {
+      if (pending.length) commitPending();
       void sendOrder();
     }
   };
@@ -636,6 +667,26 @@ const AIAgent = () => {
                 })}
               </ul>
             )}
+            {pending.length > 0 && (
+              <div aria-label="Picked, not sent yet" className="flex flex-wrap gap-1.5">
+                {pending.map(({ product, qty }) => (
+                  <span
+                    key={product.id}
+                    className="inline-flex items-center gap-1 rounded-full bg-green-50 border border-green-100 pl-3 pr-1 py-1 text-sm text-primary"
+                  >
+                    {product.name} × {qty}
+                    <button
+                      type="button"
+                      aria-label={`Remove ${product.name}`}
+                      onClick={() => unpick(product.id)}
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-primary/70 hover:bg-green-100"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
             <div className="bg-[#F4F4F4] w-full p-4 flex items-end gap-2 rounded-xl">
               <textarea
                 ref={inputRef}
@@ -653,7 +704,7 @@ const AIAgent = () => {
                 type="button"
                 aria-label="Add to list"
                 onClick={() => handleSend(input)}
-                disabled={sending || !input.trim()}
+                disabled={sending || (!input.trim() && pending.length === 0)}
                 className="disabled:opacity-50"
               >
                 <Send />
