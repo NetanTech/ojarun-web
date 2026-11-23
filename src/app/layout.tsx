@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import { CustomerSessionProvider } from "@/lib/customerAuth";
 import { ToastProvider } from "@/components/ui/Toast";
@@ -12,6 +12,11 @@ const dmSans = DM_Sans({
   preload: true,
 });
 
+// Colours the phone's browser bar / installed-app title bar in brand green.
+export const viewport: Viewport = {
+  themeColor: "#004a19",
+};
+
 export const metadata: Metadata = {
   // Makes the generated link-preview image URL absolute (WhatsApp needs that).
   metadataBase: new URL("https://www.ojarun.com"),
@@ -23,6 +28,13 @@ export const metadata: Metadata = {
     "Fresh food from local markets, sourced by trained agents and delivered to your doorstep without the stress, time, or guesswork.",
   icons: {
     icon: "/icon.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  // iPhone "Add to Home Screen" opens full-screen with this name.
+  appleWebApp: {
+    capable: true,
+    title: "Ojarun",
+    statusBarStyle: "default",
   },
   keywords: [
     "Ojarun",

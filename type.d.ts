@@ -100,6 +100,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 // Order Interfaces for the OrderItem, PaymentDetails, DeliveryDetails, OrderTimeline and the OrderProperties
 interface OrderItem {
   id: string;
+  /** Catalog product id (null for items no longer linked to a product). */
+  productId?: string | null;
   name: string;
   quantity: number;
   unit: string; // e.g. "Per Can", "Per Box"

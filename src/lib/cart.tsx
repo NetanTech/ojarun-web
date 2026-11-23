@@ -105,6 +105,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const syncedForCustomerId = useRef<string | null>(null);
+  // True once a customer has been logged in during this visit.
+  const wasLoggedIn = useRef(false);
   const linesRef = useRef(lines);
 
   useEffect(() => {
@@ -144,10 +146,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     if (!customer) {
       syncedForCustomerId.current = null;
-      setLines([]);
+      // Only empty the cart when someone has just logged out (their cart lives
+      // on the server). A guest who simply reloads the page keeps their cart.
+      if (wasLoggedIn.current) {
+        wasLoggedIn.current = false;
+        setLines([]);
+      }
       return;
     }
 
+    wasLoggedIn.current = true;
     if (syncedForCustomerId.current === customer.id) return;
     syncedForCustomerId.current = customer.id;
 
