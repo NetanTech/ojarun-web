@@ -32,7 +32,10 @@ const MarketplaceContent = () => {
   const [catalog, setCatalog] = useState<ProductCardProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCat, setSelectedCat] = useState("all");
+  // ?category=Fruits (e.g. from a product page breadcrumb) opens that category.
+  const [selectedCat, setSelectedCat] = useState(
+    () => searchParams.get("category") || "all",
+  );
   const [reloadKey, setReloadKey] = useState(0);
 
   // A new search covers the whole catalogue, not just the category the

@@ -10,13 +10,15 @@ import { useToast } from "@/components/ui/Toast";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/imagePlaceholder";
 import Modal from "@/components/ui/Modal";
 import { fetchProductDetail } from "@/lib/products";
+import Link from "next/link";
+import { productPath } from "@/lib/productSlug";
 
 type ProductCardExtras = ProductCardProps & {
   /** Only the first few above-the-fold cards should opt into this. */
   priority?: boolean;
 };
 
-function FavoriteButton({ product }: { product: ProductCardProps }) {
+export function FavoriteButton({ product }: { product: ProductCardProps }) {
   const favorites = useFavorites();
   const { showToast } = useToast();
   const favorited = favorites.isFavorited(product.id);
@@ -39,7 +41,7 @@ function FavoriteButton({ product }: { product: ProductCardProps }) {
   );
 }
 
-function CartControls({ product }: { product: ProductCardProps }) {
+export function CartControls({ product }: { product: ProductCardProps }) {
   const { addItem, setQuantity } = useCartActions();
   const quantity = useCartQuantity(product.id);
   const { showToast } = useToast();
@@ -167,6 +169,13 @@ function ProductDetails({
             </p>
           )}
         </div>
+
+        <Link
+          href={productPath(product)}
+          className="text-sm font-medium text-primary underline self-start"
+        >
+          View full page &amp; share
+        </Link>
       </div>
     </Modal>
   );
