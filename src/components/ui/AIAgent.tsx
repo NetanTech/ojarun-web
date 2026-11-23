@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   MessageIcon,
@@ -8,17 +8,25 @@ import {
   Logo,
   MessageIconUnread,
 } from "../../../public/svg/svg";
-import { MinusCircleIcon, X } from "lucide-react";
+import { Check, Minus, MinusCircleIcon, Plus, X } from "lucide-react";
 import { submitChatList } from "@/lib/aiChat";
 import { getToken, useCustomerSession } from "@/lib/customerAuth";
+import { fetchProducts } from "@/lib/products";
+import { useCartActions } from "@/lib/cart";
 
 /**
- * Order-only chat (owner's request): no AI and no small talk. The customer
- * types or pastes what they want to buy, we read it back, and when they're
- * done the list goes to the admin Messages inbox for a person to take up.
+ * Order-only chat (owner's request): no AI and no small talk. As the customer
+ * types, matching products from the catalog pop up; picking one (with a
+ * quantity) puts it straight in the cart and on the list. Anything we don't
+ * stock stays on the list as typed and goes to the admin Messages inbox.
  */
 
-type ChatAction = "add_more" | "browse" | "send" | "login";
+type ChatAction = "add_more" | "browse" | "send" | "login" | "checkout";
+
+/** A list entry: typed text, or a catalog product already put in the cart. */
+type ListItem = { text: string; inCart?: boolean };
+
+const MAX_SUGGESTIONS = 5;
 
 type ChatMessage = {
   id: string;
@@ -33,7 +41,7 @@ const WELCOME_MESSAGE =
   "Hello! Type what you want to buy, or paste your shopping list, and an Ojarun admin will take up your order.";
 
 const INSTRUCTION =
-  "Type what you want to buy or paste your list. One item per line, e.g. “2 cups rice”, “Tomatoes ₦1,000”.";
+  "Start typing a product, e.g. “rice”. Pick it from the list, set the quantity and tap ✓ to add it to your cart. Can't find it? Just send it and an admin will get it for you.";
 
 const NOT_A_LIST =
   "I can only take shopping lists here. Type what you want to buy, e.g. “3 tubers of yam, 1 crate of eggs”.";
@@ -43,6 +51,7 @@ const ACTION_LABEL: Record<ChatAction, string> = {
   browse: "Browse market",
   send: "That's all, send my order",
   login: "Log in to send",
+  checkout: "Go to checkout",
 };
 
 const STORAGE_KEY = "ojarun_chat_list";
@@ -75,17 +84,25 @@ function makeId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function readSavedList(): string[] {
+function readSavedList(): ListItem[] {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+    if (!Array.isArray(parsed)) return [];
+    // Older saves were plain strings.
+    return parsed.flatMap((x): ListItem[] =>
+      typeof x === "string"
+        ? [{ text: x }]
+        : x && typeof x.text === "string"
+          ? [{ text: x.text, inCart: x.inCart === true }]
+          : [],
+    );
   } catch {
     return [];
   }
 }
 
-function saveList(list: string[]) {
+function saveList(list: ListItem[]) {
   try {
     if (list.length) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     else sessionStorage.removeItem(STORAGE_KEY);
@@ -94,8 +111,59 @@ function saveList(list: string[]) {
   }
 }
 
-function listText(list: string[]): string {
-  return list.map((l) => `• ${l}`).join("\n");
+function listText(list: ListItem[]): string {
+  return list.map((l) => (l.inCart ? `✓ ${l.text} (in cart)` : `• ${l.text}`)).join("\n");
+}
+
+function naira(n: number): string {
+  return `₦${n.toLocaleString("en-NG")}`;
+}
+
+/** Small Cloudinary thumbnail so suggestions load fast (full photos are 960px). */
+function thumb(url: string): string {
+  return url.includes("res.cloudinary.com/") && url.includes("/upload/")
+    ? url.replace("/upload/", "/upload/c_fill,w_96,h_96,q_auto,f_auto/")
+    : url;
+}
+
+function normalize(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+/**
+ * Catalog matches for what's being typed on the last line. A leading quantity
+ * ("2 rice") is ignored; every typed word must start a word in the name
+ * ("ri" finds Rice, not Periwinkles), and names that start with the query
+ * come first.
+ */
+function matchProducts(
+  catalog: ProductCardProps[],
+  typed: string,
+): ProductCardProps[] {
+  const lastLine = typed.split(/\r?\n/).pop() ?? "";
+  const query = normalize(lastLine.replace(/^\s*\d+(\.\d+)?\s*(x\s+)?/i, ""));
+  if (query.length < 2) return [];
+  const words = query.split(" ");
+  return catalog
+    .map((p) => ({ p, name: normalize(p.name) }))
+    .filter(({ name }) => {
+      const nameWords = name.split(" ");
+      return words.every((w) => nameWords.some((nw) => nw.startsWith(w)));
+    })
+    .sort((a, b) => {
+      const as = a.name.startsWith(query) ? 0 : 1;
+      const bs = b.name.startsWith(query) ? 0 : 1;
+      return as - bs || a.name.length - b.name.length;
+    })
+    .slice(0, MAX_SUGGESTIONS)
+    .map(({ p }) => p);
+}
+
+/** Leading number typed before the product, e.g. "3 yam" -> 3. */
+function typedQuantity(typed: string): number {
+  const lastLine = typed.split(/\r?\n/).pop() ?? "";
+  const n = parseInt(lastLine.trim(), 10);
+  return Number.isFinite(n) && n > 0 && n < 100 ? n : 1;
 }
 
 const AIAgent = () => {
@@ -108,19 +176,80 @@ const AIAgent = () => {
   ]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const listRef = useRef<string[] | null>(null);
+  const [catalog, setCatalog] = useState<ProductCardProps[]>([]);
+  // Quantity chosen in each suggestion row, by product id.
+  const [pickQty, setPickQty] = useState<Record<string, number>>({});
+  const { addItem } = useCartActions();
+  const listRef = useRef<ListItem[] | null>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // The list survives a page change (the chat lives on the marketplace page).
-  const getList = (): string[] => {
+  const getList = (): ListItem[] => {
     if (listRef.current === null) listRef.current = readSavedList();
     return listRef.current;
   };
-  const setList = (list: string[]) => {
+  const setList = (list: ListItem[]) => {
     listRef.current = list;
     saveList(list);
+  };
+
+  // Load the catalog once the chat is opened (cached by fetchProducts).
+  useEffect(() => {
+    if (!open || catalog.length) return;
+    fetchProducts()
+      .then(setCatalog)
+      .catch(() => {
+        /* no suggestions; typed lists still work */
+      });
+  }, [open, catalog.length]);
+
+  const suggestions = useMemo(
+    () => (sending ? [] : matchProducts(catalog, input)),
+    [catalog, input, sending],
+  );
+  const defaultQty = typedQuantity(input);
+  const qtyFor = (id: string) => pickQty[id] ?? defaultQty;
+
+  const changeQty = (id: string, delta: number) => {
+    setPickQty((prev) => ({
+      ...prev,
+      [id]: Math.min(99, Math.max(1, (prev[id] ?? defaultQty) + delta)),
+    }));
+  };
+
+  /** Puts a suggested product in the cart and on the list, then clears the line. */
+  const pickProduct = (product: ProductCardProps) => {
+    const qty = qtyFor(product.id);
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.imageURL,
+        unit: product.more,
+      },
+      qty,
+    );
+
+    const label = `${product.name} × ${qty}${product.more ? ` (${product.more})` : ""} – ${naira(product.price * qty)}`;
+    const list = [...getList(), { text: label, inCart: true }];
+    setList(list);
+
+    // Keep any earlier lines the customer typed; drop the one just matched.
+    const lines = input.split(/\r?\n/);
+    lines.pop();
+    setInput(lines.join("\n"));
+    setPickQty({});
+
+    appendMessage("user", `${product.name} × ${qty}`);
+    appendMessage(
+      "assistant",
+      `Added to your cart ✓\n\nYour list so far:\n${listText(list)}\n\nAnything else? Keep typing, or tap "That's all".`,
+      ["add_more", "checkout", "send"],
+    );
+    inputRef.current?.focus();
   };
 
   const closeChat = () => {
@@ -245,12 +374,17 @@ const AIAgent = () => {
       return;
     }
 
-    const list = [...getList(), ...toLines(trimmed)];
+    const list: ListItem[] = [
+      ...getList(),
+      ...toLines(trimmed).map((text) => ({ text })),
+    ];
     setList(list);
     appendMessage(
       "assistant",
       `Got it! Your list so far:\n${listText(list)}\n\nAnything else to add? You can type more, browse the market, or send your order.`,
-      ["add_more", "browse", "send"],
+      list.some((l) => l.inCart)
+        ? ["add_more", "checkout", "send"]
+        : ["add_more", "browse", "send"],
     );
   };
 
@@ -262,6 +396,21 @@ const AIAgent = () => {
       appendMessage("assistant", "Your list is empty. Type what you want to buy first.");
       return;
     }
+
+    // Products already in the cart are paid for at checkout; only the items
+    // we couldn't match go to an admin, so nothing is ordered twice.
+    const forAdmin = list.filter((l) => !l.inCart);
+    const inCart = list.filter((l) => l.inCart);
+    if (forAdmin.length === 0) {
+      setList([]);
+      appendMessage(
+        "assistant",
+        `Your ${inCart.length === 1 ? "item is" : "items are"} in your cart. Tap "Go to checkout" to choose delivery and pay.`,
+        ["checkout"],
+      );
+      return;
+    }
+
     const token = getToken();
     if (!token || (ready && !customer)) {
       appendMessage(
@@ -274,9 +423,20 @@ const AIAgent = () => {
 
     setSending(true);
     try {
-      const result = await submitChatList(list, token);
+      const result = await submitChatList(
+        forAdmin.map((l) => l.text),
+        token,
+      );
       setList([]);
-      appendMessage("assistant", `✅ ${result.message}`);
+      if (inCart.length) {
+        appendMessage(
+          "assistant",
+          `✅ ${result.message}\n\nThe items in your cart are separate: tap "Go to checkout" to pay for them.`,
+          ["checkout"],
+        );
+      } else {
+        appendMessage("assistant", `✅ ${result.message}`);
+      }
     } catch (err) {
       appendMessage(
         "assistant",
@@ -357,10 +517,10 @@ const AIAgent = () => {
                   {message.actions && message.id === lastAssistantId && (
                     <div className="ml-4 mt-1 flex flex-wrap gap-2">
                       {message.actions.map((action) =>
-                        action === "login" ? (
+                        action === "login" || action === "checkout" ? (
                           <Link
                             key={action}
-                            href="/login"
+                            href={action === "login" ? "/login" : "/checkout"}
                             onClick={closeChat}
                             className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
                           >
@@ -416,6 +576,66 @@ const AIAgent = () => {
           </div>
 
           <div className="p-3 py-5 bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.04)] flex flex-col gap-2">
+            {suggestions.length > 0 && (
+              <ul
+                aria-label="Matching products"
+                className="max-h-64 overflow-y-auto rounded-xl border border-green-100 divide-y divide-grey-50"
+              >
+                {suggestions.map((p) => {
+                  const qty = qtyFor(p.id);
+                  return (
+                    <li key={p.id} className="flex items-center gap-2 p-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={thumb(p.imageURL)}
+                        alt=""
+                        className="h-10 w-10 shrink-0 rounded-lg object-cover bg-grey-50"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-black">
+                          {p.name}
+                        </p>
+                        <p className="truncate body-xsmall text-grey-400">
+                          {naira(p.price)}
+                          {p.more ? ` / ${p.more}` : ""}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button
+                          type="button"
+                          aria-label={`Fewer ${p.name}`}
+                          onClick={() => changeQty(p.id, -1)}
+                          disabled={qty <= 1}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-grey-100 text-grey-500 disabled:opacity-40"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="w-6 text-center text-sm font-semibold" aria-live="polite">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label={`More ${p.name}`}
+                          onClick={() => changeQty(p.id, 1)}
+                          disabled={qty >= 99}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-grey-100 text-grey-500 disabled:opacity-40"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Add ${qty} ${p.name} to cart`}
+                          onClick={() => pickProduct(p)}
+                          className="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
             <div className="bg-[#F4F4F4] w-full p-4 flex items-end gap-2 rounded-xl">
               <textarea
                 ref={inputRef}
