@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { cancelOrder, confirmOrder } from "@/lib/orders";
 import { fetchReviewForOrder, Review } from "@/lib/reviews";
 import ReviewModal from "./ReviewModal";
+import { useReorder } from "@/lib/reorder";
 
 const statusVariants = {
   "in progress": "bg-warning-50 text-warning-500",
@@ -75,6 +76,11 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [review, setReview] = useState<Review | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const { reorder, reordering } = useReorder();
+  const handleReorder = (e: React.MouseEvent) => {
+    e.stopPropagation(); // don't also open the order drawer
+    void reorder(props.items);
+  };
 
   useEffect(() => {
     if (props.status !== "successful") return;
@@ -180,8 +186,10 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             variant="primary"
             leftIcon={<Repeat />}
             className="flex-1"
+            onClick={handleReorder}
+            isDisabled={reordering}
           >
-            Reorder
+            {reordering ? "Adding…" : "Reorder"}
           </Button>
         </div>
       </div>
@@ -249,8 +257,10 @@ const OrderItemRow = ({ onUpdated, ...props }: OrderItemRowProps) => {
             size="sm"
             variant="primary"
             leftIcon={<Repeat />}
+            onClick={handleReorder}
+            isDisabled={reordering}
           >
-            Reorder
+            {reordering ? "Adding…" : "Reorder"}
           </Button>
         </div>
       </div>

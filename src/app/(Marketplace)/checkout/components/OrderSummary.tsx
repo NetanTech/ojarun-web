@@ -17,6 +17,9 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+/** Must match the backend's MIN_LINE_TOTAL_NAIRA (default 500). */
+const MIN_LINE_TOTAL = 500;
+
 interface OrderSummaryProps {
   paymentMethod: "cash" | "card";
   note?: string;
@@ -57,8 +60,13 @@ const OrderSummary = ({
     hasItems && quote?.serviceable ? (quote.launchDiscount ?? null) : null;
   const total = Math.max(cart.subtotal + serviceFee + deliveryFee - discount, 0);
   const loggedOut = ready && !customer;
+  // Each line must come to at least ₦500 (the backend rejects smaller ones).
+  const smallLines = cart.lines.filter(
+    (line) => line.price > 0 && line.price * line.quantity < MIN_LINE_TOTAL,
+  );
   const canPlace =
     hasItems &&
+    smallLines.length === 0 &&
     !loggedOut &&
     !loading &&
     !quoteLoading &&
@@ -134,6 +142,24 @@ const OrderSummary = ({
                   <p className="text-grey-300 body-small">
                     {formatCurrency(line.price)}
                   </p>
+                  {line.price > 0 &&
+                    line.price * line.quantity < MIN_LINE_TOTAL && (
+                      <p className="body-xsmall text-amber-700">
+                        Minimum {formatCurrency(MIN_LINE_TOTAL)} per item.{" "}
+                        <button
+                          type="button"
+                          className="underline font-medium"
+                          onClick={() =>
+                            cart.setQuantity(
+                              line.id,
+                              Math.ceil(MIN_LINE_TOTAL / line.price),
+                            )
+                          }
+                        >
+                          Make it {Math.ceil(MIN_LINE_TOTAL / line.price)}
+                        </button>
+                      </p>
+                    )}
                 </div>
               </div>
 
@@ -206,6 +232,13 @@ const OrderSummary = ({
         )}
 
         {quoteError && <p className="text-sm text-red-600">{quoteError}</p>}
+
+        {smallLines.length > 0 && (
+          <p className="text-sm text-amber-700">
+            Each item must come to at least {formatCurrency(MIN_LINE_TOTAL)}.
+            Increase the quantity of: {smallLines.map((l) => l.name).join(", ")}.
+          </p>
+        )}
 
         {loggedOut && (
           <p className="text-sm text-red-600">
