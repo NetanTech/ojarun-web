@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="38" viewBox="2 10 60 38" fill="none">
+  <!-- Plate with a wrap of pounded yam and one of eba -->
+  <ellipse cx="32" cy="44.5" rx="28" ry="3.5" fill="#BCBEC0"/>
+  <ellipse cx="32" cy="40" rx="29" ry="6.5" fill="#D9D9D9"/>
+  <ellipse cx="32" cy="39" rx="24" ry="4.5" fill="#F5F5F5"/>
+  <!-- eba (yellow) -->
+  <path d="M31 39c0-12 5-20 12-20s12 8 12 20c-3 2-8 3-12 3s-9-1-12-3z" fill="#F2C14E"/>
+  <path d="M36 25c2-2 5-3 8-2" stroke="#F8D98A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M31 39c3 2 8 3 12 3s9-1 12-3c-4 1-8 1.5-12 1.5S35 40 31 39z" fill="#D9A632"/>
+  <!-- pounded yam (white) -->
+  <path d="M8 39c0-15 7-25 16-25s16 10 16 25c-3 2.5-10 4-16 4S11 41.5 8 39z" fill="#FFFDF5"/>
+  <path d="M8 39c3 2.5 10 4 16 4s13-1.5 16-4c-4 1-10 1.6-16 1.6S12 40 8 39z" fill="#E6DFCC"/>
+  <path d="M13 26c2-4 6-6 10-6" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M33 30c1 3 1 6 0 9" stroke="#ECE6D6" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

@@ -1,13 +1,13 @@
 export const Cats: CategoriesType[] = [
     // Names must match the product `category` values in the backend exactly (filter is a case-insensitive equals).
     { name: 'Fruits', icon: '/svg/CategoriesSvg/fresh-food.svg' },
-    { name: 'Vegetables', icon: '/svg/CategoriesSvg/fresh-food.svg' },
-    { name: 'Protein', icon: '/svg/CategoriesSvg/meals.svg' },
+    { name: 'Vegetables', icon: '/svg/CategoriesSvg/vegetables.svg' },
+    { name: 'Protein', icon: '/svg/CategoriesSvg/protein.svg' },
     { name: 'Soup Things', icon: '/svg/CategoriesSvg/meals.svg' },
-    { name: 'Swallows', icon: '/svg/CategoriesSvg/grains.svg' },
+    { name: 'Swallows', icon: '/svg/CategoriesSvg/swallows.svg' },
     { name: 'Staples & Grains', icon: '/svg/CategoriesSvg/grains.svg' },
-    { name: 'Spices', icon: '/svg/CategoriesSvg/sauce.svg' },
-    { name: 'Cooking Oil', icon: '/svg/CategoriesSvg/sauce.svg' },
+    { name: 'Spices', icon: '/svg/CategoriesSvg/spices.svg' },
+    { name: 'Cooking Oil', icon: '/svg/CategoriesSvg/cooking-oil.svg' },
     { name: 'Snacks/Nuts', icon: '/svg/CategoriesSvg/snacks.svg' },
     { name: 'Dairy & Beverages', icon: '/svg/CategoriesSvg/drinks.svg' },
 ];
