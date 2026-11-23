@@ -13,6 +13,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  // Makes the generated link-preview image URL absolute (WhatsApp needs that).
+  metadataBase: new URL("https://www.ojarun.com"),
   title: {
     default: "Ojarun — Bringing the Market to Your Doorstep",
     template: "%s | Ojarun",

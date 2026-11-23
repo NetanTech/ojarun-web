@@ -25,7 +25,12 @@ const faqs: FAQItem[] = [
   {
     question: "What happens if something is unavailable?",
     answer:
-      "If an item isn't available or doesn't meet our quality standard, your agent will flag it and handle it based on your stated preferences — substitution or removal.",
+      "If an item isn't available or doesn't meet our quality standard, your agent handles it the way you chose at checkout: call you first, replace it with something similar, or remove it from your order.",
+  },
+  {
+    question: "Where do you deliver?",
+    answer:
+      "We currently deliver within Ibadan only. The delivery fee depends on the distance from Bodija Market to your address, starting from ₦700, and you see the exact fee at checkout before you pay.",
   },
   {
     question: "How long does delivery take?",
@@ -45,7 +50,7 @@ export default function FAQ() {
   const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
-    <section className="relative w-full bg-white py-20 px-4">
+    <section id="faq" className="relative w-full bg-white py-20 px-4 scroll-mt-20">
 
       {/* Decorative grocery bag — Figma: 193×249, angle 23.81°. Sits beside FAQ accordion on the left, lower portion */}
       <div className="pointer-events-none absolute bottom-0 left-4 hidden sm:left-8 lg:left-18 lg:block">

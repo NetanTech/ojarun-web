@@ -10,7 +10,7 @@ import { useCustomerSession } from "@/lib/customerAuth";
 const navLinks = [
   { label: "Agents", href: "/#agent" },
   { label: "Riders", href: "/#rider" },
-  { label: "FAQs", href: "/faqs" },
+  { label: "FAQs", href: "/#faq" },
   { label: "About", href: "/about" },
   { label: "Contact us", href: "/contact-us" },
 ];
