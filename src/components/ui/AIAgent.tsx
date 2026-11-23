@@ -3,44 +3,69 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
-  DisLike,
-  Like,
   MessageIcon,
   Send,
-  ClipBoard,
   Logo,
   MessageIconUnread,
 } from "../../../public/svg/svg";
 import { MinusCircleIcon, X } from "lucide-react";
-import {
-  sendChatMessage,
-  ChatHistoryMessage,
-  OrderDraftItem,
-} from "@/lib/aiChat";
-import { fetchProducts } from "@/lib/products";
-import { useCart } from "@/lib/cart";
+import { submitChatList } from "@/lib/aiChat";
+import { getToken, useCustomerSession } from "@/lib/customerAuth";
 
-type ChatAction = { label: string; href: string };
+/**
+ * Order-only chat (owner's request): no AI and no small talk. The customer
+ * types or pastes what they want to buy, we read it back, and when they're
+ * done the list goes to the admin Messages inbox for a person to take up.
+ */
+
+type ChatAction = "add_more" | "browse" | "send" | "login";
 
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
   time: string;
-  /** Optional button shown under an assistant message, e.g. "Go to checkout". */
-  action?: ChatAction;
+  /** Buttons shown under an assistant message. Only the latest one is live. */
+  actions?: ChatAction[];
 };
 
 const WELCOME_MESSAGE =
-  "Hello, this is Ojarun agent, build to help make your shopping experience with us much easier. Type your question below or use our templates above to get started.";
+  "Hello! Type what you want to buy, or paste your shopping list, and an Ojarun admin will take up your order.";
 
-const SUGGESTIONS = [
-  "What's fresh today?",
-  "Help me build a shopping list",
-  "Suggest ingredients for jollof rice",
-];
+const INSTRUCTION =
+  "Type what you want to buy or paste your list. One item per line, e.g. “2 cups rice”, “Tomatoes ₦1,000”.";
 
-const MAX_HISTORY_MESSAGES = 20;
+const NOT_A_LIST =
+  "I can only take shopping lists here. Type what you want to buy, e.g. “3 tubers of yam, 1 crate of eggs”.";
+
+const ACTION_LABEL: Record<ChatAction, string> = {
+  add_more: "Add more",
+  browse: "Browse market",
+  send: "That's all, send my order",
+  login: "Log in to send",
+};
+
+const STORAGE_KEY = "ojarun_chat_list";
+
+// Greetings, thanks and questions aren't shopping items.
+const SMALL_TALK =
+  /^(hi+|hello+|hey+|good\s*(morning|afternoon|evening|night)|how\s+are\s+you|thanks?|thank\s+you|ok(ay)?|yes|no|please|help)\b[\s!.,?]*$/i;
+
+const DONE =
+  /^(no+|nope|nothing(\s+else)?|that'?s\s+all|done|send( it| my order)?|no,?\s+thanks?( you)?)[\s!.]*$/i;
+
+function isSmallTalk(text: string): boolean {
+  const t = text.trim();
+  return SMALL_TALK.test(t) || (t.endsWith("?") && !t.includes("\n"));
+}
+
+/** "rice, beans\n- yam" -> ["rice, beans", "yam"]: one entry per line, bullets dropped. */
+function toLines(text: string): string[] {
+  return text
+    .split(/\r?\n/)
+    .map((l) => l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim())
+    .filter(Boolean);
+}
 
 function now(): string {
   return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -50,140 +75,31 @@ function makeId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function mergeDraftItems(
-  prev: OrderDraftItem[],
-  incoming: OrderDraftItem[],
-): OrderDraftItem[] {
-  const byName = new Map(prev.map((item) => [item.name.toLowerCase(), item]));
-  for (const item of incoming) {
-    const key = item.name.toLowerCase();
-    const existing = byName.get(key);
-    // Same item, same unit mentioned again — treat it as more of the same
-    // rather than losing the earlier quantity (e.g. "2kg tomatoes" then
-    // later "1kg tomatoes" should total 3kg, not drop back to 1kg).
-    if (existing && existing.unit.toLowerCase() === item.unit.toLowerCase()) {
-      byName.set(key, { ...item, quantity: existing.quantity + item.quantity });
-    } else {
-      byName.set(key, item);
-    }
-  }
-  return Array.from(byName.values());
-}
-
-function formatDraftList(items: OrderDraftItem[]): string {
-  return items
-    .map((item) => `• ${item.quantity} ${item.unit} ${item.name}`)
-    .join("\n");
-}
-
-type MatchedItem = {
-  productId: string;
-  productName: string;
-  price: number;
-  image: string;
-  unit: string;
-  quantity: number;
-};
-
-// The AI only ever knows item names/quantities it inferred from chat — it has
-// no idea what's actually in the catalog or what it costs. Real matching and
-// pricing has to happen here, against the real product list, not the model's guess.
-function parseNairaWorth(unit: string): number | null {
-  const match = unit.match(/n\s*([\d,]+)\s*worth/i);
-  if (!match) return null;
-  const amount = Number(match[1].replace(/,/g, ""));
-  return Number.isFinite(amount) && amount > 0 ? amount : null;
-}
-
-/** Lowercase, drop bracketed notes and punctuation: "Fresh Pepper (Ata Rodo)" -> "fresh pepper". */
-function normalizeName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/\([^)]*\)/g, " ")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-type AmbiguousItem = { item: OrderDraftItem; options: string[] };
-
-/**
- * Finds the one product an item refers to. Exact name first, then the same
- * name ignoring brackets/punctuation, then a partial match, but only when
- * exactly one product fits. Several partial matches ("pepper") are returned
- * as options so the customer can choose, instead of us guessing.
- */
-function findProduct(
-  catalog: ProductCardProps[],
-  itemName: string,
-): { product: ProductCardProps } | { options: ProductCardProps[] } | null {
-  const lower = itemName.trim().toLowerCase();
-  const exact = catalog.find((p) => p.name.toLowerCase() === lower);
-  if (exact) return { product: exact };
-
-  const norm = normalizeName(itemName);
-  if (!norm) return null;
-  const sameName = catalog.filter((p) => normalizeName(p.name) === norm);
-  if (sameName.length === 1) return { product: sameName[0] };
-  if (sameName.length > 1) return { options: sameName };
-
-  const partial = catalog.filter((p) => {
-    const pn = normalizeName(p.name);
-    return pn.includes(norm) || (pn.length >= 3 && norm.includes(pn));
-  });
-  if (partial.length === 1) return { product: partial[0] };
-  if (partial.length > 1) return { options: partial };
-  return null;
-}
-
-async function matchDraftItemsToProducts(items: OrderDraftItem[]): Promise<{
-  matched: MatchedItem[];
-  unmatched: OrderDraftItem[];
-  ambiguous: AmbiguousItem[];
-}> {
-  const matched: MatchedItem[] = [];
-  const unmatched: OrderDraftItem[] = [];
-  const ambiguous: AmbiguousItem[] = [];
-
-  // One catalog fetch for the whole list — not one API call per item.
-  let catalog: ProductCardProps[] = [];
+function readSavedList(): string[] {
   try {
-    catalog = await fetchProducts();
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
   } catch {
-    catalog = [];
+    return [];
   }
+}
 
-  for (const item of items) {
-    const found = findProduct(catalog, item.name);
-
-    if (!found) {
-      unmatched.push(item);
-      continue;
-    }
-    if ("options" in found) {
-      ambiguous.push({ item, options: found.options.slice(0, 5).map((p) => p.name) });
-      continue;
-    }
-    const best = found.product;
-
-    const nairaWorth = parseNairaWorth(item.unit);
-    const quantity = nairaWorth
-      ? Math.max(1, Math.round(nairaWorth / best.price))
-      : Math.max(1, Math.round(item.quantity) || 1);
-
-    matched.push({
-      productId: best.id,
-      productName: best.name,
-      price: best.price,
-      image: best.imageURL,
-      unit: best.more,
-      quantity,
-    });
+function saveList(list: string[]) {
+  try {
+    if (list.length) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    else sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    /* ignore */
   }
+}
 
-  return { matched, unmatched, ambiguous };
+function listText(list: string[]): string {
+  return list.map((l) => `• ${l}`).join("\n");
 }
 
 const AIAgent = () => {
+  const { customer, ready } = useCustomerSession();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(true);
   const [showNudge, setShowNudge] = useState(false);
@@ -192,10 +108,20 @@ const AIAgent = () => {
   ]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const draftItemsRef = useRef<OrderDraftItem[]>([]);
+  const listRef = useRef<string[] | null>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
-  const { addItem } = useCart();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // The list survives a page change (the chat lives on the marketplace page).
+  const getList = (): string[] => {
+    if (listRef.current === null) listRef.current = readSavedList();
+    return listRef.current;
+  };
+  const setList = (list: string[]) => {
+    listRef.current = list;
+    saveList(list);
+  };
 
   const closeChat = () => {
     setOpen(false);
@@ -213,6 +139,15 @@ const AIAgent = () => {
     } catch {
       /* ignore */
     }
+    // Picking up a list started earlier in this visit.
+    const saved = getList();
+    if (saved.length && messages.length === 1) {
+      appendMessage(
+        "assistant",
+        `Your list so far:\n${listText(saved)}\n\nAnything else to add?`,
+        ["add_more", "browse", "send"],
+      );
+    }
   };
 
   const dismissNudge = (e: React.MouseEvent) => {
@@ -225,7 +160,7 @@ const AIAgent = () => {
     }
   };
 
-  // Pop-out tip so the assistant is hard to miss on first visit this session.
+  // Pop-out tip so the chat is hard to miss on first visit this session.
   useEffect(() => {
     if (open) return;
     let seen = false;
@@ -283,126 +218,97 @@ const AIAgent = () => {
   const appendMessage = (
     role: ChatMessage["role"],
     content: string,
-    action?: ChatAction,
+    actions?: ChatAction[],
   ) => {
     setMessages((prev) => [
       ...prev,
-      { id: makeId(), role, content, time: now(), action },
+      { id: makeId(), role, content, time: now(), actions },
     ]);
   };
 
-  const handleSend = async (text: string) => {
+  const handleSend = (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || sending) return;
 
-    const history: ChatHistoryMessage[] = messages
-      .slice(-MAX_HISTORY_MESSAGES)
-      .map((m) => ({ role: m.role, content: m.content }));
+    setInput("");
+
+    // "No" to "anything else?" means they're done.
+    if (getList().length > 0 && DONE.test(trimmed)) {
+      void sendOrder(trimmed);
+      return;
+    }
 
     appendMessage("user", trimmed);
-    setInput("");
+
+    if (isSmallTalk(trimmed)) {
+      appendMessage("assistant", NOT_A_LIST);
+      return;
+    }
+
+    const list = [...getList(), ...toLines(trimmed)];
+    setList(list);
+    appendMessage(
+      "assistant",
+      `Got it! Your list so far:\n${listText(list)}\n\nAnything else to add? You can type more, browse the market, or send your order.`,
+      ["add_more", "browse", "send"],
+    );
+  };
+
+  const sendOrder = async (typed?: string) => {
+    const list = getList();
+    if (sending) return;
+    appendMessage("user", typed ?? "That's all, send my order");
+    if (list.length === 0) {
+      appendMessage("assistant", "Your list is empty. Type what you want to buy first.");
+      return;
+    }
+    const token = getToken();
+    if (!token || (ready && !customer)) {
+      appendMessage(
+        "assistant",
+        "Please log in so our admin knows who the order is for. Your list is saved and will be here when you come back.",
+        ["login"],
+      );
+      return;
+    }
+
     setSending(true);
-
     try {
-      const result = await sendChatMessage(trimmed, history);
-
-      if (result.type === "text") {
-        appendMessage("assistant", result.content);
-      } else if (result.type === "draft_update") {
-        draftItemsRef.current = mergeDraftItems(
-          draftItemsRef.current,
-          result.items,
-        );
-        const list = formatDraftList(draftItemsRef.current);
-        const addressLine = result.deliveryAddress
-          ? `\n\nDelivery to: ${result.deliveryAddress}`
-          : "";
-        appendMessage(
-          "assistant",
-          `Got it! Here's your list so far:\n${list}${addressLine}\n\nAnything else, or say "that's all" when you're ready?`,
-        );
-      } else if (draftItemsRef.current.length === 0) {
-        appendMessage(
-          "assistant",
-          `Let's get your list started first — tell me what you'd like to buy.`,
-        );
-      } else {
-        const { matched, unmatched, ambiguous } = await matchDraftItemsToProducts(
-          draftItemsRef.current,
-        );
-        draftItemsRef.current = [];
-
-        for (const item of matched) {
-          addItem(
-            {
-              id: item.productId,
-              name: item.productName,
-              price: item.price,
-              image: item.image,
-              unit: item.unit,
-            },
-            item.quantity,
-          );
-        }
-
-        const parts: string[] = [];
-        if (matched.length > 0) {
-          const addedLines = matched
-            .map(
-              (m) =>
-                `• ${m.quantity} x ${m.productName} (₦${m.price.toLocaleString()} each)`,
-            )
-            .join("\n");
-          parts.push(`Added to your cart:\n${addedLines}`);
-        }
-        if (ambiguous.length > 0) {
-          const questions = ambiguous
-            .map((a) => `• "${a.item.name}": ${a.options.join(", ")}`)
-            .join("\n");
-          parts.push(
-            `I wasn't sure which one you meant, so I didn't add these yet:\n${questions}\n\nTell me which one (and how much), then say "that's all" again.`,
-          );
-        }
-        if (unmatched.length > 0) {
-          const missingLines = unmatched
-            .map((i) => `• ${i.name}`)
-            .join("\n");
-          parts.push(
-            `We don't sell these yet, or I couldn't find them:\n${missingLines}`,
-          );
-        }
-        if (matched.length === 0 && ambiguous.length === 0) {
-          parts.push(
-            `Nothing on your list matched a product we sell. Try searching the marketplace directly.`,
-          );
-        }
-
-        appendMessage(
-          "assistant",
-          parts.join("\n\n"),
-          matched.length > 0
-            ? { label: "Go to checkout", href: "/checkout" }
-            : undefined,
-        );
-      }
+      const result = await submitChatList(list, token);
+      setList([]);
+      appendMessage("assistant", `✅ ${result.message}`);
     } catch (err) {
       appendMessage(
         "assistant",
         err instanceof Error
           ? err.message
-          : "Sorry, something went wrong. Please try again.",
+          : "Sorry, your list didn't go through. Please try again.",
+        ["send"],
       );
     } finally {
       setSending(false);
     }
   };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleAction = (action: ChatAction) => {
+    if (action === "add_more") {
+      inputRef.current?.focus();
+    } else if (action === "browse") {
+      closeChat();
+    } else if (action === "send") {
+      void sendOrder();
+    }
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter sends; Shift+Enter adds a new line for a longer list.
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend(input);
     }
   };
+
+  const lastAssistantId = [...messages].reverse().find((m) => m.role === "assistant")?.id;
 
   return (
     <div className="fixed flex flex-col bottom-3 right-3 z-50">
@@ -416,14 +322,21 @@ const AIAgent = () => {
               <div className="w-12.5 flex items-center justify-center h-12.5 bg-green-500 rounded-full overflow-hidden">
                 <Logo className="w-7.5 h-7.5" />
               </div>
-              <p className="text-lg font-semibold text-white capitalize">
-                Ojarun Agent
-              </p>
+              <div className="flex flex-col">
+                <p className="text-lg font-semibold text-white capitalize">
+                  Ojarun Orders
+                </p>
+                <p className="text-xs text-white/80">Send us your shopping list</p>
+              </div>
             </div>
-            <button onClick={closeChat}>
+            <button onClick={closeChat} aria-label="Close chat">
               <X className="block md:hidden" />
               <MinusCircleIcon className="hidden md:block" />
             </button>
+          </div>
+
+          <div className="px-3 py-2 bg-green-50 text-primary body-xsmall border-b border-green-100">
+            {INSTRUCTION}
           </div>
 
           <div
@@ -434,62 +347,48 @@ const AIAgent = () => {
               message.role === "assistant" ? (
                 <div
                   key={message.id}
-                  className="flex flex-col h-fit gap-0.5 items-start ml-2 self-start max-w-[75%]"
+                  className="flex flex-col h-fit gap-0.5 items-start ml-2 self-start max-w-[80%]"
                 >
-                  <div className="w-full ml-4 p-3 bg-green-300 rounded-bl-none rounded-2xl relative">
+                  <div className="w-full ml-4 p-3 bg-green-300 rounded-bl-none rounded-2xl">
                     <p className="text-white body-small whitespace-pre-line">
                       {message.content}
                     </p>
-
-                    <div className="bg-primary md:flex items-center gap-2 hidden md:-bottom-2 right-2 absolute p-1.5 rounded-xl">
-                      <button
-                        onClick={() =>
-                          navigator.clipboard?.writeText(message.content)
-                        }
-                      >
-                        <ClipBoard />
-                      </button>
-                      <button>
-                        <Like />
-                      </button>
-                      <button>
-                        <DisLike />
-                      </button>
-                    </div>
                   </div>
-                  {message.action && (
-                    <Link
-                      href={message.action.href}
-                      onClick={closeChat}
-                      className="ml-4 mt-1 inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
-                    >
-                      {message.action.label}
-                    </Link>
+                  {message.actions && message.id === lastAssistantId && (
+                    <div className="ml-4 mt-1 flex flex-wrap gap-2">
+                      {message.actions.map((action) =>
+                        action === "login" ? (
+                          <Link
+                            key={action}
+                            href="/login"
+                            onClick={closeChat}
+                            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white"
+                          >
+                            {ACTION_LABEL[action]}
+                          </Link>
+                        ) : (
+                          <button
+                            key={action}
+                            type="button"
+                            disabled={sending}
+                            onClick={() => handleAction(action)}
+                            className={
+                              action === "send"
+                                ? "inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                                : "inline-flex items-center justify-center rounded-full border border-primary bg-white px-4 py-2 text-sm font-semibold text-primary disabled:opacity-50"
+                            }
+                          >
+                            {ACTION_LABEL[action]}
+                          </button>
+                        ),
+                      )}
+                    </div>
                   )}
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-start gap-3">
-                      <div className="w-12.5 flex items-center justify-center h-12.5 bg-green-500 rounded-full overflow-hidden">
-                        <Logo className="w-7.5 h-7.5" />
-                      </div>
-
-                      <p className="text-grey-300 body-xsmall">{message.time}</p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-12.5 flex items-center justify-center h-12.5 bg-green-500 rounded-full overflow-hidden">
+                      <Logo className="w-7.5 h-7.5" />
                     </div>
-
-                    <div className="bg-primary flex items-center gap-2 md:hidden p-1.5 rounded-xl">
-                      <button
-                        onClick={() =>
-                          navigator.clipboard?.writeText(message.content)
-                        }
-                      >
-                        <ClipBoard />
-                      </button>
-                      <button>
-                        <Like />
-                      </button>
-                      <button>
-                        <DisLike />
-                      </button>
-                    </div>
+                    <p className="text-grey-300 body-xsmall">{message.time}</p>
                   </div>
                 </div>
               ) : (
@@ -510,43 +409,29 @@ const AIAgent = () => {
             {sending && (
               <div className="flex flex-col h-fit gap-0.5 items-start ml-2 self-start max-w-[75%]">
                 <div className="w-full ml-4 p-3 bg-green-300 rounded-bl-none rounded-2xl">
-                  <p className="text-white body-small">Typing...</p>
+                  <p className="text-white body-small">Sending your list...</p>
                 </div>
               </div>
             )}
-
           </div>
 
           <div className="p-3 py-5 bg-white shadow-[0_-2px_6px_rgba(0,0,0,0.04)] flex flex-col gap-2">
-            <div
-              className="flex items-center gap-3 overflow-x-auto w-full"
-              style={{ scrollbarWidth: "none" }}
-            >
-              {SUGGESTIONS.map((suggestion) => (
-                <button
-                  key={suggestion}
-                  type="button"
-                  onClick={() => handleSend(suggestion)}
-                  disabled={sending}
-                  className="body-xsmall p-1.5 px-2 rounded-lg bg-[#F4F4F4] shrink-0 disabled:opacity-50"
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-            <div className="bg-[#F4F4F4] w-full p-4 flex items-center gap-2 rounded-xl">
-              <input
-                type="text"
+            <div className="bg-[#F4F4F4] w-full p-4 flex items-end gap-2 rounded-xl">
+              <textarea
+                ref={inputRef}
+                rows={1}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Type your message here..."
+                placeholder="Type what you want to buy..."
                 disabled={sending}
-                className="focus-within:outline-0 flex-1 bg-transparent"
+                maxLength={2000}
+                className="focus-within:outline-0 flex-1 bg-transparent resize-none max-h-32"
               />
 
               <button
                 type="button"
+                aria-label="Add to list"
                 onClick={() => handleSend(input)}
                 disabled={sending || !input.trim()}
                 className="disabled:opacity-50"
@@ -577,9 +462,9 @@ const AIAgent = () => {
                 onClick={openChat}
                 className="w-full text-left"
               >
-                <p className="text-xs font-semibold text-primary">Ojarun Agent</p>
+                <p className="text-xs font-semibold text-primary">Ojarun Orders</p>
                 <p className="mt-0.5 text-sm leading-5 text-grey-500">
-                  Need help shopping? Tap to chat — I can build your list 👋
+                  Send us your shopping list and we&apos;ll handle the rest 🛒
                 </p>
               </button>
               <span
@@ -601,7 +486,7 @@ const AIAgent = () => {
             />
             <button
               type="button"
-              aria-label="Open Ojarun shopping assistant"
+              aria-label="Open Ojarun order chat"
               className="relative z-10 rounded-full w-14 h-14 flex items-center justify-center bg-primary shadow-[0_10px_28px_rgba(0,74,25,0.35)] ring-2 ring-white/80 transition-transform active:scale-95"
               onClick={openChat}
             >
