@@ -43,3 +43,32 @@ export async function sendChatMessage(
 
   return data as AiChatResponse;
 }
+
+/**
+ * Order-only chat: sends the customer's typed list to the Ojarun admins
+ * (it lands in the admin Messages inbox). Needs the customer to be logged in.
+ */
+export async function submitChatList(
+  entries: string[],
+  token: string,
+): Promise<{ id: string; message: string }> {
+  const res = await fetch(`${API_URL}/customer-chat/list`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ entries }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    const errorMessage = Array.isArray(data.message)
+      ? data.message.join(", ")
+      : data.message || "Could not send your list. Please try again.";
+    throw new Error(errorMessage);
+  }
+
+  return data as { id: string; message: string };
+}
