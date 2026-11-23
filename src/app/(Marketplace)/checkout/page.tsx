@@ -9,6 +9,10 @@ import DeliveryNote from "./components/DeliveryNote";
 import PromoCode from "./components/PromoCode";
 import BankTransfer from "./components/BankTransfer";
 import OrderSummary from "./components/OrderSummary";
+import UnavailablePreference, {
+  UnavailableChoice,
+  unavailableNoteLine,
+} from "./components/UnavailablePreference";
 import { PromoValidation } from "@/lib/orders";
 import {
   DeliverySelection,
@@ -20,6 +24,11 @@ const Page = () => {
   const pathName = usePathname();
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card">("cash");
   const [note, setNote] = useState("");
+  const [unavailable, setUnavailable] = useState<UnavailableChoice>("call");
+  // The agent sees the substitution choice first, then any delivery note.
+  const orderNote = [unavailableNoteLine(unavailable), note.trim()]
+    .filter(Boolean)
+    .join("\n");
   const [appliedPromo, setAppliedPromo] = useState<PromoValidation | null>(null);
   const [delivery, setDelivery] = useState<DeliverySelection | null>(null);
   const [quote, setQuote] = useState<DeliveryQuote | null>(null);
@@ -92,6 +101,15 @@ const Page = () => {
         <div className="flex flex-col lg:flex-row items-start gap-2 w-full">
           <div className="flex-1 w-full bg-white rounded-xl p-5 flex flex-col gap-5">
             <DeliveryAddress selected={delivery} onSelect={setDelivery} />
+            <p className="-mt-3 text-grey-300 body-small">
+              We currently deliver within Ibadan only. The delivery fee
+              depends on the distance from Bodija Market to your address.
+            </p>
+
+            <UnavailablePreference
+              value={unavailable}
+              onChange={setUnavailable}
+            />
 
             <DeliveryNote note={note} onSave={setNote} />
 
@@ -124,7 +142,7 @@ const Page = () => {
 
           <OrderSummary
             paymentMethod={paymentMethod}
-            note={note}
+            note={orderNote}
             promo={appliedPromo}
             delivery={delivery}
             quote={quote}
