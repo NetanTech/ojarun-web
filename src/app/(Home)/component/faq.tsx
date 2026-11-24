@@ -30,7 +30,7 @@ const faqs: FAQItem[] = [
   {
     question: "Where do you deliver?",
     answer:
-      "We currently deliver within Ibadan only. The delivery fee depends on the distance from Bodija Market to your address, starting from ₦700, and you see the exact fee at checkout before you pay.",
+      "We currently deliver within Ibadan only. Delivery is ₦1,300 for up to 4 km from UI Second Gate; farther than that it's ₦700 plus ₦190 per km. You see the exact fee at checkout before you pay.",
   },
   {
     question: "How long does delivery take?",

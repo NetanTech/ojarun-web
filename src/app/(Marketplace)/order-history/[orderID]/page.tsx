@@ -40,8 +40,8 @@ const item = {
   },
 };
 
-// Bodija Market, Ibadan. Used until the API sends the order's own pickup point.
-const DEFAULT_PICKUP = { name: "Bodija Market, Ibadan", lat: 7.4359015, lng: 3.9157404 };
+// UI Second Gate, Ibadan (delivery origin). Used until the API sends the order's own pickup point.
+const DEFAULT_PICKUP = { name: "UI Second Gate, Ibadan", lat: 7.4503374, lng: 3.907946 };
 
 function stageFromTimeline(
   status: OrderProperties["status"],
