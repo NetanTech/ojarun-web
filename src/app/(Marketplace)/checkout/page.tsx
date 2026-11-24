@@ -103,7 +103,7 @@ const Page = () => {
             <DeliveryAddress selected={delivery} onSelect={setDelivery} />
             <p className="-mt-3 text-grey-300 body-small">
               We currently deliver within Ibadan only. The delivery fee
-              depends on the distance from Bodija Market to your address.
+              depends on the distance from UI Second Gate to your address.
             </p>
 
             <UnavailablePreference
