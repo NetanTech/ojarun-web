@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Home, SafeDelivery } from "../../../../public/svg/svg";
 import DeliveryAddress from "./components/DeliveryAddress";
 import DeliveryNote from "./components/DeliveryNote";
+import DeliveryTime from "./components/DeliveryTime";
 import PromoCode from "./components/PromoCode";
 import BankTransfer from "./components/BankTransfer";
 import OrderSummary from "./components/OrderSummary";
@@ -105,6 +106,8 @@ const Page = () => {
               We currently deliver within Ibadan only. The delivery fee
               depends on the distance from UI Second Gate to your address.
             </p>
+
+            <DeliveryTime />
 
             <UnavailablePreference
               value={unavailable}
