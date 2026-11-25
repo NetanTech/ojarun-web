@@ -33,9 +33,9 @@ const faqs: FAQItem[] = [
       "We currently deliver within Ibadan only. Delivery is ₦1,300 for up to 4 km from UI Second Gate; farther than that it's ₦700 plus ₦190 per km. You see the exact fee at checkout before you pay.",
   },
   {
-    question: "How long does delivery take?",
+    question: "When will my order arrive?",
     answer:
-      "Delivery times vary by location, but most orders are fulfilled and delivered within a few hours of placement during operating hours.",
+      "We deliver four times a day: 9 am, 12 pm, 3 pm and 6 pm. Orders placed between 7 am and 10 am arrive at 12 pm, between 10 am and 1 pm at 3 pm, and between 1 pm and 4 pm at 6 pm. Orders placed after 4 pm arrive at 9 am the next morning. Checkout shows your delivery time before you place the order.",
   },
   {
     question: "Which markets do we pick up from?",
