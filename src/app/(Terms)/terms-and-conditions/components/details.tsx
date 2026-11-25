@@ -131,8 +131,13 @@ const sections: Section[] = [
       {
         type: "list",
         items: [
-          "Standard delivery: within 3 hours of order confirmation.",
-          "Delivery times depend on traffic, market availability, and your location.",
+          "We deliver four times a day: 9 am, 12 pm, 3 pm and 6 pm (Nigeria time).",
+          "Orders placed between 7 am and 10 am are delivered at 12 pm the same day.",
+          "Orders placed between 10 am and 1 pm are delivered at 3 pm the same day.",
+          "Orders placed between 1 pm and 4 pm are delivered at 6 pm the same day.",
+          "Orders placed after 4 pm are delivered at 9 am the next morning.",
+          "Your delivery time is shown at checkout before you place the order.",
+          "Actual arrival may vary slightly with traffic, market availability, and your location.",
         ],
       },
       {
