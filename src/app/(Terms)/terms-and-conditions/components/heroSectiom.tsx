@@ -32,7 +32,7 @@ export default function HeroSection() {
             Terms and Conditions
           </h1>
           <p className="mt-4  text-sm sm:text-base leading-relaxed text-white/60">
-            Last updated on May 15, 2026.
+            Last updated on November 25, 2026.
           </p>
         </motion.div>
 
