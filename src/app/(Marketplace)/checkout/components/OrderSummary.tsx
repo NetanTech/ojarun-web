@@ -14,6 +14,7 @@ import {
   DeliverySelection,
   computeServiceFee,
 } from "@/lib/delivery";
+import { getDeliverySlot } from "@/lib/deliverySchedule";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -91,7 +92,10 @@ const OrderSummary = ({
         lat: delivery.lat,
         lng: delivery.lng,
         paymentMethod,
-        note: note?.trim() || undefined,
+        // Slot is taken at the moment of ordering, so agents see the run it belongs to.
+        note: [`Delivery: ${getDeliverySlot().label}`, note?.trim()]
+          .filter(Boolean)
+          .join("\n"),
         promoCode: promo?.code,
       });
 
