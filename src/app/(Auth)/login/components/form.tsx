@@ -9,6 +9,7 @@ import {
   useCustomerSession,
   warmUpBackend,
 } from "@/lib/customerAuth";
+import { takeReturnTo } from "@/lib/returnTo";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function LoginForm() {
     try {
       const { accessToken, customer } = await loginCustomer({ phone, password });
       login(accessToken, customer);
-      router.push("/marketplace");
+      router.push(takeReturnTo());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

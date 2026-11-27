@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { WhatsAppIcon } from "../../public/svg/svg";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 
 export default function SubFooter({ className = "" }: { className?: string }) {
@@ -43,13 +42,10 @@ export default function SubFooter({ className = "" }: { className?: string }) {
 
             {/* Get started button — Figma: padding 12/24, radius 8 */}
             <Link
-              href="https://wa.me/2348025957234"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/marketplace"
               className="inline-flex items-center justify-center gap-2 self-center rounded-lg bg-primary px-6 py-3 text-base font-medium leading-6 tracking-[-0.02em] text-white sm:self-start"
             >
-              <WhatsAppIcon className="h-5 w-5 shrink-0" />
-              Get started on WhatsApp
+              Get started
             </Link>
           </motion.div>
 

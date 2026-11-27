@@ -5,6 +5,7 @@ import { LogOut, User } from "../../../../public/svg/svg";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { rememberReturnTo } from "@/lib/returnTo";
 import { useCustomerSession } from "@/lib/customerAuth";
 
 
@@ -112,7 +113,10 @@ const MobileMenu = ({ isOpen, onClose, routes }: MobileMenuProps) => {
               ) : (
                 <Link
                   href="/login"
-                  onClick={onClose}
+                  onClick={() => {
+                    rememberReturnTo(pathName);
+                    onClose();
+                  }}
                   className="flex items-center gap-4 text-green-500 w-full py-2"
                 >
                   <LogOut />

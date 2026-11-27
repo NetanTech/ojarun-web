@@ -17,6 +17,7 @@ import {
 import { getDeliverySlot } from "@/lib/deliverySchedule";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { rememberReturnTo } from "@/lib/returnTo";
 
 /** Must match the backend's MIN_LINE_TOTAL_NAIRA (default 500). */
 const MIN_LINE_TOTAL = 500;
@@ -246,7 +247,11 @@ const OrderSummary = ({
 
         {loggedOut && (
           <p className="text-sm text-red-600">
-            <Link href="/login" className="underline font-medium">
+            <Link
+              href="/login"
+              onClick={() => rememberReturnTo("/checkout")}
+              className="underline font-medium"
+            >
               Log in
             </Link>{" "}
             to place your order.
