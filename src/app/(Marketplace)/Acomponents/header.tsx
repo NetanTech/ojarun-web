@@ -19,6 +19,7 @@ import { Menu, X } from "lucide-react";
 import CartDrawer from "./CartDialog";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { rememberReturnTo } from "@/lib/returnTo";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import MobileMenu from "./MobileMenu";
@@ -163,6 +164,7 @@ const Header = () => {
           {!ready ? null : !customer ? (
             <Link
               href="/login"
+              onClick={() => rememberReturnTo(pathName)}
               className="bg-white text-black px-3 py-2 flex rounded-md text-sm font-medium items-center justify-center"
             >
               Login

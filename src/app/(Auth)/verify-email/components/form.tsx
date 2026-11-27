@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { takeReturnTo } from "@/lib/returnTo";
 import {
   verifyOtp,
   resendOtp,
@@ -76,7 +77,7 @@ export default function VerifyForm() {
       const { accessToken, customer } = await verifyOtp(email, otp.join(""));
       login(accessToken, customer);
       clearPendingEmail();
-      router.push("/marketplace");
+      router.push(takeReturnTo());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
